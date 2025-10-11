@@ -1,16 +1,35 @@
-# lab_portal
+# 🧭 CPD_HUB — Competitive Programming Management App
 
-A new Flutter project.
+A full-stack **Flutter + Django** app designed for the **CSEC Competitive Programming Division (CPD)** to track attendance, daily problem-solving activity, contest ratings, and event reminders.  
+Used by **30+ CPD members** and **100+ community users** to stay consistent, monitor progress, and improve competitive programming performance.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Features
 
-A few resources to get you started if this is your first Flutter project:
+- 📊 **Activity Tracking** – Monitor daily problem-solving consistency and contest performance.  
+- 🗓️ **Event Reminders** – Get notified about upcoming contests, meetings, and coding events.  
+- 🧠 **Performance Insights** – View personal stats, leaderboards, and progress trends.  
+- 👥 **Community Management** – Track attendance and engagement for members.  
+- 🔐 **Secure Backend** – Django REST APIs integrated with Supabase and PostgreSQL for authentication and data persistence.  
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🧰 Tech Stack
+
+| Layer | Technology |
+|-------|-------------|
+| **Frontend** | Flutter (Dart) |
+| **Backend** | Django REST Framework (Python) |
+| **Database** | PostgreSQL |
+| **Authentication & Hosting** | Supabase |
+| **Version Control** | Git + GitHub |
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Bereke1t2/CPD_HUB.git
+cd codetrack
