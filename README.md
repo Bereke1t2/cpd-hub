@@ -32,4 +32,4 @@ Used by **30+ CPD members** and **100+ community users** to stay consistent, mon
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/Bereke1t2/CPD_HUB.git
-cd codetrack
+cd CPD_HUB
