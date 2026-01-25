@@ -81,37 +81,46 @@ class HomePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(left: 8.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(6.0),
-                                decoration: BoxDecoration(
-                                  color: UiConstants.primaryButtonColor
-                                      .withOpacity(0.18),
-                                  borderRadius: BorderRadius.circular(4.0),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(left: 8.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(6.0),
+                                  decoration: BoxDecoration(
+                                    color: UiConstants.primaryButtonColor
+                                        .withOpacity(0.18),
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                  child: const Icon(
+                                    Icons.grid_view,
+                                    color: UiConstants.statTextColor,
+                                    size: 20,
+                                  ),
                                 ),
-                                child: const Icon(Icons.grid_view,
-                                    color: UiConstants.statTextColor, size: 20),
-                              ),
-                              const SizedBox(width: 12.0),
-                              Text(
-                                "All Problems",
-                                style: TextStyle(
+                                const SizedBox(width: 12.0),
+                                const Text(
+                                  'All Problems',
+                                  style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: UiConstants.mainTextColor),
-                              ),
-                            ],
+                                    color: UiConstants.mainTextColor,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Icon(Icons.arrow_drop_down,
-                            color: UiConstants.subtitleTextColor),
-                      ],
+                          const Spacer(),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            color: UiConstants.subtitleTextColor,
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 12.0),
                     BlocBuilder<ProblemsBloc, ProblemsState>(
@@ -133,14 +142,18 @@ class HomePage extends StatelessWidget {
                         final problems =
                             (state as ProblemsLoaded).problems.take(5).toList();
 
-                        return Column(
-                          children: List.generate(problems.length, (index) {
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: problems.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 0),
+                          itemBuilder: (context, index) {
                             final p = problems[index];
                             return ProblemBox(
                               title: p.title,
                               difficulty: p.difficulty,
                             );
-                          }),
+                          },
                         );
                       },
                     ),
@@ -149,8 +162,12 @@ class HomePage extends StatelessWidget {
                         Navigator.pushNamed(context, '/problems');
                       },
                       child: Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.fromLTRB(12, 8, 12, 12),
                         padding: const EdgeInsets.symmetric(
-                            vertical: 12.0, horizontal: 16),
+                          vertical: 12.0,
+                          horizontal: 16,
+                        ),
                         decoration: BoxDecoration(
                           color:
                               UiConstants.primaryButtonColor.withOpacity(0.10),
@@ -158,17 +175,21 @@ class HomePage extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              'See more',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: UiConstants.primaryButtonColor,
+                            const Flexible(
+                              child: Text(
+                                'See more',
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: UiConstants.primaryButtonColor,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 6),
-                            Icon(
+                            const Icon(
                               Icons.arrow_forward_rounded,
                               size: 18,
                               color: UiConstants.primaryButtonColor,
