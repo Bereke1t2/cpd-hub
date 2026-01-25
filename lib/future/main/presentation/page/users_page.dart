@@ -7,7 +7,7 @@ import 'package:lab_portal/future/main/presentation/widget/search.dart';
 import 'package:lab_portal/future/main/presentation/widget/user_box.dart';
 
 class UsersPage extends StatelessWidget {
-  UsersPage({super.key});
+  const UsersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class UsersPage extends StatelessWidget {
           builder: (context, constraints) {
             final maxWidth = constraints.maxWidth;
             final isWide = maxWidth >= 900;
-            final contentWidth = isWide ? 900.0 : maxWidth;
+            final contentWidth = isWide ? 980.0 : maxWidth;
 
             return Align(
               alignment: Alignment.topCenter,
@@ -34,12 +34,13 @@ class UsersPage extends StatelessWidget {
                       builder: (context, state) {
                         return SearchBox(
                           hintText: 'Search users...',
-                          onChanged: (value) =>
-                              context.read<UsersBloc>().add(UsersSearchChanged(value)),
+                          onChanged: (value) => context
+                              .read<UsersBloc>()
+                              .add(UsersSearchChanged(value)),
                         );
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     Expanded(
                       child: BlocBuilder<UsersBloc, UsersState>(
                         builder: (context, state) {
@@ -64,16 +65,15 @@ class UsersPage extends StatelessWidget {
                             return const Center(child: Text('No users found'));
                           }
 
-                          // Responsive: List on small screens, 2-column grid on wide screens.
                           if (isWide) {
                             return GridView.builder(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              padding: const EdgeInsets.fromLTRB(8, 6, 8, 14),
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 12,
                                 mainAxisSpacing: 12,
-                                childAspectRatio: 3.2,
+                                childAspectRatio: 3.35,
                               ),
                               itemCount: users.length,
                               itemBuilder: (context, index) {
@@ -91,7 +91,7 @@ class UsersPage extends StatelessWidget {
                           }
 
                           return ListView.builder(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            padding: const EdgeInsets.only(top: 2, bottom: 12),
                             itemCount: users.length,
                             itemBuilder: (context, index) {
                               final user = users[index];

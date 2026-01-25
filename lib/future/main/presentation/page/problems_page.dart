@@ -8,7 +8,7 @@ import 'package:lab_portal/future/main/presentation/di/main_di.dart';
 import '../widget/problem_container.dart';
 
 class ProblemsPage extends StatelessWidget {
-  ProblemsPage({super.key});
+  const ProblemsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,48 +18,74 @@ class ProblemsPage extends StatelessWidget {
         selectedIndex: 1,
         title: 'Problems',
         subtitle: 'Explore and solve coding challenges',
-        body: Column(
-          children: [
-            SearchBox(
-              hintText: "Search problems...",
-              onChanged: (value) =>
-                  context.read<ProblemsBloc>().add(ProblemsSearchChanged(value)),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: BlocBuilder<ProblemsBloc, ProblemsState>(
-                builder: (context, state) {
-                  if (state is ProblemsLoading || state is ProblemsInitial) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (state is ProblemsError) {
-                    return Center(child: Text(state.message));
-                  }
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final maxWidth = constraints.maxWidth;
+            final isWide = maxWidth >= 1000;
+            final contentWidth = isWide ? 980.0 : maxWidth;
 
-                  final problems = (state as ProblemsLoaded).problems;
-                  if (problems.isEmpty) {
-                    return const Center(child: Text('No problems found'));
-                  }
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: contentWidth),
+                child: Column(
+                  children: [
+                    SearchBox(
+                      hintText: 'Search problems...',
+                      onChanged: (value) => context
+                          .read<ProblemsBloc>()
+                          .add(ProblemsSearchChanged(value)),
+                    ),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: BlocBuilder<ProblemsBloc, ProblemsState>(
+                        builder: (context, state) {
+                          if (state is ProblemsLoading ||
+                              state is ProblemsInitial) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          if (state is ProblemsError) {
+                            return Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text(state.message),
+                              ),
+                            );
+                          }
 
-                  return ListView.builder(
-                    itemCount: problems.length,
-                    itemBuilder: (context, index) {
-                      final p = problems[index];
-                      return ProblemContainer(
-                        title: p.title,
-                        difficulty: p.difficulty,
-                        timestamp: DateTime.now(),
-                        isSolved: p.isSolved,
-                        likedCount: p.numberOfLikes,
-                        dislikedCount: p.numberOfDislikes,
-                        tags: p.tags,
-                      );
-                    },
-                  );
-                },
+                          final problems = (state as ProblemsLoaded).problems;
+                          if (problems.isEmpty) {
+                            return const Center(
+                              child: Text('No problems found'),
+                            );
+                          }
+
+                          return ListView.builder(
+                            padding: const EdgeInsets.only(top: 4, bottom: 12),
+                            itemCount: problems.length,
+                            itemBuilder: (context, index) {
+                              final p = problems[index];
+                              return ProblemContainer(
+                                title: p.title,
+                                difficulty: p.difficulty,
+                                timestamp: DateTime.now(),
+                                isSolved: p.isSolved,
+                                likedCount: p.numberOfLikes,
+                                dislikedCount: p.numberOfDislikes,
+                                tags: p.tags,
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
