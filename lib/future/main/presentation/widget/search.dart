@@ -9,27 +9,50 @@ class SearchBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(14.0),
+        border: Border.all(
+          color: UiConstants.primaryButtonColor.withOpacity(0.16),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.white.withOpacity(0.1),
-            blurRadius: 4.0,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 10.0,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: TextField(
-        onChanged: onChanged,
-        style: TextStyle(color: UiConstants.mainTextColor),
-        decoration: InputDecoration(
-          hintText: hintText,
-          border: InputBorder.none,
-          icon: const Icon(Icons.search, color: Colors.grey),
-        ),
+      child: Row(
+        children: [
+          const Icon(Icons.search, color: UiConstants.subtitleTextColor),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              onChanged: onChanged,
+              style: const TextStyle(color: UiConstants.mainTextColor),
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle: const TextStyle(color: UiConstants.subtitleTextColor),
+                border: InputBorder.none,
+                isDense: true,
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Clear',
+            onPressed: () {
+              FocusScope.of(context).unfocus();
+            },
+            icon: const Icon(
+              Icons.close_rounded,
+              size: 18,
+              color: UiConstants.subtitleTextColor,
+            ),
+          ),
+        ],
       ),
     );
   }

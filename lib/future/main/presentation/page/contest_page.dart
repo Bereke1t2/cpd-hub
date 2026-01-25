@@ -8,7 +8,7 @@ import 'package:lab_portal/future/main/presentation/di/main_di.dart';
 import '../widget/bar_box.dart';
 
 class ContestPage extends StatelessWidget {
-  ContestPage({super.key});
+  const ContestPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -27,23 +27,27 @@ class ContestPage extends StatelessWidget {
 
                 Widget chip(String text) {
                   final selected = currentFilter == text;
-                  return GestureDetector(
+                  return BarBox(
+                    text: text,
+                    isSelected: selected,
                     onTap: () => context
                         .read<ContestsBloc>()
                         .add(ContestsFilterChanged(text)),
-                    child: BarBox(text: text, isSelected: selected),
                   );
                 }
 
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    chip('All'),
-                    const SizedBox(width: 16),
-                    chip('Div1'),
-                    const SizedBox(width: 16),
-                    chip('Div2'),
-                  ],
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      chip('All'),
+                      chip('Div1'),
+                      chip('Div2'),
+                    ],
+                  ),
                 );
               },
             ),
@@ -61,23 +65,32 @@ class ContestPage extends StatelessWidget {
                   final upcoming = contests.where((c) => !c.isPast).toList();
                   final past = contests.where((c) => c.isPast).toList();
 
+                  Widget sectionTitle(String text) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          text,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white.withValues(alpha: 0.90),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
                   return SingleChildScrollView(
                     child: Column(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(16.0),
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Upcoming Contests',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white.withValues(alpha: 0.87),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          children: List.generate(upcoming.length, (index) {
+                        sectionTitle('Upcoming Contests'),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: upcoming.length,
+                          itemBuilder: (context, index) {
                             final contest = upcoming[index];
                             return ContestBox(
                               title: contest.title,
@@ -89,22 +102,14 @@ class ContestPage extends StatelessWidget {
                                   DateTime.now(),
                               numberOfContestants: 1,
                             );
-                          }),
+                          },
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(16.0),
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            'Past Contests',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white.withValues(alpha: 0.87),
-                            ),
-                          ),
-                        ),
-                        Column(
-                          children: List.generate(past.length, (index) {
+                        sectionTitle('Past Contests'),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: past.length,
+                          itemBuilder: (context, index) {
                             final contest = past[index];
                             return ContestBox(
                               title: contest.title,
@@ -116,8 +121,9 @@ class ContestPage extends StatelessWidget {
                                   DateTime.now(),
                               numberOfContestants: 1,
                             );
-                          }),
+                          },
                         ),
+                        const SizedBox(height: 12),
                       ],
                     ),
                   );
