@@ -5,16 +5,25 @@ import 'future/main/presentation/page/problems_page.dart';
 import 'future/main/presentation/page/profile_page.dart';
 import 'future/main/presentation/page/users_page.dart';
 
-void main(){
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    routes: {
-      '/': (context) => HomePage(),
-      '/problems': (context) => ProblemsPage(),
-      '/contests': (context) => ContestPage(),
-      '/profile': (context) => ProfilePage(),
-      '/users': (context) => UsersPage(),
-    },
-    initialRoute: '/',
-  ));
+class LabPortalApp extends StatelessWidget {
+  const LabPortalApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      routes: {
+        '/': (context) => const HomePage(),
+        '/problems': (context) => ProblemsPage(),
+        '/contests': (context) => ContestPage(),
+        '/profile': (context) => const ProfilePage(),
+        '/users': (context) => UsersPage(),
+      },
+      initialRoute: '/',
+    );
+  }
+}
+
+void main() {
+  runApp(const LabPortalApp());
 }
