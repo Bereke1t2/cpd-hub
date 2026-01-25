@@ -1,0 +1,148 @@
+import '../../model/user_model.dart';
+
+abstract class MockUsersDataSource {
+  Future<List<UserModel>> getUsers();
+}
+
+class MockUsersDataSourceImpl implements MockUsersDataSource {
+  @override
+  Future<List<UserModel>> getUsers() async {
+    // Simulate latency so UI states (loading) can be tested.
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+
+    return const [
+      UserModel(
+        username: 'smartguy',
+        fullName: 'Smart Guy',
+        bio: 'I am the smartest guy',
+        avatarUrl: 'https://example.com/avatar.jpg',
+        rating: 2900,
+        rank: '1',
+        division: 'A',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'codewizard',
+        fullName: 'Code Wizard',
+        bio: 'Passionate about clean architecture and open-source.',
+        avatarUrl: 'https://example.com/avatar2.jpg',
+        rating: 2750,
+        rank: '2',
+        division: 'A',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'devops_ninja',
+        fullName: 'DevOps Ninja',
+        bio: 'Automating deployments and scaling infrastructure.',
+        avatarUrl: 'https://example.com/avatar3.jpg',
+        rating: 1500,
+        rank: '3',
+        division: 'B',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'ui_guru',
+        fullName: 'UI Guru',
+        bio: 'Design systems advocate and Flutter UI craftsman.',
+        avatarUrl: 'https://example.com/avatar4.jpg',
+        rating: 3400,
+        rank: '4',
+        division: 'A',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'data_cruncher',
+        fullName: 'Data Cruncher',
+        bio: 'ML enthusiast turning data into insights.',
+        avatarUrl: 'https://example.com/avatar5.jpg',
+        rating: 800,
+        rank: '5',
+        division: 'C',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'bug_hunter',
+        fullName: 'Bug Hunter',
+        bio: 'Relentless at finding edge cases and race conditions.',
+        avatarUrl: 'https://example.com/avatar6.jpg',
+        rating: 2400,
+        rank: '6',
+        division: 'B',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'async_master',
+        fullName: 'Async Master',
+        bio: 'Concurrency, isolates, and streams fanatic.',
+        avatarUrl: 'https://example.com/avatar7.jpg',
+        rating: 1200,
+        rank: '7',
+        division: 'C',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'security_sage',
+        fullName: 'Security Sage',
+        bio: 'Securing APIs and hardening apps.',
+        avatarUrl: 'https://example.com/avatar8.jpg',
+        rating: 10,
+        rank: '8',
+        division: 'C',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'test_writer',
+        fullName: 'Test Writer',
+        bio: 'TDD believer. Tests before coffee.',
+        avatarUrl: 'https://example.com/avatar9.jpg',
+        rating: 2350,
+        rank: '9',
+        division: 'B',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'perf_tuner',
+        fullName: 'Perf Tuner',
+        bio: 'Micro-optimizations that add up.',
+        avatarUrl: 'https://example.com/avatar10.jpg',
+        rating: 2525,
+        rank: '10',
+        division: 'B',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'fullstack_alex',
+        fullName: 'Fullstack Alex',
+        bio: 'Bridging frontend and backend worlds.',
+        avatarUrl: 'https://example.com/avatar11.jpg',
+        rating: 2700,
+        rank: '11',
+        division: 'A',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+      UserModel(
+        username: 'package_builder',
+        fullName: 'Package Builder',
+        bio: 'Publishing reusable Dart & Flutter packages.',
+        avatarUrl: 'https://example.com/avatar12.jpg',
+        rating: 2450,
+        rank: '12',
+        division: 'B',
+        solvedProblems: 0,
+        contributions: 0,
+      ),
+    ];
+  }
+}

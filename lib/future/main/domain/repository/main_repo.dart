@@ -1,4 +1,3 @@
-
 import 'package:dartz/dartz.dart';
 import 'package:lab_portal/future/main/domain/entitiy/info_entitity.dart';
 import 'package:lab_portal/future/main/domain/entitiy/user_entity.dart';
@@ -19,5 +18,6 @@ abstract class MainRepo {
   Future<Either<void , Failure>> dislikeProblem(String problemId);
   Future<Either<void , Failure>> markProblemAsSolved(String problemId);
   Future<Either<void , Failure>> unmarkProblemAsSolved(String problemId);
+  Future<Either<List<UserEntity>, Failure>> getUsers();
 
 }

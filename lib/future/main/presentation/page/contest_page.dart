@@ -1,133 +1,131 @@
 import 'package:flutter/material.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import 'package:lab_portal/future/main/presentation/widget/contest_box.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_portal/future/main/presentation/bloc/contests/contests_bloc.dart';
+import 'package:lab_portal/future/main/presentation/di/main_di.dart';
 
 import '../widget/bar_box.dart';
 
 class ContestPage extends StatelessWidget {
-  final List<Map<String, String>> contests = [
-    {
-      "title": "Weekly Coding Challenge 1",
-      "date": DateTime.now().add(Duration(days: 3)).toString(),
-      "participated": "false",
-      "numberOfProblems": "5",
-      "time": DateTime.now().add(Duration(hours: 2)).toString(),
-      "numberOfContestants": "1",
-    },
-    {
-      "title": "Weekly Coding Challenge 2",
-      "date": DateTime.now().add(Duration(days: 4)).toString(),
-      "participated": "true",
-      "numberOfProblems": "5",
-      "time": DateTime.now().add(Duration(hours: 3)).toString(),
-      "numberOfContestants": "1",
-    },
-    {
-      "title": "Weekly Coding Challenge 3",
-      "date": DateTime.now().add(Duration(days: 5)).toString(),
-      "participated": "true",
-      "numberOfProblems": "5",
-      "time": DateTime.now().add(Duration(hours: 4)).toString(),
-      "numberOfContestants": "1",
-    },
-    {
-      "title": "Weekly Coding Challenge 4",
-      "date": DateTime.now().add(Duration(days: 6)).toString(),
-      "participated": "true",
-      "numberOfProblems": "5",
-      "time": DateTime.now().add(Duration(hours: 5)).toString(),
-      "numberOfContestants": "1",
-    },
-    {
-      "title": "Weekly Coding Challenge 5",
-      "date": DateTime.now().add(Duration(days: 7)).toString(),
-      "participated": "false",
-      "numberOfProblems": "5",
-      "time": DateTime.now().add(Duration(hours: 6)).toString(),
-      "numberOfContestants": "1",
-    },
-  ];
-   ContestPage({super.key});
+  ContestPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BasePage(
-      title: "Contests",
-      selectedIndex: 2,
-      subtitle: "Upcoming contests",
-      body: Column(
-    
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BarBox(text: "All", isSelected: true),
-              SizedBox(width: 16),
-              BarBox(text: "Div1", isSelected: false),
-              SizedBox(width: 16),
-              BarBox(text: "Div2", isSelected: false),
-            ],
-          ),
+    return BlocProvider(
+      create: (_) => MainDI.buildContestsBloc()..add(ContestsStarted()),
+      child: BasePage(
+        title: "Contests",
+        selectedIndex: 2,
+        subtitle: "Upcoming contests",
+        body: Column(
+          children: [
+            BlocBuilder<ContestsBloc, ContestsState>(
+              builder: (context, state) {
+                final currentFilter =
+                    state is ContestsLoaded ? state.filter : 'All';
 
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16.0),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Upcoming Contests',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withValues(alpha: 0.87),
-                      ),
+                Widget chip(String text) {
+                  final selected = currentFilter == text;
+                  return GestureDetector(
+                    onTap: () => context
+                        .read<ContestsBloc>()
+                        .add(ContestsFilterChanged(text)),
+                    child: BarBox(text: text, isSelected: selected),
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    chip('All'),
+                    const SizedBox(width: 16),
+                    chip('Div1'),
+                    const SizedBox(width: 16),
+                    chip('Div2'),
+                  ],
+                );
+              },
+            ),
+            Expanded(
+              child: BlocBuilder<ContestsBloc, ContestsState>(
+                builder: (context, state) {
+                  if (state is ContestsLoading || state is ContestsInitial) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state is ContestsError) {
+                    return Center(child: Text(state.message));
+                  }
+
+                  final contests = (state as ContestsLoaded).contests;
+                  final upcoming = contests.where((c) => !c.isPast).toList();
+                  final past = contests.where((c) => c.isPast).toList();
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Upcoming Contests',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white.withValues(alpha: 0.87),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: List.generate(upcoming.length, (index) {
+                            final contest = upcoming[index];
+                            return ContestBox(
+                              title: contest.title,
+                              date: DateTime.tryParse(contest.startTime) ??
+                                  DateTime.now(),
+                              participated: contest.isParticipating,
+                              numberOfProblems: contest.numberOfProblems,
+                              time: DateTime.tryParse(contest.startTime) ??
+                                  DateTime.now(),
+                              numberOfContestants: 1,
+                            );
+                          }),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Past Contests',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white.withValues(alpha: 0.87),
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: List.generate(past.length, (index) {
+                            final contest = past[index];
+                            return ContestBox(
+                              title: contest.title,
+                              date: DateTime.tryParse(contest.startTime) ??
+                                  DateTime.now(),
+                              participated: contest.isParticipating,
+                              numberOfProblems: contest.numberOfProblems,
+                              time: DateTime.tryParse(contest.startTime) ??
+                                  DateTime.now(),
+                              numberOfContestants: 1,
+                            );
+                          }),
+                        ),
+                      ],
                     ),
-                  ),
-                  Column(
-                    children: List.generate(contests.length, (index) {
-                      final contest = contests[index];
-                      return ContestBox(
-                        title: contest["title"]!,
-                        date: DateTime.parse(contest["date"]!),
-                        participated: contest["participated"] == "true",
-                        numberOfProblems: int.parse(contest["numberOfProblems"]!),
-                        time: DateTime.parse(contest["time"]!),
-                        numberOfContestants: int.parse(contest["numberOfContestants"]!),
-                      );
-                    }),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(16.0),
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Past Contests',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white.withValues(alpha: 0.87),
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: List.generate(contests.length, (index) {
-                      final contest = contests[index];
-                      return ContestBox(
-                        title: contest["title"]!,
-                        date: DateTime.parse(contest["date"]!),
-                        participated: contest["participated"] == "true",
-                        numberOfProblems: int.parse(contest["numberOfProblems"]!),
-                        time: DateTime.parse(contest["time"]!),
-                        numberOfContestants: int.parse(contest["numberOfContestants"]!),
-                      );
-                    }),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
