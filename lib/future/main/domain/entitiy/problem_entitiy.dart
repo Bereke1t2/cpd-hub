@@ -11,6 +11,8 @@ class ProblemEntity extends Equatable {
   final bool isLiked;
   final bool isDisliked;
   final bool isSolved;
+  final String description;
+  final int numberOfSolvedPeople;
 
   const ProblemEntity({
     required this.title,
@@ -23,6 +25,8 @@ class ProblemEntity extends Equatable {
     required this.isLiked,
     required this.isDisliked,
     required this.isSolved,
+    this.description = '',
+    this.numberOfSolvedPeople = 0,
   });
 
   @override
@@ -37,5 +41,7 @@ class ProblemEntity extends Equatable {
         isLiked,
         isDisliked,
         isSolved,
+        description,
+        numberOfSolvedPeople,
       ];
 }

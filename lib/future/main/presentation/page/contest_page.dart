@@ -6,6 +6,7 @@ import 'package:lab_portal/future/main/presentation/bloc/contests/contests_bloc.
 import 'package:lab_portal/future/main/presentation/di/main_di.dart';
 
 import '../widget/bar_box.dart';
+import 'package:lab_portal/future/main/presentation/page/contest_leaderboard_page.dart';
 
 class ContestPage extends StatelessWidget {
   const ContestPage({super.key});
@@ -75,7 +76,7 @@ class ContestPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white.withValues(alpha: 0.90),
+                            color: Colors.white.withOpacity(0.90),
                           ),
                         ),
                       ),
@@ -101,6 +102,16 @@ class ContestPage extends StatelessWidget {
                               time: DateTime.tryParse(contest.startTime) ??
                                   DateTime.now(),
                               numberOfContestants: 1,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ContestLeaderboardPage(
+                                      contest: contest,
+                                    ),
+                                  ),
+                                );
+                              },
                             );
                           },
                         ),
@@ -120,6 +131,16 @@ class ContestPage extends StatelessWidget {
                               time: DateTime.tryParse(contest.startTime) ??
                                   DateTime.now(),
                               numberOfContestants: 1,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ContestLeaderboardPage(
+                                      contest: contest,
+                                    ),
+                                  ),
+                                );
+                              },
                             );
                           },
                         ),

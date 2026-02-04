@@ -6,6 +6,7 @@ import '../../../../core/failure.dart';
 import '../entitiy/contest_entitiy.dart';
 import '../entitiy/daily_problem_entitiy.dart';
 import '../entitiy/problem_entitiy.dart';
+import '../entitiy/leaderboard_entry_entity.dart';
 
 abstract class MainRepo {
 
@@ -19,5 +20,8 @@ abstract class MainRepo {
   Future<Either<void , Failure>> markProblemAsSolved(String problemId);
   Future<Either<void , Failure>> unmarkProblemAsSolved(String problemId);
   Future<Either<List<UserEntity>, Failure>> getUsers();
+  Future<Either<List<LeaderboardEntryEntity>, Failure>> getContestLeaderboard(
+    String contestUrl,
+  );
 
 }
