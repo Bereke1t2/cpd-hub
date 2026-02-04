@@ -8,6 +8,7 @@ class ContestBox extends StatelessWidget {
   final int numberOfProblems;
   final DateTime time;
   final int numberOfContestants;
+  final VoidCallback? onTap;
   const ContestBox({
     super.key,
     required this.title,
@@ -16,6 +17,7 @@ class ContestBox extends StatelessWidget {
     required this.numberOfProblems,
     required this.time,
     required this.numberOfContestants,
+    this.onTap,
   });
 
   String _relativeFrom(DateTime date) {
@@ -39,12 +41,22 @@ class ContestBox extends StatelessWidget {
       fontSize: 12,
     );
 
-    return Container(
+    final content = Container(
       padding: const EdgeInsets.all(16.0),
       margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(
+          color: UiConstants.primaryButtonColor.withOpacity(0.14),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.10),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,6 +93,17 @@ class ContestBox extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+
+    if (onTap == null) return content;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16.0),
+        child: content,
       ),
     );
   }

@@ -7,6 +7,7 @@ import 'package:lab_portal/future/main/presentation/di/main_di.dart';
 
 import '../../../../core/ui_constants.dart';
 import '../widget/info_box.dart';
+import '../widget/streak_progress_box.dart';
 import '../widget/todays_problem_box.dart';
 import '../widget/welcomback_box.dart';
 import 'base_page.dart';
@@ -34,6 +35,11 @@ class HomePage extends StatelessWidget {
           child: Column(
             children: [
               const WelcomeBackBox(name: 'Bereket'),
+              const StreakProgressBox(
+                currentStreak: 7,
+                problemsSolved: 42,
+                totalProblems: 100,
+              ),
               const InfoBox(
                 title: 'Problem Solving',
                 description: 'Let\'s tackle today\'s challenges together!',

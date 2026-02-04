@@ -81,13 +81,12 @@ class UserBox extends StatelessWidget {
                     bio: bio,
                     rating: rating,
                     ratingColor: ratingColor,
+                    rank: rank,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Icon(Icons.chevron_right, color: UiConstants.subtitleTextColor),
-                const SizedBox(width: 12),
-                Text('Rank: $rank', style: TextStyle(color: UiConstants.subtitleTextColor)),
-                
+                const SizedBox(width: 8),
+                Icon(Icons.chevron_right,
+                    color: UiConstants.subtitleTextColor, size: 20),
               ],
             ),
           ),
@@ -117,12 +116,14 @@ class _UserInfo extends StatelessWidget {
   final String username;
   final String bio;
   final int rating;
+  final int rank;
   final Color ratingColor;
 
   const _UserInfo({
     required this.username,
     required this.bio,
     required this.rating,
+    required this.rank,
     required this.ratingColor,
   });
 
@@ -149,6 +150,8 @@ class _UserInfo extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             _RatingPill(rating: rating, ratingColor: ratingColor),
+            const SizedBox(width: 8),
+            _RankPill(rank: rank, ratingColor: ratingColor),
           ],
         ),
         const SizedBox(height: 4),
@@ -189,6 +192,35 @@ class _RatingPill extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: ratingColor,
           letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+}
+
+class _RankPill extends StatelessWidget {
+  final int rank;
+  final Color ratingColor;
+  const _RankPill({required this.rank, required this.ratingColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: UiConstants.infoBackgroundColor.withOpacity(0.55),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: ratingColor.withOpacity(0.18), width: 1),
+        ),
+        child: Text(
+          'Rank $rank',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: UiConstants.subtitleTextColor,
+          ),
         ),
       ),
     );
