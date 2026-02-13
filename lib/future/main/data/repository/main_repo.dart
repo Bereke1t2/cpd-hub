@@ -1,129 +1,117 @@
-
-
 import 'package:dartz/dartz.dart';
-import 'package:lab_portal/future/main/data/dataSources/remote/remote_data_source.dart';
-import 'package:lab_portal/future/main/data/model/contest_model.dart';
-import 'package:lab_portal/future/main/data/model/info_model.dart';
-import 'package:lab_portal/future/main/data/model/problem_model.dart';
-import 'package:lab_portal/future/main/data/model/user_model.dart';
+import 'package:cpd_hub/core/failure.dart';
+import 'package:cpd_hub/core/network.dart';
+import 'package:cpd_hub/future/main/data/dataSources/remote/remote_data_source.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/activity_entity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/attendance_entity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/contest_entitiy.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/daily_problem_entitiy.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/heatmap_entry_entity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/info_entitity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/leaderboard_entry_entity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/problem_entitiy.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/rating_point_entity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/submission_entity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/user_entity.dart';
+import 'package:cpd_hub/future/main/domain/repository/main_repo.dart';
 
-import '../../../../core/failure.dart';
-import '../../../../core/network.dart';
-import '../../domain/repository/main_repo.dart';
-import '../model/daily_problem_model.dart';
-
-class MainRepoImpl implements MainRepo{
+class MainRepoImpl implements MainRepo {
   final RemoteDataSource remoteDataSource;
-  final NetworkInfo network;
+  final NetworkInfo networkInfo;
 
-  MainRepoImpl(this.remoteDataSource, this.network);
+  MainRepoImpl({required this.remoteDataSource, required this.networkInfo});
+
+  Future<Either<T, Failure>> _guardedCall<T>(Future<T> Function() call) async {
+    try {
+      final result = await call();
+      return Left(result);
+    } on Exception catch (e) {
+      return Right(ServerFailure(e.toString()));
+    }
+  }
 
   @override
-  Future<Either<void , Failure>> dislikeProblem(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
-    }
-    try {
-      final result = await remoteDataSource.dislikeProblem(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<List<ProblemEntity>, Failure>> getProblems() async {
+    return _guardedCall(() => remoteDataSource.getProblems());
   }
+
   @override
-  Future<Either<void , Failure>> likeProblem(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
-    }
-    try {
-      final result = await remoteDataSource.likeProblem(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<DailyProblemEntitiy, Failure>> getDailyProblems() async {
+    return _guardedCall(() => remoteDataSource.getDailyProblems());
   }
+
   @override
-  Future<Either<InfoModel, Failure>> getInfo() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getInfo();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<List<ContestEntitiy>, Failure>> getContests() async {
+    return _guardedCall(() => remoteDataSource.getContests());
   }
+
   @override
-  Future<Either<List<ProblemModel>, Failure>> getProblems() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getProblems();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<UserEntity, Failure>> getProfile(String username) async {
+    return _guardedCall(() => remoteDataSource.getProfile(username));
   }
+
   @override
-  Future<Either<UserModel, Failure>> getProfile() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getProfile();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<InfoEntity, Failure>> getInfo() async {
+    return _guardedCall(() => remoteDataSource.getInfo());
   }
+
   @override
-  Future<Either<List<ContestModel>, Failure>> getContests() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getContests();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<void, Failure>> likeProblem(String problemId) async {
+    return _guardedCall(() => remoteDataSource.likeProblem(problemId));
   }
+
   @override
-  Future<Either<DailyProblemModel, Failure>> getDailyProblems() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getDailyProblems();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+  Future<Either<void, Failure>> dislikeProblem(String problemId) async {
+    return _guardedCall(() => remoteDataSource.dislikeProblem(problemId));
   }
+
   @override
   Future<Either<void, Failure>> markProblemAsSolved(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
-    }
-    try {
-      final result = await remoteDataSource.markProblemAsSolved(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+    return _guardedCall(() => remoteDataSource.markProblemAsSolved(problemId));
   }
+
   @override
   Future<Either<void, Failure>> unmarkProblemAsSolved(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
-    }
-    try {
-      final result = await remoteDataSource.unmarkProblemAsSolved(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+    return _guardedCall(() => remoteDataSource.unmarkProblemAsSolved(problemId));
+  }
+
+  @override
+  Future<Either<List<UserEntity>, Failure>> getUsers() async {
+    return _guardedCall(() => remoteDataSource.getUsers());
+  }
+
+  @override
+  Future<Either<List<LeaderboardEntryEntity>, Failure>> getLeaderboard(String contestId) async {
+    return _guardedCall(() => remoteDataSource.getLeaderboard(contestId));
+  }
+
+  @override
+  Future<Either<List<ActivityEntity>, Failure>> getActivityFeed() async {
+    return _guardedCall(() => remoteDataSource.getActivityFeed());
+  }
+
+  @override
+  Future<Either<List<AttendanceEntity>, Failure>> getAttendance(String username, int month, int year) async {
+    return _guardedCall(() => remoteDataSource.getAttendance(username, month, year));
+  }
+
+  @override
+  Future<Either<List<HeatmapEntryEntity>, Failure>> getHeatmap(String username, int month, int year) async {
+    return _guardedCall(() => remoteDataSource.getHeatmap(username, month, year));
+  }
+
+  @override
+  Future<Either<List<RatingPointEntity>, Failure>> getRatingHistory(String username) async {
+    return _guardedCall(() => remoteDataSource.getRatingHistory(username));
+  }
+
+  @override
+  Future<Either<List<SubmissionEntity>, Failure>> getSubmissions(String username) async {
+    return _guardedCall(() => remoteDataSource.getSubmissions(username));
+  }
+
+  @override
+  Future<Either<List<InfoEntity>, Failure>> getInfoList() async {
+    return _guardedCall(() => remoteDataSource.getInfoList());
   }
 }

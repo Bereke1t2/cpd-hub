@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 
-import 'package:lab_portal/core/failure.dart';
+import 'package:cpd_hub/core/failure.dart';
 
 import '../entitiy/daily_problem_entitiy.dart';
 import '../repository/main_repo.dart';
