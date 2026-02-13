@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'social_link_entity.dart';
 
 class UserEntity extends Equatable {
   final String username;
@@ -10,6 +11,9 @@ class UserEntity extends Equatable {
   final String division;
   final int solvedProblems;
   final int contributions;
+  final int globalRank;
+  final int attendedContestsCount;
+  final List<SocialLinkEntity> socialLinks;
 
   const UserEntity({
     required this.username,
@@ -21,6 +25,9 @@ class UserEntity extends Equatable {
     required this.division,
     required this.solvedProblems,
     required this.contributions,
+    required this.globalRank,
+    required this.attendedContestsCount,
+    required this.socialLinks,
   });
 
   @override
@@ -34,5 +41,8 @@ class UserEntity extends Equatable {
         division,
         solvedProblems,
         contributions,
+        globalRank,
+        attendedContestsCount,
+        socialLinks,
       ];
 }
