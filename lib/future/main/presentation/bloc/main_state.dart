@@ -87,3 +87,8 @@ final class UsersMoreLoadedState extends UsersPageState {
   UsersMoreLoadedState(this.users, {this.hasReachedMax = false});
 }
 
+final class DailyProblemsLoadedState extends ProblemsPageState {
+  final List dailyProblems;
+
+  DailyProblemsLoadedState({required this.dailyProblems});
+}

@@ -1,128 +1,213 @@
 import 'package:flutter/material.dart';
-import 'package:lab_portal/future/main/presentation/page/base_page.dart';
-import 'package:lab_portal/future/main/presentation/widget/search.dart';
-import 'package:lab_portal/future/main/presentation/widget/user_box.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cpd_hub/core/ui_constants.dart';
+import 'package:cpd_hub/future/main/presentation/bloc/users_cubit.dart';
+import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
+import 'package:cpd_hub/future/main/presentation/page/profile_page.dart';
+import '../widget/user_box.dart';
 
-class UsersPage extends StatelessWidget {
-  final List<Map<String, String>> users = [
-    {
-      'username': 'smartguy',
-      'bio': 'I am the smartest guy',
-      'avatarUrl': 'https://example.com/avatar.jpg',
-      'rating': '2900',
-      'rank': '1',
-    },
-    {
-      'username': 'codewizard',
-      'bio': 'Passionate about clean architecture and open-source.',
-      'avatarUrl': 'https://example.com/avatar2.jpg',
-      'rating': '2750',
-      'rank': '2',
-    },
-    {
-      'username': 'devops_ninja',
-      'bio': 'Automating deployments and scaling infrastructure.',
-      'avatarUrl': 'https://example.com/avatar3.jpg',
-      'rating': '1500',
-      'rank': '3',
-    },
-    {
-      'username': 'ui_guru',
-      'bio': 'Design systems advocate and Flutter UI craftsman.',
-      'avatarUrl': 'https://example.com/avatar4.jpg',
-      'rating': '3400',
-      'rank': '4',
-    },
-    {
-      'username': 'data_cruncher',
-      'bio': 'ML enthusiast turning data into insights.',
-      'avatarUrl': 'https://example.com/avatar5.jpg',
-      'rating': '800',
-      'rank': '5',
-    },
-    {
-      'username': 'bug_hunter',
-      'bio': 'Relentless at finding edge cases and race conditions.',
-      'avatarUrl': 'https://example.com/avatar6.jpg',
-      'rating': '2400',
-      'rank': '6',
-    },
-    {
-      'username': 'async_master',
-      'bio': 'Concurrency, isolates, and streams fanatic.',
-      'avatarUrl': 'https://example.com/avatar7.jpg',
-      'rating': '1200',
-      'rank': '7',
-    },
-    {
-      'username': 'security_sage',
-      'bio': 'Securing APIs and hardening apps.',
-      'avatarUrl': 'https://example.com/avatar8.jpg',
-      'rating': '10',
-      'rank': '8',
-    },
-    {
-      'username': 'test_writer',
-      'bio': 'TDD believer. Tests before coffee.',
-      'avatarUrl': 'https://example.com/avatar9.jpg',
-      'rating': '2350',
-      'rank': '9',
-    },
-    {
-      'username': 'perf_tuner',
-      'bio': 'Micro-optimizations that add up.',
-      'avatarUrl': 'https://example.com/avatar10.jpg',
-      'rating': '2525',
-      'rank': '10',
-    },
-    {
-      'username': 'fullstack_alex',
-      'bio': 'Bridging frontend and backend worlds.',
-      'avatarUrl': 'https://example.com/avatar11.jpg',
-      'rating': '2700',
-      'rank': '11',
-    },
-    {
-      'username': 'package_builder',
-      'bio': 'Publishing reusable Dart & Flutter packages.',
-      'avatarUrl': 'https://example.com/avatar12.jpg',
-      'rating': '2450',
-      'rank': '12',
-    }
+class UsersPage extends StatefulWidget {
+  const UsersPage({super.key});
 
-  ];
-  UsersPage({super.key});
+  @override
+  State<UsersPage> createState() => _UsersPageState();
+}
+
+class _UsersPageState extends State<UsersPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
+  String _sortBy = "Rating";
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<UsersCubit>().loadUsers();
+  }
 
   @override
   Widget build(BuildContext context) {
     return BasePage(
-      title: "Users",
-      subtitle: "Explore and connect with users",
       selectedIndex: 3,
-      body: Column(
+      title: 'Community',
+      subtitle: 'Connect with fellow coders',
+      body: BlocBuilder<UsersCubit, UsersState>(
+        builder: (context, state) {
+          if (state is UsersLoading) {
+            return const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor));
+          }
+          if (state is UsersLoaded) {
+            return _buildContent(state);
+          }
+          if (state is UsersError) {
+            return Center(child: Text(state.message, style: const TextStyle(color: Colors.redAccent)));
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  Widget _buildContent(UsersLoaded state) {
+    var users = state.users.where((u) => u.username.toLowerCase().contains(_searchQuery.toLowerCase()) || u.fullName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+
+    switch (_sortBy) {
+      case 'Rating':
+        users.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+      case 'Name':
+        users.sort((a, b) => a.fullName.compareTo(b.fullName));
+        break;
+      case 'Rank':
+        users.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+    }
+
+    // Top contributors: top 3 by rating
+    final topContributors = List.of(users)..sort((a, b) => b.rating.compareTo(a.rating));
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SearchBox(hintText: 'Search users...', onChanged: (value) {
-            // Handle search logic here
-          }),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: List.generate(users.length, (index) {
-                  final user = users[index];
-                  return UserBox(
-                    username: user['username']!,
-                    bio: user['bio']!,
-                    avatarUrl: user['avatarUrl']!,
-                    rating: int.tryParse(user['rating']!) ?? 0,
-                    rank: int.tryParse(user['rank']!) ?? 0,
-                    onTap: () {
-                      // Handle user box tap
-                    },
-                  );
-                }),
+          const SizedBox(height: 20),
+          // Search
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Container(
+              height: 52,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.white.withOpacity(0.1)),
+              ),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) => setState(() => _searchQuery = val),
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: "Search members...",
+                  hintStyle: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.4), fontSize: 13),
+                  prefixIcon: const Icon(Icons.search_rounded, color: UiConstants.primaryButtonColor, size: 20),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                ),
               ),
             ),
-          )
+          ),
+          const SizedBox(height: 16),
+
+          // Sort controls
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: ['Rating', 'Name', 'Rank'].map((s) {
+                final isSelected = _sortBy == s;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () => setState(() => _sortBy = s),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? UiConstants.primaryButtonColor : Colors.white.withOpacity(0.03),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isSelected ? Colors.transparent : Colors.white10),
+                      ),
+                      child: Text(s, style: TextStyle(color: isSelected ? Colors.black : UiConstants.subtitleTextColor, fontWeight: FontWeight.w900, fontSize: 11)),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Top Contributors
+          if (topContributors.length >= 3) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: Row(
+                children: [
+                  Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+                  const SizedBox(width: 10),
+                  const Text("TOP CONTRIBUTORS", style: TextStyle(color: UiConstants.mainTextColor, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 160,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: topContributors.take(3).length,
+                itemBuilder: (context, index) {
+                  final u = topContributors[index];
+                  return GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage(username: u.username),
+                      ),
+                    ),
+                    child: Container(
+                      width: 140,
+                      margin: const EdgeInsets.only(right: 12),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: UiConstants.infoBackgroundColor.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: index == 0 ? Colors.amber.withOpacity(0.3) : UiConstants.borderColor.withOpacity(0.15)),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: UiConstants.primaryButtonColor.withOpacity(0.2),
+                            child: Text(u.fullName[0], style: const TextStyle(color: UiConstants.primaryButtonColor, fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(u.username, style: const TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.w900, fontSize: 13), overflow: TextOverflow.ellipsis),
+                          Text('Rating: ${u.rating}', style: TextStyle(color: UiConstants.getUserRatingColor(u.rating), fontSize: 11, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          // All members
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+            child: Row(
+              children: [
+                Icon(Icons.people_rounded, color: UiConstants.primaryButtonColor, size: 18),
+                const SizedBox(width: 10),
+                Text("ALL MEMBERS (${users.length})".toUpperCase(), style: const TextStyle(color: UiConstants.mainTextColor, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+              ],
+            ),
+          ),
+          ...users.map((u) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: UserBox(
+                  username: u.username,
+                  bio: u.bio,
+                  avatarUrl: u.avatarUrl,
+                  rating: u.rating,
+                  rank: u.solvedProblems,
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(username: u.username),
+                    ),
+                  ),
+                ),
+              )),
+          const SizedBox(height: 100),
         ],
       ),
     );

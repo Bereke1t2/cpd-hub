@@ -9,26 +9,35 @@ class DifficultyBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lowerDiff = difficulty.toLowerCase();
+    Color bgColor;
+    Color textColor;
+
+    if (lowerDiff == 'easy') {
+      bgColor = Colors.green.withOpacity(0.15);
+      textColor = Colors.greenAccent.shade400;
+    } else if (lowerDiff == 'medium') {
+      bgColor = Colors.orange.withOpacity(0.15);
+      textColor = Colors.orangeAccent.shade400;
+    } else {
+      bgColor = Colors.red.withOpacity(0.15);
+      textColor = Colors.redAccent.shade400;
+    }
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
       decoration: BoxDecoration(
-        color: difficulty.toLowerCase() == 'easy'
-            ? UiConstants.easyProblemColor
-            : difficulty.toLowerCase() == 'medium'
-            ? UiConstants.mediumProblemColor
-            : UiConstants.hardProblemColor,
-        borderRadius: BorderRadius.circular(4.0),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: textColor.withOpacity(0.3), width: 0.5),
       ),
       child: Text(
         difficulty,
-        textAlign: TextAlign.center,
         style: TextStyle(
-          color: difficulty.toLowerCase() == 'easy'
-              ? Colors.green.shade400
-              : difficulty.toLowerCase() == 'medium'
-              ? Colors.orange.shade400
-              : Colors.red.shade400,
-          fontSize: 12.0,
+          color: textColor,
+          fontSize: 11.0,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.2,
         ),
       ),
     );

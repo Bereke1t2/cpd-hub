@@ -35,3 +35,10 @@ class LoadUserProfileEvent extends MainEvent {
 
   LoadUserProfileEvent(this.username);
 }
+
+class LoadDailyProblemsEvent extends MainEvent {}
+class LikeProblemEvent extends MainEvent {
+  final String problemId;
+
+  LikeProblemEvent(this.problemId);
+}

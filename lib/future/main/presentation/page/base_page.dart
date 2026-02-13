@@ -7,12 +7,18 @@ class BasePage extends StatefulWidget {
   final String title;
   final String subtitle;
 
+  final bool showBackButton;
+
+  final bool hasSliverAppBar;
+
   const BasePage({
     super.key,
     required this.body,
     this.selectedIndex = 0,
-    required this.title,
-    required this.subtitle,
+    this.title = '',
+    this.subtitle = '',
+    this.showBackButton = false,
+    this.hasSliverAppBar = false,
   });
 
   @override
@@ -40,7 +46,7 @@ class _BasePageState extends State<BasePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: UiConstants.infoBackgroundColor.withOpacity(0.75),
-      appBar: PreferredSize(
+      appBar: widget.hasSliverAppBar ? null : PreferredSize(
         preferredSize: const Size.fromHeight(90),
         child: AppBar(
           automaticallyImplyLeading: false,
@@ -74,7 +80,13 @@ class _BasePageState extends State<BasePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Row(
                   children: [
-                    const Icon(Icons.code, color: Colors.white, size: 30),
+                    if (widget.showBackButton)
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    else
+                      const Icon(Icons.code, color: Colors.white, size: 30),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -83,7 +95,7 @@ class _BasePageState extends State<BasePage> {
                         children: [
                           Text(
                             widget.title,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
