@@ -1,4 +1,4 @@
-import 'package:lab_portal/future/main/domain/entitiy/daily_problem_entitiy.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/daily_problem_entitiy.dart';
 
 class DailyProblemModel extends DailyProblemEntitiy {
   const DailyProblemModel({

@@ -1,4 +1,5 @@
-import 'package:lab_portal/future/main/domain/entitiy/user_entity.dart';
+import 'package:cpd_hub/future/main/data/model/social_link_model.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/user_entity.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
@@ -11,6 +12,9 @@ class UserModel extends UserEntity {
     required super.division,
     required super.solvedProblems,
     required super.contributions,
+    required super.globalRank,
+    required super.attendedContestsCount,
+    required super.socialLinks,
   }); 
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +28,12 @@ class UserModel extends UserEntity {
       division: json['division'] ?? '',
       solvedProblems: json['solvedProblems'] ?? 0,
       contributions: json['contributions'] ?? 0,
+      globalRank: json['globalRank'] ?? 0,
+      attendedContestsCount: json['attendedContestsCount'] ?? 0,
+      socialLinks: (json['socialLinks'] as List?)
+          ?.map((e) => SocialLinkModel.fromJson(e))
+          .toList() ??
+          [],
     );
   }
 
@@ -38,6 +48,9 @@ class UserModel extends UserEntity {
       'division': division,
       'solvedProblems': solvedProblems,
       'contributions': contributions,
+      'globalRank': globalRank,
+      'attendedContestsCount': attendedContestsCount,
+      'socialLinks': socialLinks.map((e) => (e as SocialLinkModel).toJson()).toList(),
     };
   }
 

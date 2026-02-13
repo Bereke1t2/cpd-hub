@@ -15,7 +15,7 @@ class ProblemModel extends ProblemEntity {
   });
 
   factory ProblemModel.fromJson(Map<String, dynamic> json) {
-    final rawTags = json['tags'];
+    final rawTags = json['topic_tags'];
     return ProblemModel(
       title: (json['title'] ?? '') as String,
       difficulty: (json['difficulty'] ?? '') as String,
@@ -24,11 +24,11 @@ class ProblemModel extends ProblemEntity {
           : <String>[],
       numberOfLikes: (json['numberOfLikes'] ?? json['likes'] ?? 0) as int,
       numberOfDislikes: (json['numberOfDislikes'] ?? json['dislikes'] ?? 0) as int,
-      problemUrl: (json['problemUrl'] ?? json['url'] ?? '') as String,
-      problemId: (json['problemId'] ?? json['id'] ?? '') as String,
+      problemUrl: (json['deep_link'] ?? json['url'] ?? '') as String,
+      problemId: (json['id'] ?? json['id'] ?? '') as String,
       isLiked: (json['isLiked'] ?? false) as bool,
       isDisliked: (json['isDisliked'] ?? false) as bool,
-      isSolved: (json['isSolved'] ?? false) as bool,
+      isSolved: (json['solved'] ?? false) as bool,
     );
   }
 

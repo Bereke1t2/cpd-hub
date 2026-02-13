@@ -1,4 +1,4 @@
-import 'package:lab_portal/future/main/domain/entitiy/info_entitity.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/info_entitity.dart';
 
 class InfoModel extends InfoEntity{
   const InfoModel({
