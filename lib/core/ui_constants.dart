@@ -32,14 +32,12 @@ class UiConstants {
   static const Color shadowColor = Color(0x80000000); // Semi-transparent black for shadows
 
   static Color getUserRatingColor(int rating) {
-    if (rating >= 2000) {
-      return const Color(0xFFFF5722); // Red for Expert
-    } else if (rating >= 1500) {
-      return const Color(0xFFFF9800); // Orange for Advanced
-    } else if (rating >= 1000) {
-      return const Color(0xFFFFEB3B); // Yellow for Intermediate
-    } else {
-      return const Color(0xFF4CAF50); // Green for Beginner
-    }
+    if (rating < 1200) return Colors.grey;
+    if (rating < 1400) return Colors.green;
+    if (rating < 1600) return Colors.cyan;
+    if (rating < 1900) return Colors.blue;
+    if (rating < 2100) return Colors.purple;
+    if (rating < 2400) return Colors.orange;
+    return Colors.red;
   }
 }
