@@ -1,6 +1,6 @@
 # CPD Hub
 
-A modern **Flutter + Django** application for the **Competitive Programming Division (CPD)** — track problems, contests, leaderboards, user profiles, daily challenges, attendance, and performance insights all in one place.  
+A modern **Flutter + Go** application for the **Competitive Programming Division (CPD)** — track problems, contests, leaderboards, user profiles, daily challenges, attendance, and performance insights all in one place.  
 Used by **30+ CPD members** and **100+ community users**.
 
 ## Features
@@ -44,7 +44,7 @@ lib/
 | Layer | Technology |
 |---|---|
 | Frontend | Flutter (Dart) |
-| Backend | Django REST Framework (Python) |
+| Backend | Go (REST API) |
 | Database | PostgreSQL |
 | Auth & Hosting | Supabase |
 | State Management | `flutter_bloc` |
