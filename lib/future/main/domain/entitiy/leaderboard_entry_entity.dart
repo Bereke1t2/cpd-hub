@@ -18,5 +18,12 @@ class LeaderboardEntryEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props => [rank, username, rating, score, penalty, problemsSolved];
+  List<Object?> get props => [
+    rank,
+    username,
+    rating,
+    score,
+    penalty,
+    problemsSolved,
+  ];
 }

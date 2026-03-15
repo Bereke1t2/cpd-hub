@@ -7,7 +7,9 @@ class GetLeaderboard {
   final MainRepo repository;
   GetLeaderboard(this.repository);
 
-  Future<Either<List<LeaderboardEntryEntity>, Failure>> call(String contestId) async {
+  Future<Either<List<LeaderboardEntryEntity>, Failure>> call(
+    String contestId,
+  ) async {
     return await repository.getLeaderboard(contestId);
   }
 }

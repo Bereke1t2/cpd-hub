@@ -72,7 +72,9 @@ class MainRepoImpl implements MainRepo {
 
   @override
   Future<Either<void, Failure>> unmarkProblemAsSolved(String problemId) async {
-    return _guardedCall(() => remoteDataSource.unmarkProblemAsSolved(problemId));
+    return _guardedCall(
+      () => remoteDataSource.unmarkProblemAsSolved(problemId),
+    );
   }
 
   @override
@@ -81,7 +83,9 @@ class MainRepoImpl implements MainRepo {
   }
 
   @override
-  Future<Either<List<LeaderboardEntryEntity>, Failure>> getLeaderboard(String contestId) async {
+  Future<Either<List<LeaderboardEntryEntity>, Failure>> getLeaderboard(
+    String contestId,
+  ) async {
     return _guardedCall(() => remoteDataSource.getLeaderboard(contestId));
   }
 
@@ -91,22 +95,38 @@ class MainRepoImpl implements MainRepo {
   }
 
   @override
-  Future<Either<List<AttendanceEntity>, Failure>> getAttendance(String username, int month, int year) async {
-    return _guardedCall(() => remoteDataSource.getAttendance(username, month, year));
+  Future<Either<List<AttendanceEntity>, Failure>> getAttendance(
+    String username,
+    int month,
+    int year,
+  ) async {
+    return _guardedCall(
+      () => remoteDataSource.getAttendance(username, month, year),
+    );
   }
 
   @override
-  Future<Either<List<HeatmapEntryEntity>, Failure>> getHeatmap(String username, int month, int year) async {
-    return _guardedCall(() => remoteDataSource.getHeatmap(username, month, year));
+  Future<Either<List<HeatmapEntryEntity>, Failure>> getHeatmap(
+    String username,
+    int month,
+    int year,
+  ) async {
+    return _guardedCall(
+      () => remoteDataSource.getHeatmap(username, month, year),
+    );
   }
 
   @override
-  Future<Either<List<RatingPointEntity>, Failure>> getRatingHistory(String username) async {
+  Future<Either<List<RatingPointEntity>, Failure>> getRatingHistory(
+    String username,
+  ) async {
     return _guardedCall(() => remoteDataSource.getRatingHistory(username));
   }
 
   @override
-  Future<Either<List<SubmissionEntity>, Failure>> getSubmissions(String username) async {
+  Future<Either<List<SubmissionEntity>, Failure>> getSubmissions(
+    String username,
+  ) async {
     return _guardedCall(() => remoteDataSource.getSubmissions(username));
   }
 

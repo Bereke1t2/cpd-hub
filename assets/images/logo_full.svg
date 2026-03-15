@@ -1,0 +1,18 @@
+<svg width="620" height="200" viewBox="0 0 620 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="100" y1="8" x2="100" y2="192" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#32D74B"/>
+      <stop offset="1" stop-color="#1FA855"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Badge icon -->
+  <path d="M100 8L178 53V147L100 192L22 147V53L100 8Z" fill="url(#bg)"/>
+  <path d="M80 64L52 100L80 136" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M120 64L148 100L120 136" stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <line x1="113" y1="56" x2="87" y2="144" stroke="white" stroke-width="11" stroke-linecap="round" opacity="0.55"/>
+
+  <!-- App name -->
+  <text x="218" y="118" fill="#F0FFF5" font-family="Inter, SF Pro Display, Segoe UI, Arial, sans-serif" font-size="80" font-weight="800" letter-spacing="2">CPD</text>
+  <text x="430" y="118" fill="#28C76F" font-family="Inter, SF Pro Display, Segoe UI, Arial, sans-serif" font-size="80" font-weight="800" letter-spacing="2">HUB</text>
+</svg>

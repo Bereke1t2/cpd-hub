@@ -1,10 +1,7 @@
 import '../../domain/entitiy/attendance_entity.dart';
 
 class AttendanceModel extends AttendanceEntity {
-  const AttendanceModel({
-    required super.date,
-    required super.status,
-  });
+  const AttendanceModel({required super.date, required super.status});
 
   factory AttendanceModel.fromJson(Map<String, dynamic> json) {
     return AttendanceModel(
@@ -14,9 +11,6 @@ class AttendanceModel extends AttendanceEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'date': date,
-      'status': status,
-    };
+    return {'date': date, 'status': status};
   }
 }

@@ -17,7 +17,8 @@ class LeaderboardEntryModel extends LeaderboardEntryEntity {
       rating: json['rating'] ?? 0,
       score: json['score'] ?? 0,
       penalty: json['penalty'] ?? 0,
-      problemsSolved: (json['problemsSolved'] as List?)
+      problemsSolved:
+          (json['problemsSolved'] as List?)
               ?.map((e) => e.toString())
               .toList() ??
           [],

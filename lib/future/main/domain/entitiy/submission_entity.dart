@@ -4,7 +4,8 @@ class SubmissionEntity extends Equatable {
   final String id;
   final String problemId;
   final String problemTitle;
-  final String status; // e.g., 'Accepted', 'Wrong Answer', 'Time Limit Exceeded'
+  final String
+  status; // e.g., 'Accepted', 'Wrong Answer', 'Time Limit Exceeded'
   final String language;
   final String executionTime;
   final String memoryUsed;
@@ -23,13 +24,13 @@ class SubmissionEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        problemId,
-        problemTitle,
-        status,
-        language,
-        executionTime,
-        memoryUsed,
-        timestamp,
-      ];
+    id,
+    problemId,
+    problemTitle,
+    status,
+    language,
+    executionTime,
+    memoryUsed,
+    timestamp,
+  ];
 }

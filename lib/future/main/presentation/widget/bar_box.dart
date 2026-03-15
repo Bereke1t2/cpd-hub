@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import '../../../../core/ui_constants.dart';
 
 class BarBox extends StatelessWidget {
@@ -15,23 +16,16 @@ class BarBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      duration: const Duration(milliseconds: 250),
+      padding: EdgeInsets.symmetric(horizontal: 14 * sc, vertical: 8 * sc),
       decoration: BoxDecoration(
-        color: isActive ? UiConstants.primaryButtonColor : UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        color: isActive ? UiConstants.primaryButtonColor : Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isActive ? UiConstants.primaryButtonColor : UiConstants.borderColor.withOpacity(0.3),
-          width: 1.5,
+          color: isActive ? Colors.transparent : Colors.white10,
         ),
-        boxShadow: isActive ? [
-          BoxShadow(
-            color: UiConstants.primaryButtonColor.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          )
-        ] : [],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -39,18 +33,18 @@ class BarBox extends StatelessWidget {
           if (icon != null) ...[
             Icon(
               icon,
-              size: 16,
+              size: 14 * sc,
               color: isActive ? Colors.black : UiConstants.primaryButtonColor,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 6 * sc),
           ],
           Text(
             text,
             style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5,
-              color: isActive ? Colors.black : UiConstants.mainTextColor.withOpacity(0.8),
+              fontSize: 12 * sc,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.3,
+              color: isActive ? Colors.black : UiConstants.subtitleTextColor,
             ),
           ),
         ],

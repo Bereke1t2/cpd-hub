@@ -1,10 +1,7 @@
 import '../../domain/entitiy/rating_point_entity.dart';
 
 class RatingPointModel extends RatingPointEntity {
-  const RatingPointModel({
-    required super.date,
-    required super.rating,
-  });
+  const RatingPointModel({required super.date, required super.rating});
 
   factory RatingPointModel.fromJson(Map<String, dynamic> json) {
     return RatingPointModel(
@@ -14,9 +11,6 @@ class RatingPointModel extends RatingPointEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'date': date,
-      'rating': rating,
-    };
+    return {'date': date, 'rating': rating};
   }
 }

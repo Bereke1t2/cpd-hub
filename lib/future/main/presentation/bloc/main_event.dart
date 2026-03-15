@@ -8,6 +8,7 @@ class ChangePageEvent extends MainEvent {
 
   ChangePageEvent(this.pageIndex);
 }
+
 class SearchEvent extends MainEvent {
   final String query;
 
@@ -37,6 +38,7 @@ class LoadUserProfileEvent extends MainEvent {
 }
 
 class LoadDailyProblemsEvent extends MainEvent {}
+
 class LikeProblemEvent extends MainEvent {
   final String problemId;
 

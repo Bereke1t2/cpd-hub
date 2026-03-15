@@ -29,16 +29,16 @@ class ContestEntitiy extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        contestUrl,
-        startTime,
-        duration,
-        platform,
-        numberOfProblems,
-        numberOfContestants,
-        date,
-        isPast,
-        isParticipating,
-      ];
+    id,
+    title,
+    contestUrl,
+    startTime,
+    duration,
+    platform,
+    numberOfProblems,
+    numberOfContestants,
+    date,
+    isPast,
+    isParticipating,
+  ];
 }

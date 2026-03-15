@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import '../../../../core/ui_constants.dart';
 
 class ContestBox extends StatelessWidget {
@@ -23,34 +24,29 @@ class ContestBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     final isUpcoming = date.isAfter(DateTime.now());
-    final statusColor = isUpcoming ? UiConstants.primaryButtonColor : UiConstants.subtitleTextColor.withOpacity(0.5);
+    final statusColor = isUpcoming ? UiConstants.primaryButtonColor : UiConstants.subtitleTextColor.withValues(alpha: 0.5);
     final statusText = isUpcoming ? "Upcoming" : "Finished";
 
     return Hero(
-      tag: 'contest_${title}',
+      tag: 'contest_$title',
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: EdgeInsets.symmetric(horizontal: 16 * sc, vertical: 6 * sc),
         decoration: BoxDecoration(
           color: UiConstants.infoBackgroundColor,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.15)),
         ),
         child: Material(
           color: Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(20),
-            splashColor: UiConstants.primaryButtonColor.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(16),
+            splashColor: UiConstants.primaryButtonColor.withValues(alpha: 0.05),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(14 * sc),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -58,60 +54,53 @@ class ContestBox extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 4 * sc),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.1),
+                          color: statusColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: statusColor.withOpacity(0.2)),
                         ),
                         child: Text(
                           statusText,
                           style: TextStyle(
                             color: statusColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
+                            fontSize: 11 * sc,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
                           ),
                         ),
                       ),
                       if (participated)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(Icons.check_circle_outline_rounded, size: 12, color: Colors.blue),
-                              SizedBox(width: 4),
-                              Text(
-                                "Participated",
-                                style: TextStyle(color: Colors.blue, fontSize: 10, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.check_circle_rounded, size: 14 * sc, color: Colors.blue),
+                            SizedBox(width: 4 * sc),
+                            Text(
+                              "Participated",
+                              style: TextStyle(color: Colors.blue, fontSize: 11 * sc, fontWeight: FontWeight.w600),
+                            ),
+                          ],
                         ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 12 * sc),
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    style: TextStyle(
+                      fontSize: 15 * sc,
+                      fontWeight: FontWeight.w700,
                       color: UiConstants.mainTextColor,
-                      letterSpacing: -0.5,
+                      letterSpacing: -0.3,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 10 * sc),
                   Row(
                     children: [
-                      _buildStatIcon(Icons.code_rounded, "$numberOfProblems Problems"),
-                      const SizedBox(width: 16),
-                      _buildStatIcon(Icons.people_outline_rounded, "$numberOfContestants Contestants"),
-                      const SizedBox(width: 16),
-                      _buildStatIcon(Icons.access_time_rounded, isUpcoming ? "2h 30m" : "Ended"),
+                      _buildStatIcon(Icons.code_rounded, "$numberOfProblems Problems", sc),
+                      SizedBox(width: 16 * sc),
+                      _buildStatIcon(Icons.people_outline_rounded, "$numberOfContestants Users", sc),
+                      SizedBox(width: 16 * sc),
+                      _buildStatIcon(Icons.access_time_rounded, isUpcoming ? "2h 30m" : "Ended", sc),
                     ],
                   ),
                 ],
@@ -123,16 +112,16 @@ class ContestBox extends StatelessWidget {
     );
   }
 
-  Widget _buildStatIcon(IconData icon, String label) {
+  Widget _buildStatIcon(IconData icon, String label, double sc) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
-        const SizedBox(width: 4),
+        Icon(icon, size: 13 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.6)),
+        SizedBox(width: 5 * sc),
         Text(
           label,
           style: TextStyle(
-            color: UiConstants.subtitleTextColor.withOpacity(0.8),
-            fontSize: 11,
+            color: UiConstants.subtitleTextColor.withValues(alpha: 0.8),
+            fontSize: 11 * sc,
             fontWeight: FontWeight.w500,
           ),
         ),

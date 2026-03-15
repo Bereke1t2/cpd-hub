@@ -1,0 +1,18 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="128" y1="16" x2="128" y2="240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#32D74B"/>
+      <stop offset="1" stop-color="#1FA855"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Solid rounded hex badge -->
+  <path d="M128 16L220 69V187L128 240L36 187V69L128 16Z" fill="url(#bg)" rx="12"/>
+
+  <!-- Code brackets cut out in white -->
+  <path d="M102 82L66 128L102 174" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M154 82L190 128L154 174" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Slash -->
+  <line x1="144" y1="72" x2="112" y2="184" stroke="white" stroke-width="14" stroke-linecap="round" opacity="0.6"/>
+</svg>

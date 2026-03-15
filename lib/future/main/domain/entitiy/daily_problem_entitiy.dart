@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class DailyProblemEntitiy extends Equatable{
+class DailyProblemEntitiy extends Equatable {
   final String title;
   final String difficulty;
   final List<String> tags;
@@ -29,16 +29,16 @@ class DailyProblemEntitiy extends Equatable{
 
   @override
   List<Object?> get props => [
-        title,
-        difficulty,
-        tags,
-        problemUrl,
-        problemId,
-        isLiked,
-        isDisliked,
-        isSolved,
-        numberOfLikes,
-        numberOfDislikes,
-        numberOfSolvedPeople,
-      ];
+    title,
+    difficulty,
+    tags,
+    problemUrl,
+    problemId,
+    isLiked,
+    isDisliked,
+    isSolved,
+    numberOfLikes,
+    numberOfDislikes,
+    numberOfSolvedPeople,
+  ];
 }

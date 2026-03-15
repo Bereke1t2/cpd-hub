@@ -7,6 +7,7 @@ abstract class ProblemsState extends Equatable {
 }
 
 class ProblemsInitial extends ProblemsState {}
+
 class ProblemsLoading extends ProblemsState {}
 
 class ProblemsLoaded extends ProblemsState {

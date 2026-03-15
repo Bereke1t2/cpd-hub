@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 import 'package:cpd_hub/future/main/presentation/widget/profil_section.dart';
 
@@ -18,6 +19,7 @@ class InfoSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return Column(
       children: [
         Row(
@@ -30,7 +32,7 @@ class InfoSection extends StatelessWidget {
                 color: UiConstants.ratingTextColor,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12 * sc),
             Expanded(
               child: ProfileSection(
                 title: 'Global Rank',
@@ -41,7 +43,7 @@ class InfoSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12 * sc),
         Row(
           children: [
             Expanded(
@@ -52,7 +54,7 @@ class InfoSection extends StatelessWidget {
                 color: UiConstants.primaryButtonColor,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12 * sc),
             Expanded(
               child: ProfileSection(
                 title: 'Solved',

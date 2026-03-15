@@ -49,12 +49,14 @@ class HomeCubit extends Cubit<HomeState> {
     activityResult.fold((l) => activity = l, (_) {});
     infoResult.fold((l) => infos = l, (_) {});
 
-    emit(HomeLoaded(
-      dailyProblem: daily,
-      trendingProblems: problems,
-      upcomingContests: contests.where((c) => !c.isPast).toList(),
-      activityFeed: activity,
-      infoList: infos,
-    ));
+    emit(
+      HomeLoaded(
+        dailyProblem: daily,
+        trendingProblems: problems,
+        upcomingContests: contests.where((c) => !c.isPast).toList(),
+        activityFeed: activity,
+        infoList: infos,
+      ),
+    );
   }
 }

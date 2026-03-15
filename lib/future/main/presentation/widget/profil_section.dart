@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import '../../../../core/ui_constants.dart';
 
 class ProfileSection extends StatelessWidget {
@@ -17,37 +18,31 @@ class ProfileSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     final themeColor = color ?? UiConstants.statTextColor;
-    
+
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(12.0 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: themeColor.withOpacity(0.15), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: themeColor.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: themeColor.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(8.0 * sc),
             decoration: BoxDecoration(
-              color: themeColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12.0),
+              color: themeColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               icon,
               color: themeColor,
-              size: 28.0,
+              size: 20.0 * sc,
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 12 * sc),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,18 +51,18 @@ class ProfileSection extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11 * sc,
                     fontWeight: FontWeight.w600,
-                    color: UiConstants.subtitleTextColor.withOpacity(0.8),
-                    letterSpacing: 0.5,
+                    color: UiConstants.subtitleTextColor.withValues(alpha: 0.7),
+                    letterSpacing: 0.3,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 3 * sc),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                  style: TextStyle(
+                    fontSize: 15 * sc,
+                    fontWeight: FontWeight.w700,
                     color: UiConstants.mainTextColor,
                   ),
                 ),

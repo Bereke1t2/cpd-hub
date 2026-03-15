@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
-import 'package:cpd_hub/future/main/presentation/bloc/leaderboard_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
 
 class ContestLeaderboardPage extends StatelessWidget {
   final String contestId;
   final String contestTitle;
-  
+
   ContestLeaderboardPage({super.key, required this.contestId, required this.contestTitle});
 
   final List<Map<String, dynamic>> leaderboard = [
@@ -60,36 +59,37 @@ class ContestLeaderboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return BasePage(
       title: "Leaderboard",
       subtitle: contestTitle,
       showBackButton: true,
       body: Column(
         children: [
-          _buildPredictionHeader(),
-          const SizedBox(height: 16),
-          _buildProblemStatsHeatmap(),
-          const SizedBox(height: 24),
+          _buildPredictionHeader(sc),
+          SizedBox(height: 16 * sc),
+          _buildProblemStatsHeatmap(sc),
+          SizedBox(height: 24 * sc),
           Expanded(
-            child: _buildLeaderboardTable(),
+            child: _buildLeaderboardTable(sc),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPredictionHeader() {
+  Widget _buildPredictionHeader(double sc) {
     return Hero(
       tag: 'contest_$contestTitle',
       child: Container(
-        padding: const EdgeInsets.all(20),
-        margin: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.all(20 * sc),
+        margin: EdgeInsets.symmetric(horizontal: 16 * sc),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [UiConstants.primaryButtonColor.withOpacity(0.2), Colors.blue.withOpacity(0.1)],
+            colors: [UiConstants.primaryButtonColor.withValues(alpha: 0.2), Colors.blue.withValues(alpha: 0.1)],
           ),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.3)),
+          border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.3)),
         ),
         child: Material(
           color: Colors.transparent,
@@ -100,25 +100,25 @@ class ContestLeaderboardPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Your Performance", style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12)),
-                    const SizedBox(height: 4),
+                    Text("Your Performance", style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12 * sc)),
+                    SizedBox(height: 4 * sc),
                     Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 12,
-                      runSpacing: 4,
+                      spacing: 12 * sc,
+                      runSpacing: 4 * sc,
                       children: [
-                        const Text("Rank #42", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        Text("Rank #42", style: TextStyle(color: Colors.white, fontSize: 20 * sc, fontWeight: FontWeight.bold)),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.green.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
-                          child: const Text("+45 Rating", style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold)),
+                          padding: EdgeInsets.symmetric(horizontal: 8 * sc, vertical: 2 * sc),
+                          decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
+                          child: Text("+45 Rating", style: TextStyle(color: Colors.green, fontSize: 12 * sc, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.auto_graph_rounded, color: UiConstants.primaryButtonColor, size: 32),
+              Icon(Icons.auto_graph_rounded, color: UiConstants.primaryButtonColor, size: 32 * sc),
             ],
           ),
         ),
@@ -126,54 +126,54 @@ class ContestLeaderboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProblemStatsHeatmap() {
+  Widget _buildProblemStatsHeatmap(double sc) {
     final problems = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
     final solveRates = [0.95, 0.82, 0.45, 0.12, 0.03, 0.01, 0.005];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16 * sc),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Live Analytics", style: TextStyle(color: UiConstants.mainTextColor, fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-          const SizedBox(height: 12),
+          Text("Live Analytics", style: TextStyle(color: UiConstants.mainTextColor, fontSize: 13 * sc, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+          SizedBox(height: 12 * sc),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: List.generate(problems.length, (index) {
                 return Container(
-                  width: 65,
-                  margin: EdgeInsets.only(right: 8),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  width: 65 * sc,
+                  margin: EdgeInsets.only(right: 8 * sc),
+                  padding: EdgeInsets.symmetric(vertical: 12 * sc),
                   decoration: BoxDecoration(
                     color: UiConstants.infoBackgroundColor,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
+                    border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     children: [
-                      Text(problems[index], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-                      const SizedBox(height: 8),
+                      Text(problems[index], style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12 * sc)),
+                      SizedBox(height: 8 * sc),
                       Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
-                          Container(height: 40, width: 4, decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(2))),
+                          Container(height: 40 * sc, width: 4 * sc, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(2))),
                           Container(
-                            height: 40 * solveRates[index],
-                            width: 4,
+                            height: 40 * sc * solveRates[index],
+                            width: 4 * sc,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: solveRates[index] > 0.5 
-                                  ? [Colors.green, Colors.greenAccent] 
-                                  : [Colors.orange, Colors.redAccent],
+                                colors: solveRates[index] > 0.5
+                                    ? [Colors.green, Colors.greenAccent]
+                                    : [Colors.orange, Colors.redAccent],
                                 begin: Alignment.bottomCenter,
                                 end: Alignment.topCenter,
                               ),
                               borderRadius: BorderRadius.circular(2),
                               boxShadow: [
                                 BoxShadow(
-                                  color: (solveRates[index] > 0.5 ? Colors.green : Colors.orange).withOpacity(0.3),
+                                  color: (solveRates[index] > 0.5 ? Colors.green : Colors.orange).withValues(alpha: 0.3),
                                   blurRadius: 4,
                                 ),
                               ],
@@ -181,8 +181,8 @@ class ContestLeaderboardPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text("${(solveRates[index] * 100).toInt()}%", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.6), fontSize: 9, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 4 * sc),
+                      Text("${(solveRates[index] * 100).toInt()}%", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.6), fontSize: 9 * sc, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 );
@@ -194,26 +194,26 @@ class ContestLeaderboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLeaderboardTable() {
+  Widget _buildLeaderboardTable(double sc) {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16 * sc),
       itemCount: leaderboard.length,
       itemBuilder: (context, index) {
         final entry = leaderboard[index];
         final ratingColor = UiConstants.getUserRatingColor(entry['rating']);
-        
+
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: EdgeInsets.only(bottom: 12 * sc),
           decoration: BoxDecoration(
             color: UiConstants.infoBackgroundColor,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: UiConstants.borderColor.withOpacity(0.2)),
+            border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.2)),
             boxShadow: [
               BoxShadow(
-                color: ratingColor.withOpacity(0.05),
+                color: ratingColor.withValues(alpha: 0.05),
                 blurRadius: 15,
-                offset: const Offset(0, 4),
+                offset: Offset(0, 4),
               ),
             ],
           ),
@@ -222,15 +222,15 @@ class ContestLeaderboardPage extends StatelessWidget {
             child: InkWell(
               onTap: () {},
               borderRadius: BorderRadius.circular(24),
-              splashColor: ratingColor.withOpacity(0.1),
+              splashColor: ratingColor.withValues(alpha: 0.1),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                padding: EdgeInsets.symmetric(horizontal: 12 * sc, vertical: 14 * sc),
                 child: Row(
                   children: [
-                    _buildRankBadge(entry['rank']),
-                    const SizedBox(width: 12),
-                    _buildUserAvatar(entry['username'], ratingColor),
-                    const SizedBox(width: 12),
+                    _buildRankBadge(entry['rank'], sc),
+                    SizedBox(width: 12 * sc),
+                    _buildUserAvatar(entry['username'], ratingColor, sc),
+                    SizedBox(width: 12 * sc),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,24 +242,24 @@ class ContestLeaderboardPage extends StatelessWidget {
                             style: TextStyle(
                               color: ratingColor,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 16 * sc,
                               letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6 * sc),
                           Wrap(
-                            spacing: 3,
-                            runSpacing: 3,
+                            spacing: 3 * sc,
+                            runSpacing: 3 * sc,
                             children: ['A', 'B', 'C', 'D', 'E'].map((p) {
                               final solved = (entry['problems'] as List).contains(p);
                               return Container(
-                                width: 18,
-                                height: 18,
+                                width: 18 * sc,
+                                height: 18 * sc,
                                 decoration: BoxDecoration(
-                                  color: solved ? Colors.green.withOpacity(0.1) : Colors.white.withOpacity(0.03),
+                                  color: solved ? Colors.green.withValues(alpha: 0.1) : Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(4),
                                   border: Border.all(
-                                    color: solved ? Colors.green.withOpacity(0.3) : Colors.transparent,
+                                    color: solved ? Colors.green.withValues(alpha: 0.3) : Colors.transparent,
                                   ),
                                 ),
                                 child: Center(
@@ -267,7 +267,7 @@ class ContestLeaderboardPage extends StatelessWidget {
                                     p,
                                     style: TextStyle(
                                       color: solved ? Colors.green : Colors.white24,
-                                      fontSize: 8,
+                                      fontSize: 8 * sc,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -278,8 +278,8 @@ class ContestLeaderboardPage extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    _buildPerformanceColumn(entry['score'], entry['penalty']),
+                    SizedBox(width: 8 * sc),
+                    _buildPerformanceColumn(entry['score'], entry['penalty'], sc),
                   ],
                 ),
               ),
@@ -290,7 +290,7 @@ class ContestLeaderboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRankBadge(int rank) {
+  Widget _buildRankBadge(int rank, double sc) {
     Color badgeColor;
     IconData? rankIcon;
     bool isElite = rank <= 3;
@@ -305,26 +305,26 @@ class ContestLeaderboardPage extends StatelessWidget {
       badgeColor = Colors.brown[300]!;
       rankIcon = Icons.military_tech_rounded;
     } else {
-      badgeColor = UiConstants.subtitleTextColor.withOpacity(0.6);
+      badgeColor = UiConstants.subtitleTextColor.withValues(alpha: 0.6);
     }
 
     return Container(
-      width: 32,
-      height: 48,
+      width: 32 * sc,
+      height: 48 * sc,
       decoration: BoxDecoration(
-        color: badgeColor.withOpacity(isElite ? 0.15 : 0.05),
+        color: badgeColor.withValues(alpha: isElite ? 0.15 : 0.05),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (isElite) Icon(rankIcon, size: 14, color: badgeColor),
+          if (isElite) Icon(rankIcon, size: 14 * sc, color: badgeColor),
           Text(
             "#$rank",
             style: TextStyle(
               color: badgeColor,
               fontWeight: FontWeight.w900,
-              fontSize: 10,
+              fontSize: 10 * sc,
             ),
           ),
         ],
@@ -332,92 +332,92 @@ class ContestLeaderboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildUserAvatar(String username, Color ratingColor) {
+  Widget _buildUserAvatar(String username, Color ratingColor, double sc) {
     return Container(
-      padding: const EdgeInsets.all(2),
+      padding: EdgeInsets.all(2 * sc),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: ratingColor.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: ratingColor.withValues(alpha: 0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: ratingColor.withOpacity(0.2),
+            color: ratingColor.withValues(alpha: 0.2),
             blurRadius: 8,
             spreadRadius: 1,
           ),
         ],
       ),
       child: CircleAvatar(
-        radius: 18,
+        radius: 18 * sc,
         backgroundColor: UiConstants.infoBackgroundColor,
         child: Text(
           username[0].toUpperCase(),
-          style: TextStyle(color: ratingColor, fontWeight: FontWeight.bold, fontSize: 14),
+          style: TextStyle(color: ratingColor, fontWeight: FontWeight.bold, fontSize: 14 * sc),
         ),
       ),
     );
   }
 
-  Widget _buildPerformanceColumn(num score, int penalty) {
+  Widget _buildPerformanceColumn(num score, int penalty, double sc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _buildMiniMetric(Icons.star_rounded, score.toString(), Colors.blue),
-        const SizedBox(height: 4),
-        _buildMiniMetric(Icons.timer_rounded, "${penalty}m", Colors.orange),
+        _buildMiniMetric(Icons.star_rounded, score.toString(), Colors.blue, sc),
+        SizedBox(height: 4 * sc),
+        _buildMiniMetric(Icons.timer_rounded, "${penalty}m", Colors.orange, sc),
       ],
     );
   }
 
-  Widget _buildMiniMetric(IconData icon, String value, Color color) {
+  Widget _buildMiniMetric(IconData icon, String value, Color color, double sc) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           value,
           style: TextStyle(
-            color: color.withOpacity(0.9),
+            color: color.withValues(alpha: 0.9),
             fontWeight: FontWeight.w900,
-            fontSize: 12,
+            fontSize: 12 * sc,
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(width: 4),
-        Icon(icon, size: 12, color: color.withOpacity(0.7)),
+        SizedBox(width: 4 * sc),
+        Icon(icon, size: 12 * sc, color: color.withValues(alpha: 0.7)),
       ],
     );
   }
 
-  Widget _buildMetricBadge(IconData icon, String value, String label, Color color) {
+  Widget _buildMetricBadge(IconData icon, String value, String label, Color color, double sc) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 8 * sc),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 12, color: color),
-              const SizedBox(width: 4),
+              Icon(icon, size: 12 * sc, color: color),
+              SizedBox(width: 4 * sc),
               Text(
                 value,
                 style: TextStyle(
                   color: color,
                   fontWeight: FontWeight.w900,
-                  fontSize: 13,
+                  fontSize: 13 * sc,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2 * sc),
           Text(
             label,
             style: TextStyle(
-              color: color.withOpacity(0.6),
-              fontSize: 8,
+              color: color.withValues(alpha: 0.6),
+              fontSize: 8 * sc,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
             ),

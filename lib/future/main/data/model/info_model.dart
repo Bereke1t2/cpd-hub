@@ -1,10 +1,7 @@
 import 'package:cpd_hub/future/main/domain/entitiy/info_entitity.dart';
 
-class InfoModel extends InfoEntity{
-  const InfoModel({
-    required super.title,
-    required super.description,
-  });
+class InfoModel extends InfoEntity {
+  const InfoModel({required super.title, required super.description});
   factory InfoModel.fromJson(Map<String, dynamic> json) {
     return InfoModel(
       title: json['title'] ?? '',
@@ -12,10 +9,6 @@ class InfoModel extends InfoEntity{
     );
   }
   Map<String, dynamic> toJson() {
-    return {
-      'title': title,
-      'description': description,
-    };
+    return {'title': title, 'description': description};
   }
-
 }

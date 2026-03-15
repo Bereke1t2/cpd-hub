@@ -32,9 +32,17 @@ class ProfileCubit extends Cubit<ProfileState> {
     emit(ProfileLoading());
 
     final profileResult = await getProfile(username);
-    final heatmapResult = await getHeatmap(username, DateTime.now().month, DateTime.now().year);
+    final heatmapResult = await getHeatmap(
+      username,
+      DateTime.now().month,
+      DateTime.now().year,
+    );
     final ratingResult = await getRatingHistory(username);
-    final attendanceResult = await getAttendance(username, DateTime.now().month, DateTime.now().year);
+    final attendanceResult = await getAttendance(
+      username,
+      DateTime.now().month,
+      DateTime.now().year,
+    );
     final submissionsResult = await getSubmissions(username);
 
     UserEntity? user;
@@ -50,30 +58,38 @@ class ProfileCubit extends Cubit<ProfileState> {
     submissionsResult.fold((l) => submissions = l, (_) {});
 
     if (user != null) {
-      emit(ProfileLoaded(
-        user: user!,
-        heatmapData: heatmap,
-        ratingHistory: ratings,
-        attendanceData: attendance,
-        submissionData: submissions,
-      ));
+      emit(
+        ProfileLoaded(
+          user: user!,
+          heatmapData: heatmap,
+          ratingHistory: ratings,
+          attendanceData: attendance,
+          submissionData: submissions,
+        ),
+      );
     } else {
       emit(const ProfileError('Failed to load profile'));
     }
   }
 
-  Future<void> loadAttendanceForMonth(String username, int month, int year) async {
+  Future<void> loadAttendanceForMonth(
+    String username,
+    int month,
+    int year,
+  ) async {
     if (state is ProfileLoaded) {
       final current = state as ProfileLoaded;
       final result = await getAttendance(username, month, year);
       result.fold(
-        (attendance) => emit(ProfileLoaded(
-          user: current.user,
-          heatmapData: current.heatmapData,
-          ratingHistory: current.ratingHistory,
-          attendanceData: attendance,
-          submissionData: current.submissionData,
-        )),
+        (attendance) => emit(
+          ProfileLoaded(
+            user: current.user,
+            heatmapData: current.heatmapData,
+            ratingHistory: current.ratingHistory,
+            attendanceData: attendance,
+            submissionData: current.submissionData,
+          ),
+        ),
         (_) {},
       );
     }
@@ -84,13 +100,15 @@ class ProfileCubit extends Cubit<ProfileState> {
       final current = state as ProfileLoaded;
       final result = await getHeatmap(username, month, year);
       result.fold(
-        (heatmap) => emit(ProfileLoaded(
-          user: current.user,
-          heatmapData: heatmap,
-          ratingHistory: current.ratingHistory,
-          attendanceData: current.attendanceData,
-          submissionData: current.submissionData,
-        )),
+        (heatmap) => emit(
+          ProfileLoaded(
+            user: current.user,
+            heatmapData: heatmap,
+            ratingHistory: current.ratingHistory,
+            attendanceData: current.attendanceData,
+            submissionData: current.submissionData,
+          ),
+        ),
         (_) {},
       );
     }

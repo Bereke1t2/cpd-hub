@@ -16,10 +16,6 @@ class SocialLinkModel extends SocialLinkEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'platform': platform,
-      'url': url,
-      'handle': handle,
-    };
+    return {'platform': platform, 'url': url, 'handle': handle};
   }
 }

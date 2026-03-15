@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/home_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/widget/problem_box.dart';
 import 'problem_details_page.dart';
@@ -26,6 +27,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return BasePage(
       selectedIndex: 0,
       title: 'Home',
@@ -36,7 +38,7 @@ class _HomePageState extends State<HomePage> {
             return const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor));
           }
           if (state is HomeLoaded) {
-            return _buildContent(state);
+            return _buildContent(context, state, sc);
           }
           if (state is HomeError) {
             return Center(child: Text(state.message, style: const TextStyle(color: Colors.redAccent)));
@@ -47,23 +49,23 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildContent(HomeLoaded state) {
+  Widget _buildContent(BuildContext context, HomeLoaded state, double sc) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
           const WelcomeBackBox(name: 'Bereket'),
 
-          _buildSectionHeader(Icons.emoji_events_rounded, "Upcoming Contests"),
-          _buildContestCarousel(state),
-          const SizedBox(height: 24),
+          _buildSectionHeader(Icons.emoji_events_rounded, "Upcoming Contests", sc),
+          _buildContestCarousel(state, sc),
+          SizedBox(height: 20 * sc),
 
-          _buildSectionHeader(Icons.notifications_active_rounded, "Latest Updates"),
+          _buildSectionHeader(Icons.notifications_active_rounded, "Latest Updates", sc),
           ...state.infoList.map((info) => InfoBox(title: info.title, description: info.description)),
-          const SizedBox(height: 12),
+          SizedBox(height: 10 * sc),
 
           if (state.dailyProblem != null) ...[
-            _buildSectionHeader(Icons.auto_awesome_rounded, "Daily Challenge"),
+            _buildSectionHeader(Icons.auto_awesome_rounded, "Daily Challenge", sc),
             TodaysProblemBox(
               problemTitle: state.dailyProblem!.title,
               solved: state.dailyProblem!.numberOfSolvedPeople.toDouble(),
@@ -87,52 +89,52 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 20 * sc),
           ],
 
-          _buildSectionHeader(Icons.analytics_rounded, "Live Activity"),
-          _buildActivityFeed(state),
-          const SizedBox(height: 24),
+          _buildSectionHeader(Icons.analytics_rounded, "Live Activity", sc),
+          _buildActivityFeed(state, sc),
+          SizedBox(height: 20 * sc),
 
-          _buildSectionHeader(Icons.trending_up_rounded, "Trending Problems"),
-          _buildProblemsSection(state),
-          const SizedBox(height: 100),
+          _buildSectionHeader(Icons.trending_up_rounded, "Trending Problems", sc),
+          _buildProblemsSection(context, state, sc),
+          SizedBox(height: 80 * sc),
         ],
       ),
     );
   }
 
-  Widget _buildContestCarousel(HomeLoaded state) {
+  Widget _buildContestCarousel(HomeLoaded state, double sc) {
     final contests = state.upcomingContests;
     if (contests.isEmpty) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text("No upcoming contests", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5))),
+        padding: EdgeInsets.symmetric(horizontal: 16 * sc),
+        child: Text("No upcoming contests", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5))),
       );
     }
 
     return SizedBox(
-      height: 140,
+      height: 120 * sc,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16 * sc),
         itemCount: contests.length,
         itemBuilder: (context, index) {
           final c = contests[index];
           final isStarted = c.startTime == "Started" || c.duration.isEmpty;
 
           return Container(
-            width: 220,
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.all(20),
+            width: 200 * sc,
+            margin: EdgeInsets.only(right: 10 * sc),
+            padding: EdgeInsets.all(14 * sc),
             decoration: BoxDecoration(
               color: isStarted
-                  ? Colors.redAccent.withOpacity(0.1)
-                  : UiConstants.infoBackgroundColor.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(24),
+                  ? Colors.redAccent.withValues(alpha: 0.08)
+                  : UiConstants.infoBackgroundColor.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: isStarted ? Colors.redAccent.withOpacity(0.3) : UiConstants.borderColor.withOpacity(0.15),
+                color: isStarted ? Colors.redAccent.withValues(alpha: 0.25) : UiConstants.borderColor.withValues(alpha: 0.12),
               ),
             ),
             child: Column(
@@ -143,22 +145,22 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 8 * sc, vertical: 4 * sc),
                       decoration: BoxDecoration(
                         color: isStarted ? Colors.redAccent : UiConstants.primaryButtonColor,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         isStarted ? "LIVE" : "Rated",
-                        style: const TextStyle(color: Colors.black, fontSize: 9, fontWeight: FontWeight.w900),
+                        style: TextStyle(color: Colors.black, fontSize: 10 * sc, fontWeight: FontWeight.w800),
                       ),
                     ),
                     if (!isStarted)
                       Row(
                         children: [
-                          Icon(Icons.timer_rounded, size: 12, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
-                          const SizedBox(width: 4),
-                          Text(c.duration, style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.6), fontSize: 10, fontWeight: FontWeight.bold)),
+                          Icon(Icons.timer_rounded, size: 13 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.6)),
+                          SizedBox(width: 4 * sc),
+                          Text(c.duration, style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.6), fontSize: 11 * sc, fontWeight: FontWeight.w600)),
                         ],
                       ),
                   ],
@@ -167,11 +169,11 @@ class _HomePageState extends State<HomePage> {
                   c.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: UiConstants.mainTextColor, fontSize: 16, fontWeight: FontWeight.w900, height: 1.2),
+                  style: TextStyle(color: UiConstants.mainTextColor, fontSize: 14 * sc, fontWeight: FontWeight.w800, height: 1.2),
                 ),
                 Text(
                   isStarted ? "Contest is running now" : "Registration Open",
-                  style: TextStyle(color: isStarted ? Colors.redAccent : Colors.greenAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: isStarted ? Colors.redAccent : Colors.greenAccent, fontSize: 11 * sc, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -181,15 +183,15 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActivityFeed(HomeLoaded state) {
+  Widget _buildActivityFeed(HomeLoaded state, double sc) {
     final activities = state.activityFeed;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: 16 * sc),
+      padding: EdgeInsets.all(14 * sc),
       decoration: BoxDecoration(
-        color: UiConstants.infoBackgroundColor.withOpacity(0.6),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.1)),
+        color: UiConstants.infoBackgroundColor.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.08)),
       ),
       child: Column(
         children: activities.asMap().entries.map((entry) {
@@ -216,11 +218,11 @@ class _HomePageState extends State<HomePage> {
           }
           return Column(
             children: [
-              _buildActivityItem(icon, color, '${activity.username} ${activity.action}', activity.timestamp),
+              _buildActivityItem(icon, color, '${activity.username} ${activity.action}', activity.timestamp, sc),
               if (!isLast)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
-                  child: Divider(color: Colors.white10, height: 1),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0 * sc),
+                  child: const Divider(color: Colors.white10, height: 1),
                 ),
             ],
           );
@@ -229,46 +231,46 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActivityItem(IconData icon, Color color, String text, String time) {
+  Widget _buildActivityItem(IconData icon, Color color, String text, String time, double sc) {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(6 * sc),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: color, size: 14),
+          child: Icon(icon, color: color, size: 14 * sc),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12 * sc),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(color: UiConstants.mainTextColor, fontSize: 13, fontWeight: FontWeight.bold),
+            style: TextStyle(color: UiConstants.mainTextColor, fontSize: 13 * sc, fontWeight: FontWeight.w600),
           ),
         ),
         Text(
           time,
-          style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 11, fontWeight: FontWeight.w500),
+          style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 11 * sc, fontWeight: FontWeight.w500),
         ),
       ],
     );
   }
 
-  Widget _buildSectionHeader(IconData icon, String title) {
+  Widget _buildSectionHeader(IconData icon, String title, double sc) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+      padding: EdgeInsets.fromLTRB(16 * sc, 6 * sc, 16 * sc, 12 * sc),
       child: Row(
         children: [
-          Icon(icon, color: UiConstants.primaryButtonColor, size: 18),
-          const SizedBox(width: 10),
+          Icon(icon, color: UiConstants.primaryButtonColor, size: 18 * sc),
+          SizedBox(width: 8 * sc),
           Text(
             title.toUpperCase(),
-            style: const TextStyle(
-              color: UiConstants.mainTextColor,
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.5,
+            style: TextStyle(
+              color: UiConstants.subtitleTextColor.withValues(alpha: 0.7),
+              fontSize: 12 * sc,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.2,
             ),
           ),
         ],
@@ -276,33 +278,33 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildProblemsSection(HomeLoaded state) {
+  Widget _buildProblemsSection(BuildContext context, HomeLoaded state, double sc) {
     final problems = state.trendingProblems;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: EdgeInsets.symmetric(horizontal: 16.0 * sc),
       decoration: BoxDecoration(
-        color: UiConstants.infoBackgroundColor.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(24.0),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.1)),
+        color: UiConstants.infoBackgroundColor.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.08)),
       ),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.fromLTRB(16.0 * sc, 16.0 * sc, 16.0 * sc, 10.0 * sc),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.grid_view_rounded, color: UiConstants.primaryButtonColor, size: 20),
-                    SizedBox(width: 12.0),
+                    Icon(Icons.grid_view_rounded, color: UiConstants.primaryButtonColor, size: 18 * sc),
+                    SizedBox(width: 10.0 * sc),
                     Text(
                       "Trending Problems",
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: UiConstants.mainTextColor),
+                      style: TextStyle(fontSize: 15 * sc, fontWeight: FontWeight.w700, color: UiConstants.mainTextColor),
                     ),
                   ],
                 ),
-                Icon(Icons.tune_rounded, color: UiConstants.subtitleTextColor.withOpacity(0.5), size: 20),
+                Icon(Icons.tune_rounded, color: UiConstants.subtitleTextColor.withValues(alpha: 0.4), size: 20 * sc),
               ],
             ),
           ),
@@ -324,30 +326,30 @@ class _HomePageState extends State<HomePage> {
             );
           }),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(14.0 * sc),
             child: InkWell(
               onTap: () => Navigator.pushNamed(context, '/problems'),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 14.0),
+                padding: EdgeInsets.symmetric(vertical: 14.0 * sc),
                 decoration: BoxDecoration(
-                  color: UiConstants.primaryButtonColor.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(16.0),
+                  color: UiConstants.primaryButtonColor.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'EXPLORE ALL PROBLEMS',
                       style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1,
+                        fontSize: 12 * sc,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
                         color: UiConstants.primaryButtonColor,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward_ios_rounded, size: 10, color: UiConstants.primaryButtonColor),
+                    SizedBox(width: 8 * sc),
+                    Icon(Icons.arrow_forward_ios_rounded, size: 12 * sc, color: UiConstants.primaryButtonColor),
                   ],
                 ),
               ),

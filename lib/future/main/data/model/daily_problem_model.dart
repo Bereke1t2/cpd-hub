@@ -29,23 +29,24 @@ class DailyProblemModel extends DailyProblemEntitiy {
       isSolved: json['isSolved'] as bool? ?? false,
       numberOfLikes: (json['numberOfLikes'] as num?)?.toInt() ?? 0,
       numberOfDislikes: (json['numberOfDislikes'] as num?)?.toInt() ?? 0,
-      numberOfSolvedPeople: (json['numberOfSolvedPeople'] as num?)?.toInt() ?? 0,
+      numberOfSolvedPeople:
+          (json['numberOfSolvedPeople'] as num?)?.toInt() ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'difficulty': difficulty,
-        'tags': tags,
-        'problemUrl': problemUrl,
-        'problemId': problemId,
-        'isLiked': isLiked,
-        'isDisliked': isDisliked,
-        'isSolved': isSolved,
-        'numberOfLikes': numberOfLikes,
-        'numberOfDislikes': numberOfDislikes,
-        'numberOfSolvedPeople': numberOfSolvedPeople,
-      };
+    'title': title,
+    'difficulty': difficulty,
+    'tags': tags,
+    'problemUrl': problemUrl,
+    'problemId': problemId,
+    'isLiked': isLiked,
+    'isDisliked': isDisliked,
+    'isSolved': isSolved,
+    'numberOfLikes': numberOfLikes,
+    'numberOfDislikes': numberOfDislikes,
+    'numberOfSolvedPeople': numberOfSolvedPeople,
+  };
 
   DailyProblemModel copyWith({
     String? title,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 
 import '../../../../core/ui_constants.dart';
 
@@ -8,16 +9,16 @@ class TagBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return Container(
-      margin: EdgeInsets.only(right: 2.0),
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0 * sc, horizontal: 10.0 * sc),
       decoration: BoxDecoration(
         color: UiConstants.secondaryButtonColor,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         tag,
-        style: TextStyle(color: UiConstants.mainTextColor, fontSize: 12.0),
+        style: TextStyle(color: UiConstants.mainTextColor, fontSize: 11.0 * sc, fontWeight: FontWeight.w500),
       ),
     );
   }

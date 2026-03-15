@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 import 'package:cpd_hub/future/main/presentation/widget/liked_and_dis_button.dart';
-import 'package:cpd_hub/future/main/presentation/widget/normal_buttons.dart';
+
 import 'package:cpd_hub/future/main/presentation/widget/tag_box.dart';
 
 class TodaysProblemBox extends StatelessWidget {
@@ -15,163 +15,145 @@ class TodaysProblemBox extends StatelessWidget {
   final double disliked;
   final String difficulty;
   final VoidCallback? onTap;
-  const TodaysProblemBox({super.key , required this.problemTitle , required this.solved , required this.tags , required this.liked , required this.disliked , required this.difficulty , required this.isLiked , required this.isDisliked, this.onTap});
+  const TodaysProblemBox({
+    super.key,
+    required this.problemTitle,
+    required this.solved,
+    required this.tags,
+    required this.liked,
+    required this.disliked,
+    required this.difficulty,
+    required this.isLiked,
+    required this.isDisliked,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      margin: EdgeInsets.symmetric(horizontal: 16.0 * sc, vertical: 4.0 * sc),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            UiConstants.primaryButtonColor.withOpacity(0.15),
-            UiConstants.primaryButtonColor.withOpacity(0.05),
+            UiConstants.primaryButtonColor.withValues(alpha: 0.12),
+            UiConstants.primaryButtonColor.withValues(alpha: 0.04),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(28.0),
-        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: UiConstants.primaryButtonColor.withOpacity(0.1),
-            blurRadius: 30,
-            spreadRadius: -10,
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.15)),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28.0),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            splashColor: UiConstants.primaryButtonColor.withOpacity(0.1),
-            child: Stack(
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          splashColor: UiConstants.primaryButtonColor.withValues(alpha: 0.08),
+          child: Padding(
+            padding: EdgeInsets.all(16.0 * sc),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            Positioned(
-              right: -20,
-              top: -20,
-              child: Icon(
-                Icons.star_rounded,
-                size: 150,
-                color: UiConstants.primaryButtonColor.withOpacity(0.03),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: UiConstants.primaryButtonColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          "DAILY TASK",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                          ),
-                        ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 4 * sc),
+                      decoration: BoxDecoration(
+                        color: UiConstants.primaryButtonColor,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const SizedBox(width: 12),
-                      Row(
-                        children: [
-                          Icon(Icons.people_alt_rounded, size: 14, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
-                          const SizedBox(width: 4),
-                          Text(
-                            "${solved.toInt()} solvers",
-                            style: TextStyle(
-                              color: UiConstants.subtitleTextColor.withOpacity(0.6),
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16.0),
-                  Hero(
-                    tag: 'problem_$problemTitle',
-                    child: Material(
-                      color: Colors.transparent,
                       child: Text(
-                        problemTitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          color: UiConstants.mainTextColor,
-                          letterSpacing: -0.8,
+                        "DAILY",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 10 * sc,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12.0),
-                  Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: tags.map((tag) => TagBox(tag: tag)).toList(),
-                  ),
-                  const SizedBox(height: 24.0),
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      LikedAndDislikedButtons(
-                        isLiked: isLiked,
-                        isDisliked: isDisliked,
-                        likedCount: liked.toInt(),
-                        dislikedCount: disliked.toInt(),
-                        onLike: () {},
-                        onDislike: () {},
+                    SizedBox(width: 12 * sc),
+                    Icon(Icons.people_alt_rounded, size: 14 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.5)),
+                    SizedBox(width: 4 * sc),
+                    Text(
+                      "${solved.toInt()} solvers",
+                      style: TextStyle(
+                        color: UiConstants.subtitleTextColor.withValues(alpha: 0.5),
+                        fontSize: 11 * sc,
+                        fontWeight: FontWeight.w600,
                       ),
-                      ElevatedButton(
-                        onPressed: onTap,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.05),
-                          foregroundColor: UiConstants.mainTextColor,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 12.0 * sc),
+                Hero(
+                  tag: 'problem_$problemTitle',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(
+                      problemTitle,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16 * sc,
+                        fontWeight: FontWeight.w800,
+                        color: UiConstants.mainTextColor,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.0 * sc),
+                Wrap(
+                  spacing: 6.0 * sc,
+                  runSpacing: 6.0 * sc,
+                  children: tags.map((tag) => TagBox(tag: tag)).toList(),
+                ),
+                SizedBox(height: 16.0 * sc),
+                Row(
+                  children: [
+                    LikedAndDislikedButtons(
+                      isLiked: isLiked,
+                      isDisliked: isDisliked,
+                      likedCount: liked.toInt(),
+                      dislikedCount: disliked.toInt(),
+                      onLike: () {},
+                      onDislike: () {},
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: onTap,
+                      style: TextButton.styleFrom(
+                        foregroundColor: UiConstants.primaryButtonColor,
+                        padding: EdgeInsets.symmetric(horizontal: 16 * sc, vertical: 10 * sc),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: UiConstants.primaryButtonColor.withValues(alpha: 0.2)),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "Solve",
+                            style: TextStyle(fontSize: 12 * sc, fontWeight: FontWeight.w700),
                           ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Details",
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward_ios_rounded, size: 10),
-                          ],
-                        ),
+                          SizedBox(width: 6 * sc),
+                          Icon(Icons.arrow_forward_ios_rounded, size: 12 * sc),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
-    ),
-  ),
-);
+    );
   }
 }

@@ -15,7 +15,7 @@ class UserModel extends UserEntity {
     required super.globalRank,
     required super.attendedContestsCount,
     required super.socialLinks,
-  }); 
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -30,9 +30,10 @@ class UserModel extends UserEntity {
       contributions: json['contributions'] ?? 0,
       globalRank: json['globalRank'] ?? 0,
       attendedContestsCount: json['attendedContestsCount'] ?? 0,
-      socialLinks: (json['socialLinks'] as List?)
-          ?.map((e) => SocialLinkModel.fromJson(e))
-          .toList() ??
+      socialLinks:
+          (json['socialLinks'] as List?)
+              ?.map((e) => SocialLinkModel.fromJson(e))
+              .toList() ??
           [],
     );
   }
@@ -50,8 +51,9 @@ class UserModel extends UserEntity {
       'contributions': contributions,
       'globalRank': globalRank,
       'attendedContestsCount': attendedContestsCount,
-      'socialLinks': socialLinks.map((e) => (e as SocialLinkModel).toJson()).toList(),
+      'socialLinks': socialLinks
+          .map((e) => (e as SocialLinkModel).toJson())
+          .toList(),
     };
   }
-
 }

@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 
 import '../../../../core/ui_constants.dart';
-import 'big_button.dart';
 
 class WelcomeBackBox extends StatelessWidget {
   final String name;
 
-  const WelcomeBackBox({super.key , required this.name});
+  const WelcomeBackBox({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      padding: const EdgeInsets.all(24),
+      margin: EdgeInsets.fromLTRB(16 * sc, 10 * sc, 16 * sc, 16 * sc),
+      padding: EdgeInsets.all(16 * sc),
       decoration: BoxDecoration(
-        color: UiConstants.infoBackgroundColor.withOpacity(0.8),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.15)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: UiConstants.infoBackgroundColor.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.12)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: Column(
@@ -38,19 +31,19 @@ class WelcomeBackBox extends StatelessWidget {
                   children: [
                     Text(
                       'Hello, ${name.split(' ').first}!',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: UiConstants.mainTextColor,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -1,
+                        fontSize: 20 * sc,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 5 * sc),
                     Text(
                       "Ready to crush some code today?",
                       style: TextStyle(
-                        color: UiConstants.subtitleTextColor.withOpacity(0.7),
-                        fontSize: 14,
+                        color: UiConstants.subtitleTextColor.withValues(alpha: 0.6),
+                        fontSize: 13 * sc,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -58,34 +51,34 @@ class WelcomeBackBox extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(10 * sc),
                 decoration: BoxDecoration(
-                  color: UiConstants.primaryButtonColor.withOpacity(0.1),
+                  color: UiConstants.primaryButtonColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.rocket_launch_rounded, color: UiConstants.primaryButtonColor, size: 28),
+                child: Icon(Icons.rocket_launch_rounded, color: UiConstants.primaryButtonColor, size: 22 * sc),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 14 * sc),
           SizedBox(
             width: double.infinity,
-            height: 50,
+            height: 42 * sc,
             child: ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/problems'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: UiConstants.primaryButtonColor,
                 foregroundColor: Colors.black,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                textStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                textStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 12 * sc, letterSpacing: 0.5),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("START SOLVING"),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward_rounded, size: 16),
+                  SizedBox(width: 8 * sc),
+                  Icon(Icons.arrow_forward_rounded, size: 14 * sc),
                 ],
               ),
             ),

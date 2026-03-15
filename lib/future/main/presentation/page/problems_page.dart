@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/problems_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
@@ -26,6 +27,7 @@ class _ProblemsPageState extends State<ProblemsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return BasePage(
       selectedIndex: 1,
       title: 'Problems',
@@ -36,7 +38,7 @@ class _ProblemsPageState extends State<ProblemsPage> {
             return const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor));
           }
           if (state is ProblemsLoaded) {
-            return _buildContent(state);
+            return _buildContent(context, state, sc);
           }
           if (state is ProblemsError) {
             return Center(child: Text(state.message, style: const TextStyle(color: Colors.redAccent)));
@@ -47,7 +49,7 @@ class _ProblemsPageState extends State<ProblemsPage> {
     );
   }
 
-  Widget _buildContent(ProblemsLoaded state) {
+  Widget _buildContent(BuildContext context, ProblemsLoaded state, double sc) {
     final filteredProblems = state.problems.where((p) {
       final matchesSearch = p.title.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesDifficulty = _selectedDifficulty == "All" || p.difficulty == _selectedDifficulty;
@@ -57,15 +59,20 @@ class _ProblemsPageState extends State<ProblemsPage> {
     return CustomScrollView(
       physics: const BouncingScrollPhysics(),
       slivers: [
-        _buildCreativeHeader(),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: _buildFilters(),
+            padding: EdgeInsets.fromLTRB(16 * sc, 16 * sc, 16 * sc, 8 * sc),
+            child: _buildSearchField(sc),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16 * sc, 0, 16 * sc, 12 * sc),
+            child: _buildFilters(sc),
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16 * sc),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
@@ -95,116 +102,35 @@ class _ProblemsPageState extends State<ProblemsPage> {
             ),
           ),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 100)),
+        SliverToBoxAdapter(child: SizedBox(height: 80 * sc)),
       ],
     );
   }
 
-  Widget _buildCreativeHeader() {
-    return SliverToBoxAdapter(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              UiConstants.primaryButtonColor.withOpacity(0.12),
-              Colors.transparent,
-            ],
-          ),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: -50,
-              top: -50,
-              child: Icon(
-                Icons.code_rounded,
-                size: 280,
-                color: UiConstants.primaryButtonColor.withOpacity(0.03),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24.0, 48.0, 24.0, 32.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: UiConstants.primaryButtonColor.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.hub_rounded, color: UiConstants.primaryButtonColor, size: 24),
-                      ),
-                      const SizedBox(width: 16),
-                      const Flexible(
-                        child: Text(
-                          "Challenge Hub",
-                          style: TextStyle(
-                            color: UiConstants.mainTextColor,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -1.2,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "Master modern algorithms and data structures through our curated curriculum.",
-                    style: TextStyle(
-                      color: UiConstants.subtitleTextColor.withOpacity(0.6),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  _buildSearchField(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchField() {
+  Widget _buildSearchField(double sc) {
     return Container(
-      height: 56,
+      height: 44 * sc,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: Colors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: TextField(
         controller: _searchController,
         onChanged: (val) => setState(() => _searchQuery = val),
-        style: const TextStyle(color: Colors.white, fontSize: 14),
+        style: TextStyle(color: Colors.white, fontSize: 14 * sc),
         decoration: InputDecoration(
-          hintText: "Search challenges...",
-          hintStyle: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.4), fontSize: 13),
-          prefixIcon: const Icon(Icons.search_rounded, color: UiConstants.primaryButtonColor, size: 20),
+          hintText: "Search problems...",
+          hintStyle: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.4), fontSize: 13 * sc),
+          prefixIcon: Icon(Icons.search_rounded, color: UiConstants.primaryButtonColor, size: 20 * sc),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16 * sc, vertical: 13 * sc),
         ),
       ),
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(double sc) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
@@ -212,22 +138,22 @@ class _ProblemsPageState extends State<ProblemsPage> {
         children: ["All", "Easy", "Medium", "Hard"].map((diff) {
           final isSelected = _selectedDifficulty == diff;
           return Padding(
-            padding: const EdgeInsets.only(right: 10.0),
+            padding: EdgeInsets.only(right: 10.0 * sc),
             child: GestureDetector(
               onTap: () => setState(() => _selectedDifficulty = diff),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: EdgeInsets.symmetric(horizontal: 14 * sc, vertical: 8 * sc),
                 decoration: BoxDecoration(
-                  color: isSelected ? UiConstants.primaryButtonColor : Colors.white.withOpacity(0.03),
+                  color: isSelected ? UiConstants.primaryButtonColor : Colors.white.withValues(alpha: 0.03),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: isSelected ? Colors.transparent : Colors.white10),
                 ),
                 child: Row(
                   children: [
-                    Icon(_getDifficultyIcon(diff), size: 14, color: isSelected ? Colors.black : UiConstants.subtitleTextColor),
-                    const SizedBox(width: 8),
-                    Text(diff, style: TextStyle(color: isSelected ? Colors.black : UiConstants.subtitleTextColor, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.5)),
+                    Icon(_getDifficultyIcon(diff), size: 14 * sc, color: isSelected ? Colors.black : UiConstants.subtitleTextColor),
+                    SizedBox(width: 6 * sc),
+                    Text(diff, style: TextStyle(color: isSelected ? Colors.black : UiConstants.subtitleTextColor, fontWeight: FontWeight.w900, fontSize: 12 * sc, letterSpacing: 0.5)),
                   ],
                 ),
               ),

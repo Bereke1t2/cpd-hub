@@ -19,11 +19,10 @@ class ProblemModel extends ProblemEntity {
     return ProblemModel(
       title: (json['title'] ?? '') as String,
       difficulty: (json['difficulty'] ?? '') as String,
-      tags: rawTags is List
-          ? rawTags.whereType<String>().toList()
-          : <String>[],
+      tags: rawTags is List ? rawTags.whereType<String>().toList() : <String>[],
       numberOfLikes: (json['numberOfLikes'] ?? json['likes'] ?? 0) as int,
-      numberOfDislikes: (json['numberOfDislikes'] ?? json['dislikes'] ?? 0) as int,
+      numberOfDislikes:
+          (json['numberOfDislikes'] ?? json['dislikes'] ?? 0) as int,
       problemUrl: (json['deep_link'] ?? json['url'] ?? '') as String,
       problemId: (json['id'] ?? json['id'] ?? '') as String,
       isLiked: (json['isLiked'] ?? false) as bool,

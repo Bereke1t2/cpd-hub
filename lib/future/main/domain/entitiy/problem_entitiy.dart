@@ -27,15 +27,15 @@ class ProblemEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        title,
-        difficulty,
-        tags,
-        numberOfLikes,
-        numberOfDislikes,
-        problemUrl,
-        problemId,
-        isLiked,
-        isDisliked,
-        isSolved,
-      ];
+    title,
+    difficulty,
+    tags,
+    numberOfLikes,
+    numberOfDislikes,
+    problemUrl,
+    problemId,
+    isLiked,
+    isDisliked,
+    isSolved,
+  ];
 }

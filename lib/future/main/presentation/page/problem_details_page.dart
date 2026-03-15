@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 import '../widget/difficulty_box.dart';
 import '../widget/tag_box.dart';
@@ -33,31 +34,32 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: UiConstants.mainTextColor),
+          icon: Icon(Icons.close_rounded, color: UiConstants.mainTextColor, size: 24 * sc),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: 8 * sc, vertical: 4 * sc),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [UiConstants.primaryButtonColor, UiConstants.primaryButtonColor.withOpacity(0.6)],
+                  colors: [UiConstants.primaryButtonColor, UiConstants.primaryButtonColor.withValues(alpha: 0.6)],
                 ),
                 borderRadius: BorderRadius.circular(6),
               ),
-              child: const Text(
+              child: Text(
                 "ELITE",
-                style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                style: TextStyle(color: Colors.black, fontSize: 10 * sc, fontWeight: FontWeight.w900, letterSpacing: 0.5),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12 * sc),
             Expanded(
               child: Hero(
                 tag: 'problem_${widget.problemData['title']}',
@@ -65,9 +67,9 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
                   color: Colors.transparent,
                   child: Text(
                     widget.problemData['title'] ?? "Problem Details",
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: UiConstants.mainTextColor,
-                      fontSize: 18,
+                      fontSize: 18 * sc,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
                     ),
@@ -80,24 +82,24 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.share_outlined, size: 20, color: UiConstants.mainTextColor.withOpacity(0.7)),
+            icon: Icon(Icons.share_outlined, size: 20 * sc, color: UiConstants.mainTextColor.withValues(alpha: 0.7)),
             onPressed: () {},
           ),
           IconButton(
-            icon: Icon(Icons.more_horiz_rounded, size: 20, color: UiConstants.mainTextColor.withOpacity(0.7)),
+            icon: Icon(Icons.more_horiz_rounded, size: 20 * sc, color: UiConstants.mainTextColor.withValues(alpha: 0.7)),
             onPressed: () {},
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8 * sc),
         ],
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
           labelColor: UiConstants.primaryButtonColor,
-          unselectedLabelColor: UiConstants.subtitleTextColor.withOpacity(0.5),
+          unselectedLabelColor: UiConstants.subtitleTextColor.withValues(alpha: 0.5),
           indicatorColor: UiConstants.primaryButtonColor,
           indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
-          tabs: const [
+          labelStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 13 * sc),
+          tabs: [
             Tab(text: "Description"),
             Tab(text: "Editorial"),
             Tab(text: "Solutions"),
@@ -108,142 +110,143 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildDescriptionTab(),
-          _buildPlaceholderTab("Editorial Content Coming Soon"),
-          _buildPlaceholderTab("Community Solutions"),
-          _buildPlaceholderTab("Your Past Submissions"),
+          _buildDescriptionTab(sc),
+          _buildPlaceholderTab("Editorial Content Coming Soon", sc),
+          _buildPlaceholderTab("Community Solutions", sc),
+          _buildPlaceholderTab("Your Past Submissions", sc),
         ],
       ),
-      bottomNavigationBar: _buildBottomActionPanel(),
+      bottomNavigationBar: _buildBottomActionPanel(context),
     );
   }
 
-  Widget _buildDescriptionTab() {
+  Widget _buildDescriptionTab(double sc) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20 * sc),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               DifficultyBox(difficulty: widget.problemData['difficulty'] ?? "Medium"),
-              const SizedBox(width: 12),
-              Icon(Icons.thumb_up_rounded, size: 14, color: UiConstants.subtitleTextColor.withOpacity(0.5)),
-              const SizedBox(width: 4),
-              Text("${widget.problemData['likedCount'] ?? "0"}", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 12)),
-              const SizedBox(width: 12),
-              Icon(Icons.thumb_down_rounded, size: 14, color: UiConstants.subtitleTextColor.withOpacity(0.5)),
-              const SizedBox(width: 4),
-              Text("${widget.problemData['dislikedCount'] ?? "0"}", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 12)),
+              SizedBox(width: 12 * sc),
+              Icon(Icons.thumb_up_rounded, size: 14 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.5)),
+              SizedBox(width: 4 * sc),
+              Text("${widget.problemData['likedCount'] ?? "0"}", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc)),
+              SizedBox(width: 12 * sc),
+              Icon(Icons.thumb_down_rounded, size: 14 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.5)),
+              SizedBox(width: 4 * sc),
+              Text("${widget.problemData['dislikedCount'] ?? "0"}", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc)),
             ],
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: 24 * sc),
+          Text(
             "Problem Statement",
-            style: TextStyle(color: UiConstants.mainTextColor, fontSize: 20, fontWeight: FontWeight.w900),
+            style: TextStyle(color: UiConstants.mainTextColor, fontSize: 20 * sc, fontWeight: FontWeight.w900),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16 * sc),
           Text(
             "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
             style: TextStyle(
-              color: UiConstants.mainTextColor.withOpacity(0.9),
-              fontSize: 16,
+              color: UiConstants.mainTextColor.withValues(alpha: 0.9),
+              fontSize: 16 * sc,
               height: 1.7,
               letterSpacing: 0.2,
             ),
           ),
-          const SizedBox(height: 32),
-          _buildExample(1, "nums = [2,7,11,15], target = 9", "[0,1]", "Because nums[0] + nums[1] == 9, we return [0, 1]."),
-          _buildExample(2, "nums = [3,2,4], target = 6", "[1,2]", ""),
-          const SizedBox(height: 32),
-          const Text("Constraints:", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          _buildConstraint("2 <= nums.length <= 104"),
-          _buildConstraint("-109 <= nums[i] <= 109"),
-          _buildConstraint("-109 <= target <= 109"),
-          const SizedBox(height: 40),
-          const Text("Topic Tags", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 16),
+          SizedBox(height: 32 * sc),
+          _buildExample(1, "nums = [2,7,11,15], target = 9", "[0,1]", "Because nums[0] + nums[1] == 9, we return [0, 1].", sc),
+          _buildExample(2, "nums = [3,2,4], target = 6", "[1,2]", "", sc),
+          SizedBox(height: 32 * sc),
+          Text("Constraints:", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16 * sc)),
+          SizedBox(height: 8 * sc),
+          _buildConstraint("2 <= nums.length <= 104", sc),
+          _buildConstraint("-109 <= nums[i] <= 109", sc),
+          _buildConstraint("-109 <= target <= 109", sc),
+          SizedBox(height: 40 * sc),
+          Text("Topic Tags", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16 * sc)),
+          SizedBox(height: 16 * sc),
           Wrap(
-            spacing: 12,
-            runSpacing: 12,
+            spacing: 12 * sc,
+            runSpacing: 12 * sc,
             children: [
               TagBox(tag: "Array"),
               TagBox(tag: "Hash Table"),
               TagBox(tag: "Sliding Window"),
             ],
           ),
-          const SizedBox(height: 100),
+          SizedBox(height: 100 * sc),
         ],
       ),
     );
   }
 
-  Widget _buildExample(int num, String input, String output, String explanation) {
+  Widget _buildExample(int num, String input, String output, String explanation, double sc) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 20 * sc),
+      padding: EdgeInsets.all(16 * sc),
       decoration: BoxDecoration(
-        color: UiConstants.infoBackgroundColor.withOpacity(0.3),
+        color: UiConstants.infoBackgroundColor.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white10),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Example $num:", style: const TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 14)),
-          const SizedBox(height: 12),
-          _buildExampleRow("Input", input),
-          const SizedBox(height: 8),
-          _buildExampleRow("Output", output),
+          Text("Example $num:", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 14 * sc)),
+          SizedBox(height: 12 * sc),
+          _buildExampleRow("Input", input, sc),
+          SizedBox(height: 8 * sc),
+          _buildExampleRow("Output", output, sc),
           if (explanation.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            _buildExampleRow("Explanation", explanation),
+            SizedBox(height: 8 * sc),
+            _buildExampleRow("Explanation", explanation, sc),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildExampleRow(String label, String value) {
+  Widget _buildExampleRow(String label, String value, double sc) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(width: 80, child: Text("$label: ", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.7), fontSize: 13))),
-        Expanded(child: Text(value, style: const TextStyle(color: UiConstants.mainTextColor, fontSize: 13, fontFamily: 'monospace'))),
+        SizedBox(width: 80 * sc, child: Text("$label: ", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.7), fontSize: 13 * sc))),
+        Expanded(child: Text(value, style: TextStyle(color: UiConstants.mainTextColor, fontSize: 13 * sc, fontFamily: 'monospace'))),
       ],
     );
   }
 
-  Widget _buildConstraint(String text) {
+  Widget _buildConstraint(String text, double sc) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: EdgeInsets.only(bottom: 6 * sc),
       child: Row(
         children: [
-          const Icon(Icons.circle, size: 4, color: UiConstants.subtitleTextColor),
-          const SizedBox(width: 8),
-          Text(text, style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.8), fontSize: 13)),
+          Icon(Icons.circle, size: 4 * sc, color: UiConstants.subtitleTextColor),
+          SizedBox(width: 8 * sc),
+          Text(text, style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.8), fontSize: 13 * sc)),
         ],
       ),
     );
   }
 
-  Widget _buildPlaceholderTab(String message) {
+  Widget _buildPlaceholderTab(String message, double sc) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.construction_rounded, size: 60, color: UiConstants.primaryButtonColor.withOpacity(0.3)),
-          const SizedBox(height: 16),
-          Text(message, style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5))),
+          Icon(Icons.construction_rounded, size: 60 * sc, color: UiConstants.primaryButtonColor.withValues(alpha: 0.3)),
+          SizedBox(height: 16 * sc),
+          Text(message, style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 14 * sc)),
         ],
       ),
     );
   }
 
-  Widget _buildBottomActionPanel() {
+  Widget _buildBottomActionPanel(BuildContext context) {
+    final sc = context.sc;
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+      padding: EdgeInsets.fromLTRB(16 * sc, 12 * sc, 16 * sc, 32 * sc),
       decoration: BoxDecoration(
         color: Colors.black,
         border: Border(top: BorderSide(color: Colors.white10)),
@@ -251,24 +254,24 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12 * sc),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.code_rounded, color: UiConstants.primaryButtonColor, size: 20),
+            child: Icon(Icons.code_rounded, color: UiConstants.primaryButtonColor, size: 20 * sc),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12 * sc),
           Expanded(
             child: SizedBox(
-              height: 48,
+              height: 48 * sc,
               child: ElevatedButton(
-                onPressed: () => _showCodeEditor(),
+                onPressed: () => _showCodeEditor(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: UiConstants.primaryButtonColor,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  textStyle: const TextStyle(fontWeight: FontWeight.w900),
+                  textStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 14 * sc),
                 ),
                 child: const Text("SOLVE PROBLEM"),
               ),
@@ -279,76 +282,77 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
     );
   }
 
-  void _showCodeEditor() {
+  void _showCodeEditor(BuildContext context) {
+    final sc = context.sc;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E1E1E),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E1E),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
-            _buildEditorHeader(),
+            _buildEditorHeader(context),
             Expanded(
               child: TextField(
                 controller: _codeController,
                 maxLines: null,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'monospace',
                   color: Colors.white70,
-                  fontSize: 14,
+                  fontSize: 14 * sc,
                 ),
-                decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.all(20),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(20 * sc),
                   border: InputBorder.none,
                 ),
               ),
             ),
-            _buildCodeToolbar(),
-            _buildEditorActions(),
+            _buildCodeToolbar(context),
+            _buildEditorActions(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEditorHeader() {
+  Widget _buildEditorHeader(BuildContext context) {
+    final sc = context.sc;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Color(0xFF252526),
+      padding: EdgeInsets.symmetric(horizontal: 20 * sc, vertical: 12 * sc),
+      decoration: BoxDecoration(
+        color: const Color(0xFF252526),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.terminal_rounded, color: Colors.blueAccent, size: 20),
-              SizedBox(width: 10),
-              Text("Python3", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              Icon(Icons.arrow_drop_down, color: Colors.white54),
+              Icon(Icons.terminal_rounded, color: Colors.blueAccent, size: 20 * sc),
+              SizedBox(width: 10 * sc),
+              Text("Python3", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14 * sc)),
+              Icon(Icons.arrow_drop_down, color: Colors.white54, size: 24 * sc),
             ],
           ),
           Row(
             children: [
               IconButton(
                 onPressed: () {
-                   // Simulate copy
-                   ScaffoldMessenger.of(context).showSnackBar(
-                     const SnackBar(content: Text("Code copied to clipboard!")),
-                   );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Code copied to clipboard!", style: TextStyle(fontSize: 14 * sc))),
+                  );
                 },
-                icon: const Icon(Icons.copy_rounded, color: Colors.white54, size: 18),
+                icon: Icon(Icons.copy_rounded, color: Colors.white54, size: 18 * sc),
                 tooltip: "Copy Code",
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white54),
+                icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white54, size: 24 * sc),
               ),
             ],
           ),
@@ -357,17 +361,18 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
     );
   }
 
-  Widget _buildCodeToolbar() {
+  Widget _buildCodeToolbar(BuildContext context) {
+    final sc = context.sc;
     final symbols = ['(', ')', '{', '}', '[', ']', ':', '.', ';', '_', '=', '+', '-', '*', '/', '<', '>'];
     return Container(
-      height: 44,
-      decoration: const BoxDecoration(
-        color: Color(0xFF2D2D2D),
+      height: 44 * sc,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2D2D2D),
         border: Border(top: BorderSide(color: Colors.white10), bottom: BorderSide(color: Colors.white10)),
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: 8 * sc),
         itemCount: symbols.length,
         itemBuilder: (context, index) {
           return IconButton(
@@ -382,7 +387,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
             },
             icon: Text(
               symbols[index],
-              style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 14 * sc),
             ),
           );
         },
@@ -390,11 +395,12 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
     );
   }
 
-  Widget _buildEditorActions() {
+  Widget _buildEditorActions(BuildContext context) {
+    final sc = context.sc;
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      decoration: const BoxDecoration(
-        color: Color(0xFF252526),
+      padding: EdgeInsets.fromLTRB(20 * sc, 16 * sc, 20 * sc, 32 * sc),
+      decoration: BoxDecoration(
+        color: const Color(0xFF252526),
         border: Border(top: BorderSide(color: Colors.white10)),
       ),
       child: Row(
@@ -402,16 +408,16 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
         children: [
           TextButton(
             onPressed: () {},
-            child: const Text("Run", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+            child: Text("Run", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 14 * sc)),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16 * sc),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                   content: Text("Solution Submitted! Evaluating..."),
-                   backgroundColor: Colors.green,
+                SnackBar(
+                  content: Text("Solution Submitted! Evaluating...", style: TextStyle(fontSize: 14 * sc)),
+                  backgroundColor: Colors.green,
                 ),
               );
             },
@@ -419,8 +425,9 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              textStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 14 * sc),
             ),
-            child: const Text("Submit", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text("Submit"),
           ),
         ],
       ),

@@ -26,7 +26,8 @@ class MainBloc extends Bloc<MainEvent, MainState> {
     final result = await getDailyProblems();
     result.fold(
       (failure) => emit(ErrorState(failure.toString())),
-      (dailyProblems) => emit(DailyProblemsLoadedState(dailyProblems: dailyProblems as List)),
+      (dailyProblems) =>
+          emit(DailyProblemsLoadedState(dailyProblems: dailyProblems as List)),
     );
   }
 
@@ -35,7 +36,8 @@ class MainBloc extends Bloc<MainEvent, MainState> {
     final result = await getProblems();
     result.fold(
       (failure) => emit(ErrorState(failure.toString())),
-      (problems) => emit(ProblemsLoadedState(problems as List, hasReachedMax: false)),
+      (problems) =>
+          emit(ProblemsLoadedState(problems as List, hasReachedMax: false)),
     );
   }
 }

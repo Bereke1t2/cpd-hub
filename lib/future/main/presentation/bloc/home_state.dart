@@ -26,7 +26,13 @@ class HomeLoaded extends HomeState {
   });
 
   @override
-  List<Object?> get props => [dailyProblem, trendingProblems, upcomingContests, activityFeed, infoList];
+  List<Object?> get props => [
+    dailyProblem,
+    trendingProblems,
+    upcomingContests,
+    activityFeed,
+    infoList,
+  ];
 }
 
 class HomeError extends HomeState {

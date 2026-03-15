@@ -12,15 +12,21 @@ import 'package:cpd_hub/future/main/presentation/page/problems_page.dart';
 import 'package:cpd_hub/future/main/presentation/page/contest_page.dart';
 import 'package:cpd_hub/future/main/presentation/page/profile_page.dart';
 import 'package:cpd_hub/future/main/presentation/page/users_page.dart';
-import 'package:cpd_hub/future/auth/presentation/page/splash_page.dart';
 import 'package:cpd_hub/future/auth/presentation/page/login_page.dart';
 import 'package:cpd_hub/future/auth/presentation/page/signup_page.dart';
+import 'package:cpd_hub/core/theme/app_theme.dart';
+import 'package:cpd_hub/core/theme/theme_cubit.dart';
 
 void main() {
   final injection = Injection();
   injection.init();
 
-  runApp(MyApp(injection: injection));
+  runApp(
+    BlocProvider(
+      create: (_) => ThemeCubit(),
+      child: MyApp(injection: injection),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -28,36 +34,70 @@ class MyApp extends StatelessWidget {
 
   const MyApp({super.key, required this.injection});
 
+  static const _tabRoutes = {'/', '/problems', '/contests', '/users', '/profile'};
+
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<HomeCubit>.value(value: injection.homeCubit),
-        BlocProvider<ProblemsCubit>.value(value: injection.problemsCubit),
-        BlocProvider<ContestCubit>.value(value: injection.contestCubit),
-        BlocProvider<LeaderboardCubit>.value(value: injection.leaderboardCubit),
-        BlocProvider<UsersCubit>.value(value: injection.usersCubit),
-        BlocProvider<ProfileCubit>.value(value: injection.profileCubit),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'CPD Hub',
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          scaffoldBackgroundColor: Colors.black,
-        ),
-        initialRoute: '/splash',
-        routes: {
-          '/splash': (context) => const SplashPage(),
-          '/login': (context) => const LoginPage(),
-          '/signup': (context) => const SignupPage(),
-          '/': (context) => const HomePage(),
-          '/problems': (context) => const ProblemsPage(),
-          '/contests': (context) => const ContestPage(),
-          '/profile': (context) => const ProfilePage(),
-          '/users': (context) => const UsersPage(),
-        },
-      ),
+    return BlocBuilder<ThemeCubit, AppTheme>(
+      builder: (context, themeState) {
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider<HomeCubit>.value(value: injection.homeCubit),
+            BlocProvider<ProblemsCubit>.value(value: injection.problemsCubit),
+            BlocProvider<ContestCubit>.value(value: injection.contestCubit),
+            BlocProvider<LeaderboardCubit>.value(
+              value: injection.leaderboardCubit,
+            ),
+            BlocProvider<UsersCubit>.value(value: injection.usersCubit),
+            BlocProvider<ProfileCubit>.value(value: injection.profileCubit),
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'CPD Hub',
+            theme: themeState.themeData,
+            initialRoute: '/login',
+            onGenerateRoute: (settings) {
+              final page = _buildPage(settings.name);
+              if (page == null) return null;
+
+              if (_tabRoutes.contains(settings.name)) {
+                return PageRouteBuilder(
+                  settings: settings,
+                  pageBuilder: (_, __, ___) => page,
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                );
+              }
+
+              return MaterialPageRoute(
+                settings: settings,
+                builder: (_) => page,
+              );
+            },
+          ),
+        );
+      },
     );
+  }
+
+  Widget? _buildPage(String? name) {
+    switch (name) {
+      case '/login':
+        return const LoginPage();
+      case '/signup':
+        return const SignupPage();
+      case '/':
+        return HomePage();
+      case '/problems':
+        return ProblemsPage();
+      case '/contests':
+        return ContestPage();
+      case '/profile':
+        return const ProfilePage();
+      case '/users':
+        return UsersPage();
+      default:
+        return null;
+    }
   }
 }

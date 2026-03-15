@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 
 import '../../../../core/ui_constants.dart';
 
@@ -10,12 +11,13 @@ class BigButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return GestureDetector(
       onTap: onPressed,
       child: Container(
         width: double.infinity,
-        margin: const EdgeInsets.only(top: 16.0),
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        margin: EdgeInsets.only(top: 16.0 * sc),
+        padding: EdgeInsets.symmetric(vertical: 8.0 * sc, horizontal: 16.0 * sc),
         decoration: BoxDecoration(
           color: UiConstants.primaryButtonColor,
           borderRadius: BorderRadius.circular(8.0),
@@ -26,7 +28,7 @@ class BigButton extends StatelessWidget {
             style: TextStyle(
               color: UiConstants.mainTextColor,
               fontWeight: FontWeight.bold,
-              fontSize: fontSize,
+              fontSize: fontSize * sc,
             ),
           ),
         ),

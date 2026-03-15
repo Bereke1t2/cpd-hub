@@ -7,6 +7,7 @@ abstract class ContestState extends Equatable {
 }
 
 class ContestInitial extends ContestState {}
+
 class ContestLoading extends ContestState {}
 
 class ContestLoaded extends ContestState {

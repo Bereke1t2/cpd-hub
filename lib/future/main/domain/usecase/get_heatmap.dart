@@ -7,7 +7,11 @@ class GetHeatmap {
   final MainRepo repository;
   GetHeatmap(this.repository);
 
-  Future<Either<List<HeatmapEntryEntity>, Failure>> call(String username, int month, int year) async {
+  Future<Either<List<HeatmapEntryEntity>, Failure>> call(
+    String username,
+    int month,
+    int year,
+  ) async {
     return await repository.getHeatmap(username, month, year);
   }
 }

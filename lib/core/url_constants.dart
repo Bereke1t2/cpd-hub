@@ -19,10 +19,14 @@ class UrlConstants {
   // Users
   static const String users = '$baseUrl/users';
   static String profile(String username) => '$baseUrl/users/profile/$username';
-  static String heatmap(String username) => '$baseUrl/users/profile/$username/analytics/heatmap';
-  static String ratingHistory(String username) => '$baseUrl/users/profile/$username/analytics/rating-history';
-  static String attendance(String username) => '$baseUrl/users/profile/$username/attendance';
-  static String submissions(String username) => '$baseUrl/users/profile/$username/submissions';
+  static String heatmap(String username) =>
+      '$baseUrl/users/profile/$username/analytics/heatmap';
+  static String ratingHistory(String username) =>
+      '$baseUrl/users/profile/$username/analytics/rating-history';
+  static String attendance(String username) =>
+      '$baseUrl/users/profile/$username/attendance';
+  static String submissions(String username) =>
+      '$baseUrl/users/profile/$username/submissions';
 
   // Activity
   static const String activityFeed = '$baseUrl/activity';

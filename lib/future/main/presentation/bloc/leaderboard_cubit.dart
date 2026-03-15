@@ -8,7 +8,8 @@ part 'leaderboard_state.dart';
 class LeaderboardCubit extends Cubit<LeaderboardState> {
   final GetLeaderboard getLeaderboard;
 
-  LeaderboardCubit({required this.getLeaderboard}) : super(LeaderboardInitial());
+  LeaderboardCubit({required this.getLeaderboard})
+    : super(LeaderboardInitial());
 
   Future<void> loadLeaderboard(String contestId) async {
     emit(LeaderboardLoading());

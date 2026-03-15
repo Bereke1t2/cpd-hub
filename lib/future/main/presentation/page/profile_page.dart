@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
+import 'package:cpd_hub/core/theme/theme_cubit.dart';
+import 'package:cpd_hub/core/theme/app_theme.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/profile_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
 import 'package:cpd_hub/future/main/domain/entitiy/attendance_entity.dart';
@@ -11,7 +14,6 @@ import 'package:cpd_hub/future/main/domain/entitiy/user_entity.dart';
 import '../../../../core/ui_constants.dart';
 import '../widget/info_section.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   final String? username;
@@ -72,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     if (picked != null && picked != _selectedDate) {
       final oldMonth = _selectedDate.month;
       final oldYear = _selectedDate.year;
-      
+
       setState(() {
         _selectedDate = picked;
       });
@@ -86,6 +88,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return BasePage(
       title: isOwner ? "Profile" : "User Profile",
       subtitle: isOwner ? "Your personal information" : "Member statistics & activity",
@@ -96,19 +99,19 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             return const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor));
           }
           if (state is ProfileError) {
-            return Center(child: Text(state.message, style: const TextStyle(color: Colors.redAccent)));
+            return Center(child: Text(state.message, style: TextStyle(color: Colors.redAccent, fontSize: 14 * sc)));
           }
           if (state is ProfileLoaded) {
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  _buildProfileHeader(context, state.user),
-                  const SizedBox(height: 16),
-                  _buildTabBar(),
-                  const SizedBox(height: 24),
-                  _buildTabContent(state),
-                  const SizedBox(height: 100), // Extra space for scrolling
+                  _buildProfileHeader(context, state.user, sc),
+                  SizedBox(height: 16 * sc),
+                  _buildTabBar(sc),
+                  SizedBox(height: 24 * sc),
+                  _buildTabContent(state, sc),
+                  SizedBox(height: 100 * sc),
                 ],
               ),
             );
@@ -119,18 +122,18 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, UserEntity user) {
+  Widget _buildProfileHeader(BuildContext context, UserEntity user, double sc) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: EdgeInsets.symmetric(horizontal: 16 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(24.0),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 15,
-            offset: const Offset(0, 8),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -139,12 +142,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
           Stack(
             alignment: Alignment.bottomCenter,
             children: [
-              // Cover Gradient
               Container(
-                height: 120,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-                  gradient: LinearGradient(
+                height: 100 * sc,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
@@ -154,70 +156,69 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   ),
                 ),
               ),
-              // Avatar
               Transform.translate(
-                offset: const Offset(0, 40),
+                offset: Offset(0, 36),
                 child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
+                  padding: EdgeInsets.all(3 * sc),
+                  decoration: BoxDecoration(
                     color: UiConstants.infoBackgroundColor,
                     shape: BoxShape.circle,
                   ),
                   child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: UiConstants.primaryButtonColor.withOpacity(0.1),
-                    backgroundImage: user.avatarUrl.isNotEmpty 
-                      ? NetworkImage(user.avatarUrl) 
-                      : const NetworkImage('https://www.gravatar.com/avatar/placeholder?s=200&d=robohash&r=x'),
+                    radius: 40 * sc,
+                    backgroundColor: UiConstants.primaryButtonColor.withValues(alpha: 0.1),
+                    backgroundImage: user.avatarUrl.isNotEmpty
+                        ? NetworkImage(user.avatarUrl)
+                        : const NetworkImage('https://www.gravatar.com/avatar/placeholder?s=200&d=robohash&r=x'),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 50),
+          SizedBox(height: 44 * sc),
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.fromLTRB(16 * sc, 0, 16 * sc, 16 * sc),
             child: Column(
               children: [
                 Text(
                   user.fullName,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: 20 * sc,
                     fontWeight: FontWeight.bold,
                     color: UiConstants.mainTextColor,
                     letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8 * sc),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 3 * sc),
                       decoration: BoxDecoration(
-                        color: UiConstants.primaryButtonColor.withOpacity(0.15),
+                        color: UiConstants.primaryButtonColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.3)),
+                        border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.3)),
                       ),
-                      child: const Text(
+                      child: Text(
                         "Active Now",
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11 * sc,
                           fontWeight: FontWeight.w600,
                           color: UiConstants.primaryButtonColor,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
+                    SizedBox(width: 8 * sc),
+                    Text(
                       "•",
-                      style: TextStyle(color: UiConstants.subtitleTextColor),
+                      style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 11 * sc),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8 * sc),
                     Text(
                       user.rank,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: 11 * sc,
                         color: UiConstants.subtitleTextColor,
                       ),
                     ),
@@ -242,29 +243,27 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   }
 
   Widget _buildStatsSection(UserEntity user) {
-    final rating = user.rating;
-    final ratingColor = _getRatingColor(rating);
     return InfoSection(
       division: user.division == 'Div 1' ? 1 : 2,
-      rating: rating.toString(),
+      rating: user.rating.toString(),
       rank: user.rank,
       solvedProblems: user.solvedProblems,
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildTabBar(double sc) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0),
-      padding: const EdgeInsets.all(6),
+      margin: EdgeInsets.symmetric(horizontal: 16 * sc),
+      padding: EdgeInsets.all(6 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.2)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -277,35 +276,35 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
           ),
           boxShadow: [
             BoxShadow(
-              color: UiConstants.primaryButtonColor.withOpacity(0.3),
+              color: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
               blurRadius: 8,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ],
         ),
         labelColor: Colors.black,
-        unselectedLabelColor: UiConstants.subtitleTextColor.withOpacity(0.6),
+        unselectedLabelColor: UiConstants.subtitleTextColor.withValues(alpha: 0.6),
         isScrollable: true,
         tabAlignment: TabAlignment.start,
         dividerColor: Colors.transparent,
         indicatorSize: TabBarIndicatorSize.tab,
-        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12 * sc),
         tabs: [
-          const Tab(
-            icon: Icon(Icons.person_rounded, size: 20),
+          Tab(
+            icon: Icon(Icons.person_rounded, size: 18 * sc),
             text: "Profile",
           ),
-          const Tab(
-            icon: Icon(Icons.calendar_today_rounded, size: 18),
+          Tab(
+            icon: Icon(Icons.calendar_today_rounded, size: 18 * sc),
             text: "Attendance",
           ),
-          const Tab(
-            icon: Icon(Icons.history_rounded, size: 20),
+          Tab(
+            icon: Icon(Icons.history_rounded, size: 18 * sc),
             text: "Submissions",
           ),
           if (isOwner)
-            const Tab(
-              icon: Icon(Icons.settings_rounded, size: 20),
+            Tab(
+              icon: Icon(Icons.settings_rounded, size: 18 * sc),
               text: "Settings",
             ),
         ],
@@ -313,75 +312,75 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTabContent(ProfileLoaded state) {
+  Widget _buildTabContent(ProfileLoaded state, double sc) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: EdgeInsets.symmetric(horizontal: 16 * sc),
       child: [
-        _buildOverviewTab(state),
-        _buildAttendanceTab(state),
-        _buildSubmissionsTab(state.submissionData),
+        _buildOverviewTab(state, sc),
+        _buildAttendanceTab(context, state, sc),
+        _buildSubmissionsTab(state.submissionData, sc),
         if (isOwner)
-          const Center(child: Text("Settings coming soon", style: TextStyle(color: UiConstants.subtitleTextColor))),
+          _buildSettingsTab(sc),
       ][_tabController.index],
     );
   }
 
-  Widget _buildOverviewTab(ProfileLoaded state) {
+  Widget _buildOverviewTab(ProfileLoaded state, double sc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildStatsSection(state.user),
-        const SizedBox(height: 24),
-        _buildSectionTitle("Coding Consistency"),
-        const SizedBox(height: 12),
-        _buildActivityHeatmap(state.heatmapData),
-        const SizedBox(height: 24),
-        _buildSectionTitle("Rating History"),
-        const SizedBox(height: 12),
-        _buildRatingGraph(state.ratingHistory),
-        const SizedBox(height: 24),
-        _buildCPMetricsGrid(state.user),
-        const SizedBox(height: 24),
-        _buildSectionTitle("Coding Profiles"),
-        const SizedBox(height: 12),
-        _buildSocialLinksGrid(state.user.socialLinks),
-        const SizedBox(height: 24),
-        _buildSectionTitle("General Info"),
-        const SizedBox(height: 12),
+        SizedBox(height: 24 * sc),
+        _buildSectionTitle("Coding Consistency", sc),
+        SizedBox(height: 12 * sc),
+        _buildActivityHeatmap(context, state.heatmapData, sc),
+        SizedBox(height: 24 * sc),
+        _buildSectionTitle("Rating History", sc),
+        SizedBox(height: 12 * sc),
+        _buildRatingGraph(state.ratingHistory, sc),
+        SizedBox(height: 24 * sc),
+        _buildCPMetricsGrid(state.user, sc),
+        SizedBox(height: 24 * sc),
+        _buildSectionTitle("Coding Profiles", sc),
+        SizedBox(height: 12 * sc),
+        _buildSocialLinksGrid(state.user.socialLinks, sc),
+        SizedBox(height: 24 * sc),
+        _buildSectionTitle("General Info", sc),
+        SizedBox(height: 12 * sc),
         _buildInfoCard(
           "Biography",
           state.user.bio.isNotEmpty ? state.user.bio : "No bio provided",
           Icons.person_outline,
+          sc,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16 * sc),
         _buildInfoCard(
           "Experience",
           "3+ years in Flutter development, 500+ problems solved on various platforms.",
           Icons.workspace_premium_outlined,
+          sc,
         ),
       ],
     );
   }
 
-  Widget _buildRatingGraph(List<RatingPointEntity> ratingHistory) {
-    // Convert RatingPointEntity list to FlSpots
+  Widget _buildRatingGraph(List<RatingPointEntity> ratingHistory, double sc) {
     final List<FlSpot> spots = [];
     for (int i = 0; i < ratingHistory.length; i++) {
       spots.add(FlSpot(i.toDouble(), ratingHistory[i].rating.toDouble()));
     }
 
-    // Default if empty
     if (spots.isEmpty) {
       spots.add(const FlSpot(0, 1000));
     }
 
     return Container(
-      height: 200,
-      padding: const EdgeInsets.only(top: 24, right: 24, left: 16, bottom: 12),
+      height: 180 * sc,
+      padding: EdgeInsets.only(top: 16 * sc, right: 16 * sc, left: 12 * sc, bottom: 8 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.3)),
       ),
       child: LineChart(
         LineChartData(
@@ -390,7 +389,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             drawVerticalLine: false,
             horizontalInterval: 500,
             getDrawingHorizontalLine: (value) => FlLine(
-              color: UiConstants.borderColor.withOpacity(0.1),
+              color: UiConstants.borderColor.withValues(alpha: 0.1),
               strokeWidth: 1,
             ),
           ),
@@ -401,7 +400,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 22,
+                reservedSize: 22 * sc,
                 interval: 1,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
@@ -410,7 +409,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                     if (date != null) {
                       return Text(
                         _getMonthName(date.month).substring(0, 3),
-                        style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 10),
+                        style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 10 * sc),
                       );
                     }
                   }
@@ -422,11 +421,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: 500,
-                reservedSize: 35,
+                reservedSize: 35 * sc,
                 getTitlesWidget: (value, meta) {
                   return Text(
                     value.toInt().toString(),
-                    style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 10),
+                    style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 10 * sc),
                   );
                 },
               ),
@@ -442,12 +441,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
               spots: spots,
               isCurved: true,
               color: UiConstants.primaryButtonColor,
-              barWidth: 3,
+              barWidth: 2.5 * sc,
               isStrokeCapRound: true,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
-                  radius: 5,
+                  radius: 4 * sc,
                   color: _getRatingColor(spot.y.toInt()),
                   strokeWidth: 2,
                   strokeColor: Colors.white,
@@ -457,8 +456,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                 show: true,
                 gradient: LinearGradient(
                   colors: [
-                    UiConstants.primaryButtonColor.withOpacity(0.15),
-                    UiConstants.primaryButtonColor.withOpacity(0),
+                    UiConstants.primaryButtonColor.withValues(alpha: 0.15),
+                    UiConstants.primaryButtonColor.withValues(alpha: 0),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -478,18 +477,18 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   final ratingColor = _getRatingColor(rating);
                   final deltaColor = delta >= 0 ? Colors.green : Colors.red;
                   final sign = delta >= 0 ? "+" : "";
-                  
+
                   return LineTooltipItem(
                     'Rating: ',
-                    const TextStyle(color: Colors.white70, fontSize: 10),
+                    TextStyle(color: Colors.white70, fontSize: 10 * sc),
                     children: [
                       TextSpan(
                         text: '$rating\n',
-                        style: TextStyle(color: ratingColor, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(color: ratingColor, fontWeight: FontWeight.bold, fontSize: 14 * sc),
                       ),
                       TextSpan(
                         text: '$sign$delta',
-                        style: TextStyle(color: deltaColor, fontWeight: FontWeight.bold, fontSize: 11),
+                        style: TextStyle(color: deltaColor, fontWeight: FontWeight.bold, fontSize: 11 * sc),
                       ),
                     ],
                   );
@@ -502,20 +501,19 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildActivityHeatmap(List<HeatmapEntryEntity> heatmapData) {
+  Widget _buildActivityHeatmap(BuildContext context, List<HeatmapEntryEntity> heatmapData, double sc) {
     final monthName = _getMonthName(_selectedDate.month);
     final daysInMonth = DateUtils.getDaysInMonth(_selectedDate.year, _selectedDate.month);
     final firstDayOfMonth = DateTime(_selectedDate.year, _selectedDate.month, 1).weekday;
-    // Align with Sunday start (weekday is 1-7, Mon-Sun)
     final paddingDays = firstDayOfMonth == 7 ? 0 : firstDayOfMonth;
-    
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(16 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,57 +525,59 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Coding Heatmap: $monthName ${_selectedDate.year}", 
-                      style: const TextStyle(color: UiConstants.mainTextColor, fontSize: 13, fontWeight: FontWeight.bold),
+                    Text(
+                      "Coding Heatmap: $monthName ${_selectedDate.year}",
+                      style: TextStyle(color: UiConstants.mainTextColor, fontSize: 12 * sc, fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text("Monthly activity frequency", 
-                      style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.6), fontSize: 9),
+                    Text(
+                      "Monthly activity frequency",
+                      style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.6), fontSize: 9 * sc),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8 * sc),
               TextButton.icon(
                 onPressed: () => _selectDate(context),
-                icon: const Icon(Icons.calendar_month_rounded, size: 14),
-                label: const Text("Select Month", style: TextStyle(fontSize: 11)),
+                icon: Icon(Icons.calendar_month_rounded, size: 12 * sc),
+                label: Text("Select Month", style: TextStyle(fontSize: 10 * sc)),
                 style: TextButton.styleFrom(
                   foregroundColor: UiConstants.primaryButtonColor,
-                  backgroundColor: UiConstants.primaryButtonColor.withOpacity(0.1),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  backgroundColor: UiConstants.primaryButtonColor.withValues(alpha: 0.1),
+                  padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 6 * sc),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          // Day Headers
+          SizedBox(height: 24 * sc),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => Expanded(
-              child: Center(child: Text(day, style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 10, fontWeight: FontWeight.w600))),
-            )).toList(),
+            children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                .map((day) => Expanded(
+                      child: Center(
+                          child: Text(day, style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 10 * sc, fontWeight: FontWeight.w600))),
+                    ))
+                .toList(),
           ),
-          const SizedBox(height: 12),
-          // Grid
+          SizedBox(height: 12 * sc),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
+              mainAxisSpacing: 8 * sc,
+              crossAxisSpacing: 8 * sc,
             ),
             itemCount: daysInMonth + paddingDays,
             itemBuilder: (context, index) {
               if (index < paddingDays) return const SizedBox.shrink();
-              
+
               final dayIndex = index - paddingDays;
               final dayNumber = dayIndex + 1;
-              
-              // Find matching entry in heatmapData
+
               int problemCount = 0;
               for (var entry in heatmapData) {
                 final date = DateTime.tryParse(entry.date);
@@ -588,13 +588,13 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
               }
               Color boxColor;
               if (problemCount == 0) {
-                boxColor = UiConstants.borderColor.withOpacity(0.1);
+                boxColor = UiConstants.borderColor.withValues(alpha: 0.1);
               } else if (problemCount < 4) {
-                boxColor = UiConstants.primaryButtonColor.withOpacity(0.2);
+                boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.2);
               } else if (problemCount < 8) {
-                boxColor = UiConstants.primaryButtonColor.withOpacity(0.5);
+                boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.5);
               } else if (problemCount < 12) {
-                boxColor = UiConstants.primaryButtonColor.withOpacity(0.8);
+                boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.8);
               } else {
                 boxColor = UiConstants.primaryButtonColor;
               }
@@ -605,17 +605,22 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   decoration: BoxDecoration(
                     color: boxColor,
                     borderRadius: BorderRadius.circular(8),
-                    boxShadow: problemCount > 8 ? [
-                      BoxShadow(color: UiConstants.primaryButtonColor.withOpacity(0.2), blurRadius: 4, spreadRadius: 1)
-                    ] : null,
+                    boxShadow: problemCount > 8
+                        ? [
+                            BoxShadow(
+                                color: UiConstants.primaryButtonColor.withValues(alpha: 0.2),
+                                blurRadius: 4,
+                                spreadRadius: 1)
+                          ]
+                        : null,
                   ),
                   child: Center(
                     child: Text(
                       "${dayIndex + 1}",
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 10 * sc,
                         fontWeight: FontWeight.bold,
-                        color: problemCount > 8 ? Colors.white : UiConstants.mainTextColor.withOpacity(0.3),
+                        color: problemCount > 8 ? Colors.white : UiConstants.mainTextColor.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -623,30 +628,39 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
               );
             },
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20 * sc),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text("Less", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 10)),
-              const SizedBox(width: 8),
+              Text("Less", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 10 * sc)),
+              SizedBox(width: 8 * sc),
               ...List.generate(5, (index) {
                 Color boxColor;
                 switch (index) {
-                  case 0: boxColor = UiConstants.borderColor.withOpacity(0.1); break;
-                  case 1: boxColor = UiConstants.primaryButtonColor.withOpacity(0.2); break;
-                  case 2: boxColor = UiConstants.primaryButtonColor.withOpacity(0.5); break;
-                  case 3: boxColor = UiConstants.primaryButtonColor.withOpacity(0.8); break;
-                  default: boxColor = UiConstants.primaryButtonColor;
+                  case 0:
+                    boxColor = UiConstants.borderColor.withValues(alpha: 0.1);
+                    break;
+                  case 1:
+                    boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.2);
+                    break;
+                  case 2:
+                    boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.5);
+                    break;
+                  case 3:
+                    boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.8);
+                    break;
+                  default:
+                    boxColor = UiConstants.primaryButtonColor;
                 }
                 return Container(
-                  width: 14,
-                  height: 14,
-                  margin: const EdgeInsets.only(left: 4),
+                  width: 14 * sc,
+                  height: 14 * sc,
+                  margin: EdgeInsets.only(left: 4 * sc),
                   decoration: BoxDecoration(color: boxColor, borderRadius: BorderRadius.circular(3)),
                 );
               }),
-              const SizedBox(width: 8),
-              Text("More", style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 10)),
+              SizedBox(width: 8 * sc),
+              Text("More", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 10 * sc)),
             ],
           ),
         ],
@@ -654,7 +668,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildCPMetricsGrid(UserEntity user) {
+  Widget _buildCPMetricsGrid(UserEntity user, double sc) {
     return Row(
       children: [
         Expanded(
@@ -663,48 +677,50 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             user.attendedContestsCount.toString(),
             Icons.emoji_events_outlined,
             Colors.orange,
+            sc,
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12 * sc),
         Expanded(
           child: _buildMetricTile(
             "Global Rank",
             "#${user.globalRank.toString()}",
             Icons.public_outlined,
             Colors.blue,
+            sc,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildMetricTile(String title, String value, IconData icon, Color color) {
+  Widget _buildMetricTile(String title, String value, IconData icon, Color color, double sc) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(14 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.2)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 12),
+          Icon(icon, color: color, size: 20 * sc),
+          SizedBox(height: 8 * sc),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 18 * sc,
               fontWeight: FontWeight.bold,
               color: UiConstants.mainTextColor,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4 * sc),
           Text(
             title,
             style: TextStyle(
-              fontSize: 12,
-              color: UiConstants.subtitleTextColor.withOpacity(0.7),
+              fontSize: 11 * sc,
+              color: UiConstants.subtitleTextColor.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -712,12 +728,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildSocialLinksGrid(List<SocialLinkEntity> links) {
+  Widget _buildSocialLinksGrid(List<SocialLinkEntity> links, double sc) {
     if (links.isEmpty) {
       return Center(
         child: Text(
           "No social links added",
-          style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.5), fontSize: 12),
+          style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc),
         ),
       );
     }
@@ -725,26 +741,26 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     final rows = <Widget>[];
     for (int i = 0; i < links.length; i += 2) {
       final rowItems = <Widget>[];
-      rowItems.add(Expanded(child: _buildSocialCard(links[i])));
-      
+      rowItems.add(Expanded(child: _buildSocialCard(links[i], sc)));
+
       if (i + 1 < links.length) {
-        rowItems.add(const SizedBox(width: 12));
-        rowItems.add(Expanded(child: _buildSocialCard(links[i+1])));
+        rowItems.add(SizedBox(width: 12 * sc));
+        rowItems.add(Expanded(child: _buildSocialCard(links[i + 1], sc)));
       } else {
-        rowItems.add(const SizedBox(width: 12));
+        rowItems.add(SizedBox(width: 12 * sc));
         rowItems.add(const Expanded(child: SizedBox.shrink()));
       }
-      
+
       rows.add(Row(children: rowItems));
       if (i + 2 < links.length) {
-        rows.add(const SizedBox(height: 12));
+        rows.add(SizedBox(height: 12 * sc));
       }
     }
 
     return Column(children: rows);
   }
 
-  Widget _buildSocialCard(SocialLinkEntity link) {
+  Widget _buildSocialCard(SocialLinkEntity link, double sc) {
     IconData icon = Icons.link_rounded;
     Color color = UiConstants.primaryButtonColor;
 
@@ -763,59 +779,58 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: EdgeInsets.symmetric(horizontal: 14 * sc, vertical: 12 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.15)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(width: 12),
+          Icon(icon, color: color, size: 18 * sc),
+          SizedBox(width: 12 * sc),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   link.platform,
-                  style: TextStyle(fontSize: 11, color: UiConstants.subtitleTextColor.withOpacity(0.7), fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 10 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
                 ),
                 Text(
                   link.handle,
-                  style: const TextStyle(fontSize: 13, color: UiConstants.mainTextColor, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12 * sc, color: UiConstants.mainTextColor, fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          Icon(Icons.open_in_new_rounded, size: 14, color: UiConstants.subtitleTextColor.withOpacity(0.3)),
+          Icon(Icons.open_in_new_rounded, size: 12 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.3)),
         ],
       ),
     );
   }
 
-  Widget _buildAttendanceTab(ProfileLoaded state) {
+  Widget _buildAttendanceTab(BuildContext context, ProfileLoaded state, double sc) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Attendance Insights"),
-        const SizedBox(height: 12),
-        _buildAttendanceSummary(state.attendanceData),
-        const SizedBox(height: 24),
-        _buildSectionTitle("Activity Grid"),
-        const SizedBox(height: 12),
-        _buildEnhancedAttendanceGrid(state.attendanceData),
+        _buildSectionTitle("Attendance Insights", sc),
+        SizedBox(height: 12 * sc),
+        _buildAttendanceSummary(state.attendanceData, sc),
+        SizedBox(height: 24 * sc),
+        _buildSectionTitle("Activity Grid", sc),
+        SizedBox(height: 12 * sc),
+        _buildEnhancedAttendanceGrid(context, state.attendanceData, sc),
       ],
     );
   }
 
-  Widget _buildAttendanceSummary(List<AttendanceEntity> data) {
+  Widget _buildAttendanceSummary(List<AttendanceEntity> data, double sc) {
     final present = data.where((e) => e.status == 'Present').length;
     final missed = data.where((e) => e.status == 'Absent').length;
-    
-    // Simple streak calculation for mock
+
     int streak = 0;
     for (var i = data.length - 1; i >= 0; i--) {
       if (data[i].status == 'Present') {
@@ -826,72 +841,72 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     }
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(16 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildSummaryItem("Current Streak", "$streak Days", Icons.local_fire_department_rounded, Colors.orangeAccent.withOpacity(0.8)),
-          _buildSummaryVerticalDivider(),
-          _buildSummaryItem("Total Present", "$present Days", Icons.event_available_rounded, UiConstants.primaryButtonColor.withOpacity(0.8)),
-          _buildSummaryVerticalDivider(),
-          _buildSummaryItem("Missed", "$missed Days", Icons.event_busy_rounded, Colors.redAccent.withOpacity(0.8)),
+          _buildSummaryItem("Current Streak", "$streak Days", Icons.local_fire_department_rounded, Colors.orangeAccent.withValues(alpha: 0.8), sc),
+          _buildSummaryVerticalDivider(sc),
+          _buildSummaryItem("Total Present", "$present Days", Icons.event_available_rounded, UiConstants.primaryButtonColor.withValues(alpha: 0.8), sc),
+          _buildSummaryVerticalDivider(sc),
+          _buildSummaryItem("Missed", "$missed Days", Icons.event_busy_rounded, Colors.redAccent.withValues(alpha: 0.8), sc),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryVerticalDivider() {
-    return Container(height: 40, width: 1, color: UiConstants.borderColor.withOpacity(0.3));
+  Widget _buildSummaryVerticalDivider(double sc) {
+    return Container(height: 32 * sc, width: 1, color: UiConstants.borderColor.withValues(alpha: 0.3));
   }
 
-  Widget _buildSummaryItem(String label, String value, IconData icon, Color color) {
+  Widget _buildSummaryItem(String label, String value, IconData icon, Color color, double sc) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: UiConstants.mainTextColor)),
-        const SizedBox(height: 2),
-        Text(label, style: TextStyle(fontSize: 10, color: UiConstants.subtitleTextColor.withOpacity(0.6))),
+        Icon(icon, color: color, size: 20 * sc),
+        SizedBox(height: 8 * sc),
+        Text(value, style: TextStyle(fontSize: 14 * sc, fontWeight: FontWeight.bold, color: UiConstants.mainTextColor)),
+        SizedBox(height: 2 * sc),
+        Text(label, style: TextStyle(fontSize: 9 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.6))),
       ],
     );
   }
 
-  Widget _buildLegendDot(Color color, String label) {
+  Widget _buildLegendDot(Color color, String label, double sc) {
     return Row(
       children: [
         Container(
-          width: 8, 
-          height: 8, 
+          width: 8 * sc,
+          height: 8 * sc,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.7), 
+            color: color.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(3),
-            border: Border.all(color: color.withOpacity(0.2), width: 0.5),
+            border: Border.all(color: color.withValues(alpha: 0.2), width: 0.5),
           ),
         ),
-        const SizedBox(width: 6),
-        Text(label, style: TextStyle(fontSize: 11, color: UiConstants.subtitleTextColor.withOpacity(0.7), fontWeight: FontWeight.w500)),
+        SizedBox(width: 6 * sc),
+        Text(label, style: TextStyle(fontSize: 11 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.7), fontWeight: FontWeight.w500)),
       ],
     );
   }
-  Widget _buildEnhancedAttendanceGrid(List<AttendanceEntity> attendanceData) {
+
+  Widget _buildEnhancedAttendanceGrid(BuildContext context, List<AttendanceEntity> attendanceData, double sc) {
     final monthName = _getMonthName(_selectedDate.month);
     final daysInMonth = DateUtils.getDaysInMonth(_selectedDate.year, _selectedDate.month);
     final firstDayOfMonth = DateTime(_selectedDate.year, _selectedDate.month, 1).weekday;
-    // Align with Sunday start (weekday is 1-7, Mon-Sun)
     final paddingDays = firstDayOfMonth == 7 ? 0 : firstDayOfMonth;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(16 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -903,58 +918,59 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("$monthName ${_selectedDate.year}", 
-                      style: const TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold),
+                    Text(
+                      "$monthName ${_selectedDate.year}",
+                      style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 14 * sc),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    Text("Spring Semester", 
-                      style: TextStyle(fontSize: 10, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
+                    Text(
+                      "Spring Semester",
+                      style: TextStyle(fontSize: 9 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.6)),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8 * sc),
               TextButton.icon(
                 onPressed: () => _selectDate(context),
-                icon: const Icon(Icons.calendar_month_rounded, size: 16),
-                label: const Text("Select Date"),
+                icon: Icon(Icons.calendar_month_rounded, size: 14 * sc),
+                label: Text("Select Date", style: TextStyle(fontSize: 12 * sc)),
                 style: TextButton.styleFrom(
                   foregroundColor: UiConstants.primaryButtonColor,
-                  backgroundColor: UiConstants.primaryButtonColor.withOpacity(0.1),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  backgroundColor: UiConstants.primaryButtonColor.withValues(alpha: 0.1),
+                  padding: EdgeInsets.symmetric(horizontal: 12 * sc, vertical: 8 * sc),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20 * sc),
           Wrap(
-            spacing: 12,
-            runSpacing: 8,
+            spacing: 12 * sc,
+            runSpacing: 8 * sc,
             children: [
-              _buildLegendDot(UiConstants.primaryButtonColor, "Present"),
-              _buildLegendDot(Colors.redAccent, "Absent"),
-              _buildLegendDot(Colors.amberAccent, "Excused"),
+              _buildLegendDot(UiConstants.primaryButtonColor, "Present", sc),
+              _buildLegendDot(Colors.redAccent, "Absent", sc),
+              _buildLegendDot(Colors.amberAccent, "Excused", sc),
             ],
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24 * sc),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+              mainAxisSpacing: 10 * sc,
+              crossAxisSpacing: 10 * sc,
             ),
             itemCount: daysInMonth + paddingDays,
             itemBuilder: (context, index) {
               if (index < paddingDays) return const SizedBox.shrink();
-              
+
               final dayIndex = index - paddingDays;
               final dayNumber = dayIndex + 1;
 
-              // Find matching entry in attendanceData
               String status = 'None';
               for (var entry in attendanceData) {
                 final date = DateTime.tryParse(entry.date);
@@ -969,25 +985,25 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
               BoxBorder? border;
 
               switch (status) {
-                case 'Present': 
-                  boxColor = UiConstants.primaryButtonColor.withOpacity(0.15);
+                case 'Present':
+                  boxColor = UiConstants.primaryButtonColor.withValues(alpha: 0.15);
                   contentColor = UiConstants.primaryButtonColor;
-                  border = Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.3), width: 1);
+                  border = Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.3), width: 1);
                   break;
-                case 'Absent': 
-                  boxColor = Colors.redAccent.withOpacity(0.15);
+                case 'Absent':
+                  boxColor = Colors.redAccent.withValues(alpha: 0.15);
                   contentColor = Colors.redAccent;
-                  border = Border.all(color: Colors.redAccent.withOpacity(0.3), width: 1);
+                  border = Border.all(color: Colors.redAccent.withValues(alpha: 0.3), width: 1);
                   break;
-                case 'Excused': 
-                  boxColor = Colors.amberAccent.withOpacity(0.15);
+                case 'Excused':
+                  boxColor = Colors.amberAccent.withValues(alpha: 0.15);
                   contentColor = Colors.amberAccent;
-                  border = Border.all(color: Colors.amberAccent.withOpacity(0.3), width: 1);
+                  border = Border.all(color: Colors.amberAccent.withValues(alpha: 0.3), width: 1);
                   break;
-                default: 
+                default:
                   boxColor = Colors.transparent;
-                  contentColor = UiConstants.mainTextColor.withOpacity(0.15);
-                  border = Border.all(color: UiConstants.borderColor.withOpacity(0.1), width: 1);
+                  contentColor = UiConstants.mainTextColor.withValues(alpha: 0.15);
+                  border = Border.all(color: UiConstants.borderColor.withValues(alpha: 0.1), width: 1);
               }
 
               return Container(
@@ -1000,7 +1016,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   child: Text(
                     "$dayNumber",
                     style: TextStyle(
-                      fontSize: 11,
+                      fontSize: 11 * sc,
                       fontWeight: FontWeight.w500,
                       color: contentColor,
                     ),
@@ -1022,17 +1038,15 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     return months[month - 1];
   }
 
-
-
-  Widget _buildSubmissionsTab(List<SubmissionEntity> submissions) {
+  Widget _buildSubmissionsTab(List<SubmissionEntity> submissions, double sc) {
     if (submissions.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.history_rounded, size: 64, color: UiConstants.subtitleTextColor.withOpacity(0.3)),
-            const SizedBox(height: 16),
-            const Text("No recent submissions", style: TextStyle(color: UiConstants.subtitleTextColor)),
+            Icon(Icons.history_rounded, size: 48 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.3)),
+            SizedBox(height: 16 * sc),
+            Text("No recent submissions", style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 13 * sc)),
           ],
         ),
       );
@@ -1041,8 +1055,8 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Recent Submissions"),
-        const SizedBox(height: 16),
+        _buildSectionTitle("Recent Submissions", sc),
+        SizedBox(height: 16 * sc),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -1051,71 +1065,71 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
             final submission = submissions[index];
             final isAccepted = submission.status.toLowerCase() == 'accepted';
             final statusColor = isAccepted ? Colors.greenAccent : Colors.redAccent;
-            
+
             return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
+              margin: EdgeInsets.only(bottom: 12 * sc),
+              padding: EdgeInsets.all(14 * sc),
               decoration: BoxDecoration(
                 color: UiConstants.infoBackgroundColor,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: statusColor.withOpacity(0.15)),
+                border: Border.all(color: statusColor.withValues(alpha: 0.15)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    offset: Offset(0, 4),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(8 * sc),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
+                      color: statusColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       isAccepted ? Icons.check_circle_outline_rounded : Icons.error_outline_rounded,
                       color: statusColor,
-                      size: 24,
+                      size: 20 * sc,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16 * sc),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           submission.problemTitle,
-                          style: const TextStyle(
-                            fontSize: 16,
+                          style: TextStyle(
+                            fontSize: 14 * sc,
                             fontWeight: FontWeight.bold,
                             color: UiConstants.mainTextColor,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4 * sc),
                         Wrap(
-                          spacing: 8,
-                          runSpacing: 4,
+                          spacing: 8 * sc,
+                          runSpacing: 4 * sc,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
                               submission.language,
                               style: TextStyle(
-                                fontSize: 12,
-                                color: UiConstants.subtitleTextColor.withOpacity(0.6),
+                                fontSize: 12 * sc,
+                                color: UiConstants.subtitleTextColor.withValues(alpha: 0.6),
                               ),
                             ),
                             Text(
                               "•",
-                              style: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.3)),
+                              style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.3), fontSize: 12 * sc),
                             ),
                             Text(
                               submission.timestamp,
                               style: TextStyle(
-                                fontSize: 12,
-                                color: UiConstants.subtitleTextColor.withOpacity(0.6),
+                                fontSize: 12 * sc,
+                                color: UiConstants.subtitleTextColor.withValues(alpha: 0.6),
                               ),
                             ),
                           ],
@@ -1129,17 +1143,17 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                       Text(
                         submission.status,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13 * sc,
                           fontWeight: FontWeight.bold,
                           color: statusColor,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4 * sc),
                       Text(
                         submission.executionTime,
                         style: TextStyle(
-                          fontSize: 11,
-                          color: UiConstants.subtitleTextColor.withOpacity(0.5),
+                          fontSize: 10 * sc,
+                          color: UiConstants.subtitleTextColor.withValues(alpha: 0.5),
                         ),
                       ),
                     ],
@@ -1153,41 +1167,148 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildSettingsTab() {
+  Widget _buildSettingsTab(double sc) {
+    final currentSize = context.read<ThemeCubit>().state.size;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSettingsTile(Icons.manage_accounts_outlined, "Edit Profile"),
-        _buildSettingsTile(Icons.notifications_active_outlined, "Notifications"),
-        _buildSettingsTile(Icons.security_outlined, "Security & Password"),
-        _buildSettingsTile(Icons.help_outline_rounded, "Help & Support"),
-        _buildSettingsTile(Icons.logout_rounded, "Logout", isDestructive: true),
+        _buildSectionTitle("Display Size", sc),
+        SizedBox(height: 12 * sc),
+        _buildSizeSelector(currentSize, sc),
+        SizedBox(height: 24 * sc),
+        _buildSettingsTile(Icons.manage_accounts_outlined, "Edit Profile", sc),
+        _buildSettingsTile(Icons.notifications_active_outlined, "Notifications", sc),
+        _buildSettingsTile(Icons.security_outlined, "Security & Password", sc),
+        _buildSettingsTile(Icons.help_outline_rounded, "Help & Support", sc),
+        _buildSettingsTile(Icons.logout_rounded, "Logout", sc, isDestructive: true),
       ],
     );
   }
 
-  Widget _buildSettingsTile(IconData icon, String title, {bool isDestructive = false}) {
+  Widget _buildSizeSelector(AppThemeSize currentSize, double sc) {
+    return Container(
+      padding: EdgeInsets.all(16 * sc),
+      decoration: BoxDecoration(
+        color: UiConstants.infoBackgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.text_fields_rounded, color: UiConstants.primaryButtonColor, size: 18 * sc),
+              SizedBox(width: 10 * sc),
+              Text(
+                "Choose your preferred display size",
+                style: TextStyle(
+                  color: UiConstants.subtitleTextColor.withValues(alpha: 0.7),
+                  fontSize: 11 * sc,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16 * sc),
+          Row(
+            children: [
+              _buildSizeOption("Small", AppThemeSize.small, currentSize, sc),
+              SizedBox(width: 10 * sc),
+              _buildSizeOption("Normal", AppThemeSize.normal, currentSize, sc),
+              SizedBox(width: 10 * sc),
+              _buildSizeOption("Large", AppThemeSize.large, currentSize, sc),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSizeOption(String label, AppThemeSize size, AppThemeSize currentSize, double sc) {
+    final isSelected = currentSize == size;
+    final sampleFontSize = size == AppThemeSize.small ? 11.0 : size == AppThemeSize.normal ? 13.0 : 15.0;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          context.read<ThemeCubit>().setThemeSize(size);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          padding: EdgeInsets.symmetric(vertical: 14 * sc, horizontal: 8 * sc),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? UiConstants.primaryButtonColor.withValues(alpha: 0.15)
+                : Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected
+                  ? UiConstants.primaryButtonColor.withValues(alpha: 0.5)
+                  : UiConstants.borderColor.withValues(alpha: 0.15),
+              width: isSelected ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              Text(
+                "Aa",
+                style: TextStyle(
+                  fontSize: sampleFontSize * sc,
+                  fontWeight: FontWeight.w900,
+                  color: isSelected ? UiConstants.primaryButtonColor : UiConstants.mainTextColor,
+                ),
+              ),
+              SizedBox(height: 6 * sc),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11 * sc,
+                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                  color: isSelected
+                      ? UiConstants.primaryButtonColor
+                      : UiConstants.subtitleTextColor.withValues(alpha: 0.7),
+                ),
+              ),
+              if (isSelected)
+                Container(
+                  margin: EdgeInsets.only(top: 6 * sc),
+                  width: 20 * sc,
+                  height: 3 * sc,
+                  decoration: BoxDecoration(
+                    color: UiConstants.primaryButtonColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsTile(IconData icon, String title, double sc, {bool isDestructive = false}) {
     final color = isDestructive ? Colors.redAccent : UiConstants.mainTextColor;
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.only(bottom: 12 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.2)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.2)),
       ),
       child: ListTile(
-        leading: Icon(icon, color: color.withOpacity(0.8)),
-        title: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.w500)),
-        trailing: Icon(Icons.chevron_right_rounded, color: UiConstants.subtitleTextColor.withOpacity(0.5)),
+        leading: Icon(icon, color: color.withValues(alpha: 0.8), size: 20 * sc),
+        title: Text(title, style: TextStyle(color: color, fontWeight: FontWeight.w500, fontSize: 14 * sc)),
+        trailing: Icon(Icons.chevron_right_rounded, color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), size: 20 * sc),
         onTap: () {},
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title) {
+  Widget _buildSectionTitle(String title, double sc) {
     return Text(
       title,
-      style: const TextStyle(
-        fontSize: 18,
+      style: TextStyle(
+        fontSize: 16 * sc,
         fontWeight: FontWeight.bold,
         color: UiConstants.mainTextColor,
         letterSpacing: -0.5,
@@ -1195,37 +1316,37 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildInfoCard(String title, String content, IconData icon) {
+  Widget _buildInfoCard(String title, String content, IconData icon, double sc) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(16 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: UiConstants.borderColor.withOpacity(0.3)),
+        border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: UiConstants.primaryButtonColor, size: 20),
-              const SizedBox(width: 8),
+              Icon(icon, color: UiConstants.primaryButtonColor, size: 18 * sc),
+              SizedBox(width: 8 * sc),
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: 14 * sc,
                   fontWeight: FontWeight.bold,
                   color: UiConstants.mainTextColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 10 * sc),
           Text(
             content,
-            style: const TextStyle(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: 13 * sc,
               color: UiConstants.subtitleTextColor,
               height: 1.5,
             ),

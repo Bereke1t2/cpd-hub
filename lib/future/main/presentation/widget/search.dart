@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 
 class SearchBox extends StatefulWidget {
@@ -32,26 +33,27 @@ class _SearchBoxState extends State<SearchBox> {
 
   @override
   Widget build(BuildContext context) {
+    final sc = context.sc;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      margin: EdgeInsets.symmetric(horizontal: 16.0 * sc, vertical: 12.0 * sc),
+      padding: EdgeInsets.symmetric(horizontal: 16.0 * sc),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(16.0),
         border: Border.all(
-          color: _isFocused 
-              ? UiConstants.primaryButtonColor.withOpacity(0.5) 
-              : UiConstants.borderColor.withOpacity(0.5),
+          color: _isFocused
+              ? UiConstants.primaryButtonColor.withValues(alpha: 0.5)
+              : UiConstants.borderColor.withValues(alpha: 0.5),
           width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: _isFocused 
-                ? UiConstants.primaryButtonColor.withOpacity(0.1) 
-                : Colors.black.withOpacity(0.1),
+            color: _isFocused
+                ? UiConstants.primaryButtonColor.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.1),
             blurRadius: 10.0,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -59,15 +61,15 @@ class _SearchBoxState extends State<SearchBox> {
         focusNode: _focusNode,
         onChanged: widget.onChanged,
         cursorColor: UiConstants.primaryButtonColor,
-        style: const TextStyle(color: UiConstants.mainTextColor, fontSize: 15),
+        style: TextStyle(color: UiConstants.mainTextColor, fontSize: 15 * sc),
         decoration: InputDecoration(
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: UiConstants.subtitleTextColor.withOpacity(0.6)),
+          hintStyle: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.6), fontSize: 14 * sc),
           border: InputBorder.none,
           icon: Icon(
-            Icons.search_rounded, 
+            Icons.search_rounded,
             color: _isFocused ? UiConstants.primaryButtonColor : UiConstants.subtitleTextColor,
-            size: 22,
+            size: 22 * sc,
           ),
         ),
       ),

@@ -7,7 +7,11 @@ class GetAttendance {
   final MainRepo repository;
   GetAttendance(this.repository);
 
-  Future<Either<List<AttendanceEntity>, Failure>> call(String username, int month, int year) async {
+  Future<Either<List<AttendanceEntity>, Failure>> call(
+    String username,
+    int month,
+    int year,
+  ) async {
     return await repository.getAttendance(username, month, year);
   }
 }
