@@ -1,4 +1,5 @@
 import 'package:http/http.dart' as http;
+import 'package:cpd_hub/core/auth_service.dart';
 import 'package:cpd_hub/core/network.dart';
 import 'package:cpd_hub/future/main/data/dataSources/remote/remote_data_source.dart';
 import 'package:cpd_hub/future/main/data/repository/main_repo.dart';
@@ -33,6 +34,7 @@ class Injection {
   // Core
   late final http.Client httpClient;
   late final NetworkInfo networkInfo;
+  late final AuthService authService;
 
   // Data Sources
   late final RemoteDataSource remoteDataSource;
@@ -69,9 +71,13 @@ class Injection {
     // Core
     httpClient = http.Client();
     networkInfo = NetworkInfoImpl();
+    authService = AuthService(client: httpClient);
 
     // Data Source
-    remoteDataSource = RemoteDataSourceImpl(client: httpClient);
+    remoteDataSource = RemoteDataSourceImpl(
+      client: httpClient,
+      authService: authService,
+    );
 
     // Repository
     mainRepo = MainRepoImpl(

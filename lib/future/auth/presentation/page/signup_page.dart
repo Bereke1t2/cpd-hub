@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cpd_hub/core/exceptions.dart';
+import 'package:cpd_hub/core/injection.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/widgets/app_logo.dart';
@@ -52,20 +54,52 @@ class _SignupPageState extends State<SignupPage> with SingleTickerProviderStateM
   void _handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Account created successfully', style: TextStyle(fontWeight: FontWeight.w600)),
-        backgroundColor: UiConstants.primaryButtonColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) Navigator.pushReplacementNamed(context, '/login');
-    });
+
+    try {
+      final authService = Injection().authService;
+      await authService.signup(
+        fullName: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Account created successfully',
+              style: TextStyle(fontWeight: FontWeight.w600)),
+          backgroundColor: UiConstants.primaryButtonColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) Navigator.pushReplacementNamed(context, '/');
+      });
+    } on ServerException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message, style: const TextStyle(fontWeight: FontWeight.w600)),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Connection failed. Check your network.',
+              style: TextStyle(fontWeight: FontWeight.w600)),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
