@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:cpd_hub/core/exceptions.dart';
 import 'package:cpd_hub/core/failure.dart';
 import 'package:cpd_hub/core/network.dart';
 import 'package:cpd_hub/future/main/data/dataSources/remote/remote_data_source.dart';
@@ -25,6 +26,12 @@ class MainRepoImpl implements MainRepo {
     try {
       final result = await call();
       return Left(result);
+    } on UnauthorizedException catch (e) {
+      return Right(AuthenticationFailure(e.message));
+    } on NotFoundException catch (e) {
+      return Right(NotFoundFailure(e.message));
+    } on ServerException catch (e) {
+      return Right(ServerFailure(e.message));
     } on Exception catch (e) {
       return Right(ServerFailure(e.toString()));
     }
