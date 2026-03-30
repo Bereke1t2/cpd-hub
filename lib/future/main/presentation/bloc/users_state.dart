@@ -12,9 +12,29 @@ class UsersLoading extends UsersState {}
 
 class UsersLoaded extends UsersState {
   final List<UserEntity> users;
-  const UsersLoaded(this.users);
+  final bool hasMore;
+  final bool isLoadingMore;
+
+  const UsersLoaded(
+    this.users, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+  });
+
+  UsersLoaded copyWith({
+    List<UserEntity>? users,
+    bool? hasMore,
+    bool? isLoadingMore,
+  }) {
+    return UsersLoaded(
+      users ?? this.users,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+
   @override
-  List<Object?> get props => [users];
+  List<Object?> get props => [users, hasMore, isLoadingMore];
 }
 
 class UsersError extends UsersState {

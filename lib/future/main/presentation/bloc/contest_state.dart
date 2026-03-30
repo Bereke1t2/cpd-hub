@@ -12,9 +12,29 @@ class ContestLoading extends ContestState {}
 
 class ContestLoaded extends ContestState {
   final List<ContestEntitiy> contests;
-  const ContestLoaded(this.contests);
+  final bool hasMore;
+  final bool isLoadingMore;
+
+  const ContestLoaded(
+    this.contests, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+  });
+
+  ContestLoaded copyWith({
+    List<ContestEntitiy>? contests,
+    bool? hasMore,
+    bool? isLoadingMore,
+  }) {
+    return ContestLoaded(
+      contests ?? this.contests,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+
   @override
-  List<Object?> get props => [contests];
+  List<Object?> get props => [contests, hasMore, isLoadingMore];
 }
 
 class ContestError extends ContestState {

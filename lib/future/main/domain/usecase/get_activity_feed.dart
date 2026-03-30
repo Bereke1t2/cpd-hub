@@ -7,7 +7,7 @@ class GetActivityFeed {
   final MainRepo repository;
   GetActivityFeed(this.repository);
 
-  Future<Either<List<ActivityEntity>, Failure>> call() async {
-    return await repository.getActivityFeed();
+  Future<Either<List<ActivityEntity>, Failure>> call({int page = 1, int limit = 20}) async {
+    return await repository.getActivityFeed(page: page, limit: limit);
   }
 }

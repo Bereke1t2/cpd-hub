@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cpd_hub/core/injection.dart';
 import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/theme/theme_cubit.dart';
 import 'package:cpd_hub/core/theme/app_theme.dart';
@@ -9,7 +10,6 @@ import 'package:cpd_hub/future/main/domain/entitiy/attendance_entity.dart';
 import 'package:cpd_hub/future/main/domain/entitiy/heatmap_entry_entity.dart';
 import 'package:cpd_hub/future/main/domain/entitiy/rating_point_entity.dart';
 import 'package:cpd_hub/future/main/domain/entitiy/social_link_entity.dart';
-import 'package:cpd_hub/future/main/domain/entitiy/submission_entity.dart';
 import 'package:cpd_hub/future/main/domain/entitiy/user_entity.dart';
 import '../../../../core/ui_constants.dart';
 import '../widget/info_section.dart';
@@ -27,8 +27,9 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   late TabController _tabController;
   DateTime _selectedDate = DateTime.now();
 
-  bool get isOwner => (widget.username == null || widget.username == 'me');
-  String get currentUsername => widget.username ?? 'me';
+  bool get isOwner => (widget.username == null || widget.username == _loggedInUsername);
+  String get _loggedInUsername => Injection().authService.currentUsername ?? '';
+  String get currentUsername => widget.username ?? _loggedInUsername;
 
   @override
   void initState() {
@@ -95,28 +96,30 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       selectedIndex: isOwner ? 4 : 3,
       body: BlocBuilder<ProfileCubit, ProfileState>(
         builder: (context, state) {
-          if (state is ProfileLoading) {
-            return const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor));
+          if (state.error != null && state.user == null) {
+            return Center(child: Text(state.error!, style: TextStyle(color: Colors.redAccent, fontSize: 14 * sc)));
           }
-          if (state is ProfileError) {
-            return Center(child: Text(state.message, style: TextStyle(color: Colors.redAccent, fontSize: 14 * sc)));
-          }
-          if (state is ProfileLoaded) {
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  _buildProfileHeader(context, state.user, sc),
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                if (state.isUserLoading)
+                  Padding(
+                    padding: EdgeInsets.only(top: 40 * sc),
+                    child: const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor)),
+                  )
+                else if (state.user != null)
+                  _buildProfileHeader(context, state.user!, sc),
+                if (state.user != null) ...[
                   SizedBox(height: 16 * sc),
                   _buildTabBar(sc),
                   SizedBox(height: 24 * sc),
                   _buildTabContent(state, sc),
-                  SizedBox(height: 100 * sc),
                 ],
-              ),
-            );
-          }
-          return const SizedBox.shrink();
+                SizedBox(height: 100 * sc),
+              ],
+            ),
+          );
         },
       ),
     );
@@ -312,44 +315,54 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTabContent(ProfileLoaded state, double sc) {
+  Widget _buildTabContent(ProfileState state, double sc) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16 * sc),
       child: [
         _buildOverviewTab(state, sc),
         _buildAttendanceTab(context, state, sc),
-        _buildSubmissionsTab(state.submissionData, sc),
+        _buildSubmissionsTab(state, sc),
         if (isOwner)
           _buildSettingsTab(sc),
       ][_tabController.index],
     );
   }
 
-  Widget _buildOverviewTab(ProfileLoaded state, double sc) {
+  Widget _buildOverviewTab(ProfileState state, double sc) {
+    final user = state.user!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildStatsSection(state.user),
+        _buildStatsSection(user),
         SizedBox(height: 24 * sc),
+
         _buildSectionTitle("Coding Consistency", sc),
         SizedBox(height: 12 * sc),
-        _buildActivityHeatmap(context, state.heatmapData, sc),
+        if (state.isHeatmapLoading)
+          _buildLoadingPlaceholder(sc)
+        else
+          _buildActivityHeatmap(context, state.heatmapData, sc),
         SizedBox(height: 24 * sc),
+
         _buildSectionTitle("Rating History", sc),
         SizedBox(height: 12 * sc),
-        _buildRatingGraph(state.ratingHistory, sc),
+        if (state.isRatingLoading)
+          _buildLoadingPlaceholder(sc)
+        else
+          _buildRatingGraph(state.ratingHistory, sc),
         SizedBox(height: 24 * sc),
-        _buildCPMetricsGrid(state.user, sc),
+
+        _buildCPMetricsGrid(user, sc),
         SizedBox(height: 24 * sc),
         _buildSectionTitle("Coding Profiles", sc),
         SizedBox(height: 12 * sc),
-        _buildSocialLinksGrid(state.user.socialLinks, sc),
+        _buildSocialLinksGrid(user.socialLinks, sc),
         SizedBox(height: 24 * sc),
         _buildSectionTitle("General Info", sc),
         SizedBox(height: 12 * sc),
         _buildInfoCard(
           "Biography",
-          state.user.bio.isNotEmpty ? state.user.bio : "No bio provided",
+          user.bio.isNotEmpty ? user.bio : "No bio provided",
           Icons.person_outline,
           sc,
         ),
@@ -361,6 +374,17 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
           sc,
         ),
       ],
+    );
+  }
+
+  Widget _buildLoadingPlaceholder(double sc) {
+    return Container(
+      height: 100 * sc,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor, strokeWidth: 2)),
     );
   }
 
@@ -812,7 +836,10 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildAttendanceTab(BuildContext context, ProfileLoaded state, double sc) {
+  Widget _buildAttendanceTab(BuildContext context, ProfileState state, double sc) {
+    if (state.isAttendanceLoading) {
+      return _buildLoadingPlaceholder(sc);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1038,7 +1065,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
     return months[month - 1];
   }
 
-  Widget _buildSubmissionsTab(List<SubmissionEntity> submissions, double sc) {
+  Widget _buildSubmissionsTab(ProfileState state, double sc) {
+    if (state.isSubmissionsLoading) {
+      return _buildLoadingPlaceholder(sc);
+    }
+    final submissions = state.submissionData;
     if (submissions.isEmpty) {
       return Center(
         child: Column(

@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class ProblemEntity extends Equatable {
+  final String id;
   final String title;
   final String difficulty;
   final List<String> tags;
@@ -13,6 +14,7 @@ class ProblemEntity extends Equatable {
   final bool isSolved;
 
   const ProblemEntity({
+    required this.id,
     required this.title,
     required this.difficulty,
     required this.tags,
@@ -27,6 +29,7 @@ class ProblemEntity extends Equatable {
 
   @override
   List<Object?> get props => [
+    id,
     title,
     difficulty,
     tags,

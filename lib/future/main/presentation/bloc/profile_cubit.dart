@@ -26,91 +26,82 @@ class ProfileCubit extends Cubit<ProfileState> {
     required this.getRatingHistory,
     required this.getAttendance,
     required this.getSubmissions,
-  }) : super(ProfileInitial());
+  }) : super(const ProfileState());
 
   Future<void> loadProfile(String username) async {
-    emit(ProfileLoading());
+    emit(const ProfileState(
+      isUserLoading: true,
+      isHeatmapLoading: true,
+      isRatingLoading: true,
+      isAttendanceLoading: true,
+      isSubmissionsLoading: true,
+    ));
 
-    final profileResult = await getProfile(username);
-    final heatmapResult = await getHeatmap(
-      username,
-      DateTime.now().month,
-      DateTime.now().year,
-    );
-    final ratingResult = await getRatingHistory(username);
-    final attendanceResult = await getAttendance(
-      username,
-      DateTime.now().month,
-      DateTime.now().year,
-    );
-    final submissionsResult = await getSubmissions(username);
-
-    UserEntity? user;
-    List<HeatmapEntryEntity> heatmap = [];
-    List<RatingPointEntity> ratings = [];
-    List<AttendanceEntity> attendance = [];
-    List<SubmissionEntity> submissions = [];
-
-    profileResult.fold((l) => user = l, (_) {});
-    heatmapResult.fold((l) => heatmap = l, (_) {});
-    ratingResult.fold((l) => ratings = l, (_) {});
-    attendanceResult.fold((l) => attendance = l, (_) {});
-    submissionsResult.fold((l) => submissions = l, (_) {});
-
-    if (user != null) {
-      emit(
-        ProfileLoaded(
-          user: user!,
-          heatmapData: heatmap,
-          ratingHistory: ratings,
-          attendanceData: attendance,
-          submissionData: submissions,
-        ),
-      );
-    } else {
-      emit(const ProfileError('Failed to load profile'));
-    }
+    await Future.wait([
+      _loadUser(username),
+      _loadHeatmap(username),
+      _loadRating(username),
+      _loadAttendance(username),
+      _loadSubmissions(username),
+    ]);
   }
 
-  Future<void> loadAttendanceForMonth(
-    String username,
-    int month,
-    int year,
-  ) async {
-    if (state is ProfileLoaded) {
-      final current = state as ProfileLoaded;
-      final result = await getAttendance(username, month, year);
-      result.fold(
-        (attendance) => emit(
-          ProfileLoaded(
-            user: current.user,
-            heatmapData: current.heatmapData,
-            ratingHistory: current.ratingHistory,
-            attendanceData: attendance,
-            submissionData: current.submissionData,
-          ),
-        ),
-        (_) {},
-      );
-    }
+  Future<void> _loadUser(String username) async {
+    final result = await getProfile(username);
+    result.fold(
+      (user) => emit(state.copyWith(user: user, isUserLoading: false)),
+      (failure) => emit(state.copyWith(isUserLoading: false, error: failure.message)),
+    );
+  }
+
+  Future<void> _loadHeatmap(String username) async {
+    final result = await getHeatmap(username, DateTime.now().month, DateTime.now().year);
+    result.fold(
+      (heatmap) => emit(state.copyWith(heatmapData: heatmap, isHeatmapLoading: false)),
+      (_) => emit(state.copyWith(isHeatmapLoading: false)),
+    );
+  }
+
+  Future<void> _loadRating(String username) async {
+    final result = await getRatingHistory(username);
+    result.fold(
+      (ratings) => emit(state.copyWith(ratingHistory: ratings, isRatingLoading: false)),
+      (_) => emit(state.copyWith(isRatingLoading: false)),
+    );
+  }
+
+  Future<void> _loadAttendance(String username) async {
+    final now = DateTime.now();
+    final result = await getAttendance(username, now.month, now.year);
+    result.fold(
+      (attendance) => emit(state.copyWith(attendanceData: attendance, isAttendanceLoading: false)),
+      (_) => emit(state.copyWith(isAttendanceLoading: false)),
+    );
+  }
+
+  Future<void> _loadSubmissions(String username) async {
+    final result = await getSubmissions(username);
+    result.fold(
+      (submissions) => emit(state.copyWith(submissionData: submissions, isSubmissionsLoading: false)),
+      (_) => emit(state.copyWith(isSubmissionsLoading: false)),
+    );
+  }
+
+  Future<void> loadAttendanceForMonth(String username, int month, int year) async {
+    emit(state.copyWith(isAttendanceLoading: true));
+    final result = await getAttendance(username, month, year);
+    result.fold(
+      (attendance) => emit(state.copyWith(attendanceData: attendance, isAttendanceLoading: false)),
+      (_) => emit(state.copyWith(isAttendanceLoading: false)),
+    );
   }
 
   Future<void> loadHeatmapForMonth(String username, int month, int year) async {
-    if (state is ProfileLoaded) {
-      final current = state as ProfileLoaded;
-      final result = await getHeatmap(username, month, year);
-      result.fold(
-        (heatmap) => emit(
-          ProfileLoaded(
-            user: current.user,
-            heatmapData: heatmap,
-            ratingHistory: current.ratingHistory,
-            attendanceData: current.attendanceData,
-            submissionData: current.submissionData,
-          ),
-        ),
-        (_) {},
-      );
-    }
+    emit(state.copyWith(isHeatmapLoading: true));
+    final result = await getHeatmap(username, month, year);
+    result.fold(
+      (heatmap) => emit(state.copyWith(heatmapData: heatmap, isHeatmapLoading: false)),
+      (_) => emit(state.copyWith(isHeatmapLoading: false)),
+    );
   }
 }

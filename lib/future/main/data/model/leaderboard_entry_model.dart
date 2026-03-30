@@ -11,17 +11,18 @@ class LeaderboardEntryModel extends LeaderboardEntryEntity {
   });
 
   factory LeaderboardEntryModel.fromJson(Map<String, dynamic> json) {
+    final problemsRaw = json['problemsSolved'] ?? json['problems_solved'] ?? json['problems'];
+    List<String> problems = [];
+    if (problemsRaw is List) {
+      problems = problemsRaw.map((e) => e.toString()).toList();
+    }
     return LeaderboardEntryModel(
-      rank: json['rank'] ?? 0,
-      username: json['username'] ?? '',
-      rating: json['rating'] ?? 0,
-      score: json['score'] ?? 0,
-      penalty: json['penalty'] ?? 0,
-      problemsSolved:
-          (json['problemsSolved'] as List?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      rank: (json['rank'] is num) ? (json['rank'] as num).toInt() : int.tryParse('${json['rank']}') ?? 0,
+      username: json['username']?.toString() ?? '',
+      rating: (json['rating'] is num) ? (json['rating'] as num).toInt() : int.tryParse('${json['rating']}') ?? 0,
+      score: (json['score'] is num) ? (json['score'] as num).toInt() : int.tryParse('${json['score']}') ?? 0,
+      penalty: (json['penalty'] is num) ? (json['penalty'] as num).toInt() : int.tryParse('${json['penalty']}') ?? 0,
+      problemsSolved: problems,
     );
   }
 

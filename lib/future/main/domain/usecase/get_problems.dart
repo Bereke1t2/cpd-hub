@@ -10,7 +10,7 @@ class GetProblems {
 
   GetProblems(this.repository);
 
-  Future<Either<List<ProblemEntity>, Failure>> call() async {
-    return await repository.getProblems();
+  Future<Either<List<ProblemEntity>, Failure>> call({int page = 1, int limit = 20}) async {
+    return await repository.getProblems(page: page, limit: limit);
   }
 }

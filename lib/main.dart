@@ -14,10 +14,16 @@ import 'package:cpd_hub/future/main/presentation/page/profile_page.dart';
 import 'package:cpd_hub/future/main/presentation/page/users_page.dart';
 import 'package:cpd_hub/future/auth/presentation/page/login_page.dart';
 import 'package:cpd_hub/future/auth/presentation/page/signup_page.dart';
+import 'package:cpd_hub/core/contest_reminder_service.dart';
 import 'package:cpd_hub/core/theme/app_theme.dart';
 import 'package:cpd_hub/core/theme/theme_cubit.dart';
+import 'package:cpd_hub/future/learning/presentation/bloc/roadmap_cubit.dart';
+import 'package:cpd_hub/future/learning/presentation/pages/learning_hub_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ContestReminderService.instance.init();
+
   final injection = Injection();
   injection.init();
 
@@ -50,6 +56,7 @@ class MyApp extends StatelessWidget {
             ),
             BlocProvider<UsersCubit>.value(value: injection.usersCubit),
             BlocProvider<ProfileCubit>.value(value: injection.profileCubit),
+            BlocProvider<RoadmapCubit>.value(value: injection.roadmapCubit),
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
@@ -96,6 +103,8 @@ class MyApp extends StatelessWidget {
         return const ProfilePage();
       case '/users':
         return UsersPage();
+      case '/learning':
+        return const LearningHubPage();
       default:
         return null;
     }

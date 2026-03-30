@@ -1,5 +1,5 @@
 class UrlConstants {
-  static const String baseUrl = 'http://localhost:8000/api';
+  static const String baseUrl = 'http://172.17.0.1:8000/api';
 
   // Auth
   static const String login = '$baseUrl/auth/login';
@@ -8,6 +8,7 @@ class UrlConstants {
   // Problems
   static const String problems = '$baseUrl/problems';
   static const String dailyProblem = '$baseUrl/problems/daily';
+  static String problemDetail(String id) => '$baseUrl/problems/$id';
   static String likeProblem(String id) => '$baseUrl/problems/$id/like';
   static String dislikeProblem(String id) => '$baseUrl/problems/$id/dislike';
   static String solveProblem(String id) => '$baseUrl/problems/$id/solve';

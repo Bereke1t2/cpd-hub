@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
+import 'package:cpd_hub/future/main/domain/entitiy/problem_entitiy.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/problems_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
 import '../widget/problem_container.dart';
@@ -56,54 +57,76 @@ class _ProblemsPageState extends State<ProblemsPage> {
       return matchesSearch && matchesDifficulty;
     }).toList();
 
-    return CustomScrollView(
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16 * sc, 16 * sc, 16 * sc, 8 * sc),
-            child: _buildSearchField(sc),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16 * sc, 0, 16 * sc, 12 * sc),
-            child: _buildFilters(sc),
-          ),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 16 * sc),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final p = filteredProblems[index];
-                return ProblemContainer(
-                  title: p.title,
-                  difficulty: p.difficulty,
-                  timestamp: DateTime.now().subtract(Duration(days: index + 1)),
-                  isSolved: p.isSolved,
-                  likedCount: p.numberOfLikes,
-                  dislikedCount: p.numberOfDislikes,
-                  tags: p.tags,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProblemDetailsPage(problemData: {
-                        'title': p.title,
-                        'difficulty': p.difficulty,
-                        'likedCount': '${p.numberOfLikes}',
-                        'dislikedCount': '${p.numberOfDislikes}',
-                      }),
-                    ),
-                  ),
-                );
-              },
-              childCount: filteredProblems.length,
+    return NotificationListener<ScrollNotification>(
+      onNotification: (notification) {
+        if (notification is ScrollEndNotification &&
+            notification.metrics.pixels >= notification.metrics.maxScrollExtent - 200) {
+          context.read<ProblemsCubit>().loadMore();
+        }
+        return false;
+      },
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16 * sc, 16 * sc, 16 * sc, 8 * sc),
+              child: _buildSearchField(sc),
             ),
           ),
-        ),
-        SliverToBoxAdapter(child: SizedBox(height: 80 * sc)),
-      ],
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16 * sc, 0, 16 * sc, 12 * sc),
+              child: _buildFilters(sc),
+            ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * sc),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final p = filteredProblems[index];
+                  return ProblemContainer(
+                    title: p.title,
+                    difficulty: p.difficulty,
+                    timestamp: DateTime.now().subtract(Duration(days: index + 1)),
+                    isSolved: p.isSolved,
+                    isLiked: p.isLiked,
+                    isDisliked: p.isDisliked,
+                    likedCount: p.numberOfLikes,
+                    dislikedCount: p.numberOfDislikes,
+                    tags: p.tags,
+                    onLike: () => context.read<ProblemsCubit>().likeProblem(p.problemId),
+                    onDislike: () => context.read<ProblemsCubit>().dislikeProblem(p.problemId),
+                    onTap: () => _openProblemDetails(context, p),
+                  );
+                },
+                childCount: filteredProblems.length,
+              ),
+            ),
+          ),
+          if (state.isLoadingMore)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(16 * sc),
+                child: const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor, strokeWidth: 2)),
+              ),
+            ),
+          if (!state.hasMore && filteredProblems.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(16 * sc),
+                child: Center(
+                  child: Text(
+                    'All problems loaded',
+                    style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc),
+                  ),
+                ),
+              ),
+            ),
+          SliverToBoxAdapter(child: SizedBox(height: 80 * sc)),
+        ],
+      ),
     );
   }
 
@@ -160,6 +183,26 @@ class _ProblemsPageState extends State<ProblemsPage> {
             ),
           );
         }).toList(),
+      ),
+    );
+  }
+
+  void _openProblemDetails(BuildContext context, ProblemEntity p) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProblemDetailsPage(problemData: {
+          'title': p.title,
+          'difficulty': p.difficulty,
+          'likedCount': '${p.numberOfLikes}',
+          'dislikedCount': '${p.numberOfDislikes}',
+          'tags': p.tags,
+          'problemId': p.problemId,
+          'problemUrl': p.problemUrl,
+          'isSolved': p.isSolved,
+          'isLiked': p.isLiked,
+          'isDisliked': p.isDisliked,
+        }),
       ),
     );
   }

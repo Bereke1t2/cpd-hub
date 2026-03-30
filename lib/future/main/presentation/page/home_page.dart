@@ -6,6 +6,7 @@ import 'package:cpd_hub/future/main/presentation/widget/problem_box.dart';
 import 'problem_details_page.dart';
 
 import '../../../../core/ui_constants.dart';
+import '../widget/countdown_timer.dart';
 import '../widget/info_box.dart';
 import '../widget/todays_problem_box.dart';
 import '../widget/welcomback_box.dart';
@@ -34,38 +35,91 @@ class _HomePageState extends State<HomePage> {
       subtitle: 'Ready to solve today?',
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
-          if (state is HomeLoading) {
-            return const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor));
-          }
-          if (state is HomeLoaded) {
-            return _buildContent(context, state, sc);
-          }
-          if (state is HomeError) {
-            return Center(child: Text(state.message, style: const TextStyle(color: Colors.redAccent)));
-          }
-          return const SizedBox.shrink();
+          return _buildContent(context, state, sc);
         },
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, HomeLoaded state, double sc) {
+  Widget _buildContent(BuildContext context, HomeState state, double sc) {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Column(
         children: [
           const WelcomeBackBox(name: 'Bereket'),
 
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16 * sc),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => Navigator.pushNamed(context, '/learning'),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      colors: [
+                        UiConstants.primaryButtonColor.withValues(alpha: 0.2),
+                        Colors.deepPurple.withValues(alpha: 0.12),
+                      ],
+                    ),
+                    border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.35)),
+                  ),
+                  padding: EdgeInsets.all(16 * sc),
+                  child: Row(
+                    children: [
+                      Icon(Icons.school_rounded, color: UiConstants.primaryButtonColor, size: 32 * sc),
+                      SizedBox(width: 14 * sc),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Learning hub',
+                              style: TextStyle(
+                                color: UiConstants.mainTextColor,
+                                fontSize: 17 * sc,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            Text(
+                              'Roadmap · weakness radar · contests · templates',
+                              style: TextStyle(
+                                color: UiConstants.subtitleTextColor,
+                                fontSize: 11 * sc,
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(Icons.chevron_right_rounded, color: UiConstants.primaryButtonColor),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 18 * sc),
+
           _buildSectionHeader(Icons.emoji_events_rounded, "Upcoming Contests", sc),
-          _buildContestCarousel(state, sc),
+          state.isContestsLoading
+              ? _buildSectionShimmer(sc)
+              : _buildContestCarousel(state, sc),
           SizedBox(height: 20 * sc),
 
           _buildSectionHeader(Icons.notifications_active_rounded, "Latest Updates", sc),
-          ...state.infoList.map((info) => InfoBox(title: info.title, description: info.description)),
+          if (state.isInfoLoading)
+            _buildSectionShimmer(sc)
+          else
+            ...state.infoList.map((info) => InfoBox(title: info.title, description: info.description)),
           SizedBox(height: 10 * sc),
 
-          if (state.dailyProblem != null) ...[
-            _buildSectionHeader(Icons.auto_awesome_rounded, "Daily Challenge", sc),
+          _buildSectionHeader(Icons.auto_awesome_rounded, "Daily Challenge", sc),
+          if (state.isDailyLoading)
+            _buildSectionShimmer(sc)
+          else if (state.dailyProblem != null) ...[
             TodaysProblemBox(
               problemTitle: state.dailyProblem!.title,
               solved: state.dailyProblem!.numberOfSolvedPeople.toDouble(),
@@ -89,22 +143,44 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SizedBox(height: 20 * sc),
           ],
+          SizedBox(height: 20 * sc),
 
           _buildSectionHeader(Icons.analytics_rounded, "Live Activity", sc),
-          _buildActivityFeed(state, sc),
+          state.isActivityLoading
+              ? _buildSectionShimmer(sc)
+              : _buildActivityFeed(state, sc),
           SizedBox(height: 20 * sc),
 
           _buildSectionHeader(Icons.trending_up_rounded, "Trending Problems", sc),
-          _buildProblemsSection(context, state, sc),
+          state.isProblemsLoading
+              ? _buildSectionShimmer(sc)
+              : _buildProblemsSection(context, state, sc),
           SizedBox(height: 80 * sc),
         ],
       ),
     );
   }
 
-  Widget _buildContestCarousel(HomeLoaded state, double sc) {
+  Widget _buildSectionShimmer(double sc) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16 * sc),
+      child: Column(
+        children: List.generate(2, (_) => Padding(
+          padding: EdgeInsets.only(bottom: 8 * sc),
+          child: Container(
+            height: 50 * sc,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.04),
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        )),
+      ),
+    );
+  }
+
+  Widget _buildContestCarousel(HomeState state, double sc) {
     final contests = state.upcomingContests;
     if (contests.isEmpty) {
       return Padding(
@@ -122,7 +198,8 @@ class _HomePageState extends State<HomePage> {
         itemCount: contests.length,
         itemBuilder: (context, index) {
           final c = contests[index];
-          final isStarted = c.startTime == "Started" || c.duration.isEmpty;
+          final targetTime = DateTime.tryParse(c.startTime);
+          final isStarted = c.startTime == "Started" || c.duration.isEmpty || (targetTime != null && targetTime.isBefore(DateTime.now()));
 
           return Container(
             width: 200 * sc,
@@ -171,10 +248,13 @@ class _HomePageState extends State<HomePage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: UiConstants.mainTextColor, fontSize: 14 * sc, fontWeight: FontWeight.w800, height: 1.2),
                 ),
-                Text(
-                  isStarted ? "Contest is running now" : "Registration Open",
-                  style: TextStyle(color: isStarted ? Colors.redAccent : Colors.greenAccent, fontSize: 11 * sc, fontWeight: FontWeight.w600),
-                ),
+                if (targetTime != null && !isStarted)
+                  CountdownTimer(targetTime: targetTime, compact: true)
+                else
+                  Text(
+                    isStarted ? "Contest is running now" : "Registration Open",
+                    style: TextStyle(color: isStarted ? Colors.redAccent : Colors.greenAccent, fontSize: 11 * sc, fontWeight: FontWeight.w600),
+                  ),
               ],
             ),
           );
@@ -183,8 +263,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildActivityFeed(HomeLoaded state, double sc) {
+  Widget _buildActivityFeed(HomeState state, double sc) {
     final activities = state.activityFeed;
+    if (activities.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16 * sc),
+        child: Text("No recent activity", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5))),
+      );
+    }
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16 * sc),
       padding: EdgeInsets.all(14 * sc),
@@ -278,7 +364,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildProblemsSection(BuildContext context, HomeLoaded state, double sc) {
+  Widget _buildProblemsSection(BuildContext context, HomeState state, double sc) {
     final problems = state.trendingProblems;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.0 * sc),

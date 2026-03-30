@@ -26,37 +26,67 @@ class HomeCubit extends Cubit<HomeState> {
     required this.getContests,
     required this.getActivityFeed,
     required this.getInfoList,
-  }) : super(HomeInitial());
+  }) : super(const HomeState());
 
   Future<void> loadHomeData() async {
-    emit(HomeLoading());
+    emit(const HomeState(
+      isDailyLoading: true,
+      isProblemsLoading: true,
+      isContestsLoading: true,
+      isActivityLoading: true,
+      isInfoLoading: true,
+    ));
 
-    final dailyResult = await getDailyProblems();
-    final problemsResult = await getProblems();
-    final contestsResult = await getContests();
-    final activityResult = await getActivityFeed();
-    final infoResult = await getInfoList();
+    // Fire all requests concurrently — each updates the state as it resolves.
+    await Future.wait([
+      _loadDaily(),
+      _loadProblems(),
+      _loadContests(),
+      _loadActivity(),
+      _loadInfo(),
+    ]);
+  }
 
-    DailyProblemEntitiy? daily;
-    List<ProblemEntity> problems = [];
-    List<ContestEntitiy> contests = [];
-    List<ActivityEntity> activity = [];
-    List<InfoEntity> infos = [];
+  Future<void> _loadDaily() async {
+    final result = await getDailyProblems();
+    result.fold(
+      (daily) => emit(state.copyWith(dailyProblem: daily, isDailyLoading: false)),
+      (_) => emit(state.copyWith(isDailyLoading: false)),
+    );
+  }
 
-    dailyResult.fold((l) => daily = l, (_) {});
-    problemsResult.fold((l) => problems = l, (_) {});
-    contestsResult.fold((l) => contests = l, (_) {});
-    activityResult.fold((l) => activity = l, (_) {});
-    infoResult.fold((l) => infos = l, (_) {});
+  Future<void> _loadProblems() async {
+    final result = await getProblems(page: 1, limit: 5);
+    result.fold(
+      (problems) => emit(state.copyWith(trendingProblems: problems, isProblemsLoading: false)),
+      (_) => emit(state.copyWith(isProblemsLoading: false)),
+    );
+  }
 
-    emit(
-      HomeLoaded(
-        dailyProblem: daily,
-        trendingProblems: problems,
+  Future<void> _loadContests() async {
+    final result = await getContests(page: 1, limit: 5);
+    result.fold(
+      (contests) => emit(state.copyWith(
         upcomingContests: contests.where((c) => !c.isPast).toList(),
-        activityFeed: activity,
-        infoList: infos,
-      ),
+        isContestsLoading: false,
+      )),
+      (_) => emit(state.copyWith(isContestsLoading: false)),
+    );
+  }
+
+  Future<void> _loadActivity() async {
+    final result = await getActivityFeed(page: 1, limit: 10);
+    result.fold(
+      (activity) => emit(state.copyWith(activityFeed: activity, isActivityLoading: false)),
+      (_) => emit(state.copyWith(isActivityLoading: false)),
+    );
+  }
+
+  Future<void> _loadInfo() async {
+    final result = await getInfoList();
+    result.fold(
+      (infos) => emit(state.copyWith(infoList: infos, isInfoLoading: false)),
+      (_) => emit(state.copyWith(isInfoLoading: false)),
     );
   }
 }

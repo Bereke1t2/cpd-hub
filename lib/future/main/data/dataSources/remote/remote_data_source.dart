@@ -16,18 +16,18 @@ import '../../model/submission_model.dart';
 import '../../model/user_model.dart';
 
 abstract class RemoteDataSource {
-  Future<List<ProblemModel>> getProblems();
+  Future<List<ProblemModel>> getProblems({int page = 1, int limit = 20});
   Future<DailyProblemModel> getDailyProblems();
-  Future<List<ContestModel>> getContests();
+  Future<List<ContestModel>> getContests({int page = 1, int limit = 20});
   Future<UserModel> getProfile(String username);
   Future<InfoModel> getInfo();
   Future<void> likeProblem(String problemId);
   Future<void> dislikeProblem(String problemId);
   Future<void> markProblemAsSolved(String problemId);
   Future<void> unmarkProblemAsSolved(String problemId);
-  Future<List<UserModel>> getUsers();
+  Future<List<UserModel>> getUsers({int page = 1, int limit = 20});
   Future<List<LeaderboardEntryModel>> getLeaderboard(String contestId);
-  Future<List<ActivityModel>> getActivityFeed();
+  Future<List<ActivityModel>> getActivityFeed({int page = 1, int limit = 20});
   Future<List<AttendanceModel>> getAttendance(
     String username,
     int month,
@@ -121,8 +121,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   // ──────────────────── Problems ────────────────────
 
   @override
-  Future<List<ProblemModel>> getProblems() =>
-      _getList(UrlConstants.problems, ProblemModel.fromJson);
+  Future<List<ProblemModel>> getProblems({int page = 1, int limit = 20}) =>
+      _getList('${UrlConstants.problems}?page=$page&limit=$limit', ProblemModel.fromJson);
 
   @override
   Future<DailyProblemModel> getDailyProblems() =>
@@ -147,8 +147,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   // ──────────────────── Contests ────────────────────
 
   @override
-  Future<List<ContestModel>> getContests() =>
-      _getList(UrlConstants.contests, ContestModel.fromJson);
+  Future<List<ContestModel>> getContests({int page = 1, int limit = 20}) =>
+      _getList('${UrlConstants.contests}?page=$page&limit=$limit', ContestModel.fromJson);
 
   @override
   Future<List<LeaderboardEntryModel>> getLeaderboard(String contestId) =>
@@ -160,8 +160,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   // ──────────────────── Users ────────────────────
 
   @override
-  Future<List<UserModel>> getUsers() =>
-      _getList(UrlConstants.users, UserModel.fromJson);
+  Future<List<UserModel>> getUsers({int page = 1, int limit = 20}) =>
+      _getList('${UrlConstants.users}?page=$page&limit=$limit', UserModel.fromJson);
 
   @override
   Future<UserModel> getProfile(String username) =>
@@ -170,8 +170,8 @@ class RemoteDataSourceImpl implements RemoteDataSource {
   // ──────────────────── Activity ────────────────────
 
   @override
-  Future<List<ActivityModel>> getActivityFeed() =>
-      _getList(UrlConstants.activityFeed, ActivityModel.fromJson);
+  Future<List<ActivityModel>> getActivityFeed({int page = 1, int limit = 20}) =>
+      _getList('${UrlConstants.activityFeed}?page=$page&limit=$limit', ActivityModel.fromJson);
 
   // ──────────────────── Profile Analytics ────────────────────
 

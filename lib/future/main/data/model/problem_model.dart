@@ -2,6 +2,7 @@ import '../../domain/entitiy/problem_entitiy.dart';
 
 class ProblemModel extends ProblemEntity {
   const ProblemModel({
+    required super.id,
     required super.title,
     required super.difficulty,
     required super.tags,
@@ -16,7 +17,9 @@ class ProblemModel extends ProblemEntity {
 
   factory ProblemModel.fromJson(Map<String, dynamic> json) {
     final rawTags = json['topic_tags'];
+    final rawId = (json['id'] ?? '') as String;
     return ProblemModel(
+      id: rawId,
       title: (json['title'] ?? '') as String,
       difficulty: (json['difficulty'] ?? '') as String,
       tags: rawTags is List ? rawTags.whereType<String>().toList() : <String>[],
@@ -24,7 +27,7 @@ class ProblemModel extends ProblemEntity {
       numberOfDislikes:
           (json['numberOfDislikes'] ?? json['dislikes'] ?? 0) as int,
       problemUrl: (json['deep_link'] ?? json['url'] ?? '') as String,
-      problemId: (json['id'] ?? json['id'] ?? '') as String,
+      problemId: rawId,
       isLiked: (json['isLiked'] ?? false) as bool,
       isDisliked: (json['isDisliked'] ?? false) as bool,
       isSolved: (json['solved'] ?? false) as bool,
@@ -33,6 +36,7 @@ class ProblemModel extends ProblemEntity {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'difficulty': difficulty,
       'tags': tags,

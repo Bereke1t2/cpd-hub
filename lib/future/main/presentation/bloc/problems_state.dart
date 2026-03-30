@@ -12,9 +12,29 @@ class ProblemsLoading extends ProblemsState {}
 
 class ProblemsLoaded extends ProblemsState {
   final List<ProblemEntity> problems;
-  const ProblemsLoaded(this.problems);
+  final bool hasMore;
+  final bool isLoadingMore;
+
+  const ProblemsLoaded(
+    this.problems, {
+    this.hasMore = true,
+    this.isLoadingMore = false,
+  });
+
+  ProblemsLoaded copyWith({
+    List<ProblemEntity>? problems,
+    bool? hasMore,
+    bool? isLoadingMore,
+  }) {
+    return ProblemsLoaded(
+      problems ?? this.problems,
+      hasMore: hasMore ?? this.hasMore,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
+
   @override
-  List<Object?> get props => [problems];
+  List<Object?> get props => [problems, hasMore, isLoadingMore];
 }
 
 class ProblemsError extends ProblemsState {

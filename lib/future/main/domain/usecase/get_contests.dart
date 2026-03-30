@@ -10,7 +10,7 @@ class GetContests {
 
   GetContests(this.repository);
 
-  Future<Either<List<ContestEntitiy>, Failure>> call() async {
-    return await repository.getContests();
+  Future<Either<List<ContestEntitiy>, Failure>> call({int page = 1, int limit = 20}) async {
+    return await repository.getContests(page: page, limit: limit);
   }
 }

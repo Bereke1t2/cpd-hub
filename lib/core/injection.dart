@@ -25,6 +25,7 @@ import 'package:cpd_hub/future/main/presentation/bloc/leaderboard_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/problems_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/profile_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/users_cubit.dart';
+import 'package:cpd_hub/future/learning/presentation/bloc/roadmap_cubit.dart';
 
 class Injection {
   static final Injection _instance = Injection._internal();
@@ -66,6 +67,7 @@ class Injection {
   late final LeaderboardCubit leaderboardCubit;
   late final UsersCubit usersCubit;
   late final ProfileCubit profileCubit;
+  late final RoadmapCubit roadmapCubit;
 
   void init() {
     // Core
@@ -129,5 +131,7 @@ class Injection {
       getAttendance: getAttendance,
       getSubmissions: getSubmissions,
     );
+
+    roadmapCubit = RoadmapCubit()..loadMockCurriculum();
   }
 }

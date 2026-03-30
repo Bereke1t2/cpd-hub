@@ -38,8 +38,8 @@ class MainRepoImpl implements MainRepo {
   }
 
   @override
-  Future<Either<List<ProblemEntity>, Failure>> getProblems() async {
-    return _guardedCall(() => remoteDataSource.getProblems());
+  Future<Either<List<ProblemEntity>, Failure>> getProblems({int page = 1, int limit = 20}) async {
+    return _guardedCall(() => remoteDataSource.getProblems(page: page, limit: limit));
   }
 
   @override
@@ -48,8 +48,8 @@ class MainRepoImpl implements MainRepo {
   }
 
   @override
-  Future<Either<List<ContestEntitiy>, Failure>> getContests() async {
-    return _guardedCall(() => remoteDataSource.getContests());
+  Future<Either<List<ContestEntitiy>, Failure>> getContests({int page = 1, int limit = 20}) async {
+    return _guardedCall(() => remoteDataSource.getContests(page: page, limit: limit));
   }
 
   @override
@@ -85,8 +85,8 @@ class MainRepoImpl implements MainRepo {
   }
 
   @override
-  Future<Either<List<UserEntity>, Failure>> getUsers() async {
-    return _guardedCall(() => remoteDataSource.getUsers());
+  Future<Either<List<UserEntity>, Failure>> getUsers({int page = 1, int limit = 20}) async {
+    return _guardedCall(() => remoteDataSource.getUsers(page: page, limit: limit));
   }
 
   @override
@@ -97,8 +97,8 @@ class MainRepoImpl implements MainRepo {
   }
 
   @override
-  Future<Either<List<ActivityEntity>, Failure>> getActivityFeed() async {
-    return _guardedCall(() => remoteDataSource.getActivityFeed());
+  Future<Either<List<ActivityEntity>, Failure>> getActivityFeed({int page = 1, int limit = 20}) async {
+    return _guardedCall(() => remoteDataSource.getActivityFeed(page: page, limit: limit));
   }
 
   @override

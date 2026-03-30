@@ -7,7 +7,7 @@ class GetUsers {
   final MainRepo repository;
   GetUsers(this.repository);
 
-  Future<Either<List<UserEntity>, Failure>> call() async {
-    return await repository.getUsers();
+  Future<Either<List<UserEntity>, Failure>> call({int page = 1, int limit = 20}) async {
+    return await repository.getUsers(page: page, limit: limit);
   }
 }

@@ -24,30 +24,56 @@ class LikedAndDislikedButtons extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
+        _buildButton(
+          icon: isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+          color: isLiked ? Colors.green : Colors.grey,
+          count: likedCount,
           onTap: onLike,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(isLiked ? Icons.thumb_up : Icons.thumb_up_outlined, color: isLiked ? Colors.green : Colors.grey, size: 16 * sc),
-              SizedBox(width: 4 * sc),
-              Text(likedCount.toString(), style: TextStyle(color: Colors.white70, fontSize: 13 * sc, fontWeight: FontWeight.w500)),
-            ],
-          ),
+          sc: sc,
         ),
-        SizedBox(width: 14.0 * sc),
-        GestureDetector(
+        SizedBox(width: 6.0 * sc),
+        _buildButton(
+          icon: isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
+          color: isDisliked ? Colors.red : Colors.grey,
+          count: dislikedCount,
           onTap: onDislike,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined, color: isDisliked ? Colors.red : Colors.grey, size: 16 * sc),
-              SizedBox(width: 4 * sc),
-              Text(dislikedCount.toString(), style: TextStyle(color: Colors.white70, fontSize: 13 * sc, fontWeight: FontWeight.w500)),
-            ],
-          ),
+          sc: sc,
         ),
       ],
+    );
+  }
+
+  Widget _buildButton({
+    required IconData icon,
+    required Color color,
+    required int count,
+    required VoidCallback onTap,
+    required double sc,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8 * sc, vertical: 6 * sc),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, color: color, size: 16 * sc),
+              SizedBox(width: 4 * sc),
+              Text(
+                count.toString(),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13 * sc,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

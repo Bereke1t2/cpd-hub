@@ -5,6 +5,7 @@ import 'package:cpd_hub/core/ui_constants.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/contest_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
 import 'package:cpd_hub/future/main/presentation/widget/bar_box.dart';
+import 'package:cpd_hub/future/main/presentation/widget/countdown_timer.dart';
 import 'contest_leaderboard_page.dart';
 
 class ContestPage extends StatefulWidget {
@@ -17,11 +18,25 @@ class ContestPage extends StatefulWidget {
 class _ContestPageState extends State<ContestPage> {
   int _selectedFilterIndex = 0;
   final List<String> _filters = ['All', 'Rated', 'Unrated', 'Sponsors'];
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     context.read<ContestCubit>().loadContests();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      context.read<ContestCubit>().loadMore();
+    }
   }
 
   @override
@@ -53,6 +68,7 @@ class _ContestPageState extends State<ContestPage> {
     final past = state.contests.where((c) => c.isPast).toList();
 
     return SingleChildScrollView(
+      controller: _scrollController,
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +98,7 @@ class _ContestPageState extends State<ContestPage> {
 
           if (upcoming.isNotEmpty) ...[
             _buildSectionLabel('Upcoming Contests', sc),
-            ...upcoming.map((c) => _buildContestCard(context, c.id, c.title, c.date, c.isParticipating, c.numberOfProblems, c.duration, c.numberOfContestants, false, sc)),
+            ...upcoming.map((c) => _buildContestCard(context, c.id, c.title, c.date, c.isParticipating, c.numberOfProblems, c.duration, c.numberOfContestants, false, sc, startTime: c.startTime)),
             SizedBox(height: 20 * sc),
           ],
 
@@ -90,6 +106,22 @@ class _ContestPageState extends State<ContestPage> {
             _buildSectionLabel('Past Contests', sc),
             ...past.map((c) => _buildContestCard(context, c.id, c.title, c.date, c.isParticipating, c.numberOfProblems, c.duration, c.numberOfContestants, true, sc)),
           ],
+
+          if (state.isLoadingMore)
+            Padding(
+              padding: EdgeInsets.all(16 * sc),
+              child: const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor, strokeWidth: 2)),
+            ),
+          if (!state.hasMore && state.contests.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.all(16 * sc),
+              child: Center(
+                child: Text(
+                  'All contests loaded',
+                  style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc),
+                ),
+              ),
+            ),
 
           SizedBox(height: 80 * sc),
         ],
@@ -118,7 +150,10 @@ class _ContestPageState extends State<ContestPage> {
     );
   }
 
-  Widget _buildContestCard(BuildContext context, String id, String title, String date, bool participated, int problems, String time, int contestants, bool isPast, double sc) {
+  Widget _buildContestCard(BuildContext context, String id, String title, String date, bool participated, int problems, String time, int contestants, bool isPast, double sc, {String? startTime}) {
+    final DateTime? target = DateTime.tryParse(startTime ?? '');
+    final showCountdown = !isPast && target != null;
+
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -126,6 +161,7 @@ class _ContestPageState extends State<ContestPage> {
           builder: (context) => ContestLeaderboardPage(
             contestId: id,
             contestTitle: title,
+            isPast: isPast,
           ),
         ),
       ),
@@ -172,6 +208,10 @@ class _ContestPageState extends State<ContestPage> {
                   ),
               ],
             ),
+            if (showCountdown) ...[
+              SizedBox(height: 10 * sc),
+              CountdownTimer(targetTime: target),
+            ],
             SizedBox(height: 12 * sc),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,

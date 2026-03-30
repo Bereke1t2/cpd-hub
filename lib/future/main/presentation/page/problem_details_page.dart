@@ -121,6 +121,14 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
   }
 
   Widget _buildDescriptionTab(double sc) {
+    final tags = widget.problemData['tags'];
+    final tagList = tags is List ? tags.cast<String>() : <String>[];
+    final description = widget.problemData['description'] as String? ?? '';
+    final examples = widget.problemData['examples'];
+    final exampleList = examples is List ? examples.cast<Map<String, dynamic>>() : <Map<String, dynamic>>[];
+    final constraints = widget.problemData['constraints'];
+    final constraintList = constraints is List ? constraints.cast<String>() : <String>[];
+
     return SingleChildScrollView(
       padding: EdgeInsets.all(20 * sc),
       child: Column(
@@ -137,6 +145,12 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
               Icon(Icons.thumb_down_rounded, size: 14 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.5)),
               SizedBox(width: 4 * sc),
               Text("${widget.problemData['dislikedCount'] ?? "0"}", style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc)),
+              if (widget.problemData['isSolved'] == true) ...[
+                SizedBox(width: 12 * sc),
+                Icon(Icons.check_circle_rounded, size: 16 * sc, color: Colors.greenAccent),
+                SizedBox(width: 4 * sc),
+                Text("Solved", style: TextStyle(color: Colors.greenAccent, fontSize: 12 * sc, fontWeight: FontWeight.w600)),
+              ],
             ],
           ),
           SizedBox(height: 24 * sc),
@@ -145,36 +159,66 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> with SingleTick
             style: TextStyle(color: UiConstants.mainTextColor, fontSize: 20 * sc, fontWeight: FontWeight.w900),
           ),
           SizedBox(height: 16 * sc),
-          Text(
-            "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
-            style: TextStyle(
-              color: UiConstants.mainTextColor.withValues(alpha: 0.9),
-              fontSize: 16 * sc,
-              height: 1.7,
-              letterSpacing: 0.2,
+          if (description.isNotEmpty)
+            Text(
+              description,
+              style: TextStyle(
+                color: UiConstants.mainTextColor.withValues(alpha: 0.9),
+                fontSize: 16 * sc,
+                height: 1.7,
+                letterSpacing: 0.2,
+              ),
+            )
+          else
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20 * sc),
+              decoration: BoxDecoration(
+                color: UiConstants.infoBackgroundColor.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.white10),
+              ),
+              child: Column(
+                children: [
+                  Icon(Icons.description_outlined, size: 32 * sc, color: UiConstants.subtitleTextColor.withValues(alpha: 0.3)),
+                  SizedBox(height: 8 * sc),
+                  Text(
+                    "Problem description will be loaded from the server.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 13 * sc),
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 32 * sc),
-          _buildExample(1, "nums = [2,7,11,15], target = 9", "[0,1]", "Because nums[0] + nums[1] == 9, we return [0, 1].", sc),
-          _buildExample(2, "nums = [3,2,4], target = 6", "[1,2]", "", sc),
-          SizedBox(height: 32 * sc),
-          Text("Constraints:", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16 * sc)),
-          SizedBox(height: 8 * sc),
-          _buildConstraint("2 <= nums.length <= 104", sc),
-          _buildConstraint("-109 <= nums[i] <= 109", sc),
-          _buildConstraint("-109 <= target <= 109", sc),
-          SizedBox(height: 40 * sc),
-          Text("Topic Tags", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16 * sc)),
-          SizedBox(height: 16 * sc),
-          Wrap(
-            spacing: 12 * sc,
-            runSpacing: 12 * sc,
-            children: [
-              TagBox(tag: "Array"),
-              TagBox(tag: "Hash Table"),
-              TagBox(tag: "Sliding Window"),
-            ],
-          ),
+          if (exampleList.isNotEmpty) ...[
+            SizedBox(height: 32 * sc),
+            ...exampleList.asMap().entries.map((entry) {
+              final ex = entry.value;
+              return _buildExample(
+                entry.key + 1,
+                ex['input'] as String? ?? '',
+                ex['output'] as String? ?? '',
+                ex['explanation'] as String? ?? '',
+                sc,
+              );
+            }),
+          ],
+          if (constraintList.isNotEmpty) ...[
+            SizedBox(height: 32 * sc),
+            Text("Constraints:", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16 * sc)),
+            SizedBox(height: 8 * sc),
+            ...constraintList.map((c) => _buildConstraint(c, sc)),
+          ],
+          if (tagList.isNotEmpty) ...[
+            SizedBox(height: 40 * sc),
+            Text("Topic Tags", style: TextStyle(color: UiConstants.mainTextColor, fontWeight: FontWeight.bold, fontSize: 16 * sc)),
+            SizedBox(height: 16 * sc),
+            Wrap(
+              spacing: 12 * sc,
+              runSpacing: 12 * sc,
+              children: tagList.map((tag) => TagBox(tag: tag)).toList(),
+            ),
+          ],
           SizedBox(height: 100 * sc),
         ],
       ),

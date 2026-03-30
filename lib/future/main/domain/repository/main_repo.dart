@@ -15,8 +15,8 @@ import '../entitiy/submission_entity.dart';
 
 abstract class MainRepo {
   Future<Either<DailyProblemEntitiy, Failure>> getDailyProblems();
-  Future<Either<List<ContestEntitiy>, Failure>> getContests();
-  Future<Either<List<ProblemEntity>, Failure>> getProblems();
+  Future<Either<List<ContestEntitiy>, Failure>> getContests({int page = 1, int limit = 20});
+  Future<Either<List<ProblemEntity>, Failure>> getProblems({int page = 1, int limit = 20});
   Future<Either<UserEntity, Failure>> getProfile(String username);
   Future<Either<InfoEntity, Failure>> getInfo();
   Future<Either<void, Failure>> likeProblem(String problemId);
@@ -25,11 +25,11 @@ abstract class MainRepo {
   Future<Either<void, Failure>> unmarkProblemAsSolved(String problemId);
 
   // New methods
-  Future<Either<List<UserEntity>, Failure>> getUsers();
+  Future<Either<List<UserEntity>, Failure>> getUsers({int page = 1, int limit = 20});
   Future<Either<List<LeaderboardEntryEntity>, Failure>> getLeaderboard(
     String contestId,
   );
-  Future<Either<List<ActivityEntity>, Failure>> getActivityFeed();
+  Future<Either<List<ActivityEntity>, Failure>> getActivityFeed({int page = 1, int limit = 20});
   Future<Either<List<AttendanceEntity>, Failure>> getAttendance(
     String username,
     int month,

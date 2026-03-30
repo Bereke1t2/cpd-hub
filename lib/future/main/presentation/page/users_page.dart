@@ -16,6 +16,7 @@ class UsersPage extends StatefulWidget {
 
 class _UsersPageState extends State<UsersPage> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = "";
   String _sortBy = "Rating";
 
@@ -23,6 +24,20 @@ class _UsersPageState extends State<UsersPage> {
   void initState() {
     super.initState();
     context.read<UsersCubit>().loadUsers();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      context.read<UsersCubit>().loadMore();
+    }
   }
 
   @override
@@ -67,6 +82,7 @@ class _UsersPageState extends State<UsersPage> {
     final topContributors = List.of(users)..sort((a, b) => b.rating.compareTo(a.rating));
 
     return SingleChildScrollView(
+      controller: _scrollController,
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,6 +218,21 @@ class _UsersPageState extends State<UsersPage> {
                   ),
                 ),
               )),
+          if (state.isLoadingMore)
+            Padding(
+              padding: EdgeInsets.all(16 * sc),
+              child: const Center(child: CircularProgressIndicator(color: UiConstants.primaryButtonColor, strokeWidth: 2)),
+            ),
+          if (!state.hasMore && users.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.all(16 * sc),
+              child: Center(
+                child: Text(
+                  'All members loaded',
+                  style: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 12 * sc),
+                ),
+              ),
+            ),
           SizedBox(height: 80 * sc),
         ],
       ),

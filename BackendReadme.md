@@ -95,6 +95,41 @@ Retrieve all problems.
 
 ---
 
+### GET `/problems/:id`
+
+Get a single problem with full description, examples, and constraints.
+
+**Response `200`:**
+
+```json
+{
+  "id": "p1",
+  "title": "Two Sum",
+  "difficulty": "Easy",
+  "topic_tags": ["Array", "Hash Table"],
+  "likes": 245,
+  "dislikes": 12,
+  "deep_link": "https://...",
+  "isLiked": false,
+  "isDisliked": false,
+  "solved": true,
+  "description": "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.",
+  "examples": [
+    {
+      "input": "nums = [2,7,11,15], target = 9",
+      "output": "[0,1]",
+      "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+    }
+  ],
+  "constraints": [
+    "2 <= nums.length <= 10^4",
+    "-10^9 <= nums[i] <= 10^9"
+  ]
+}
+```
+
+---
+
 ### GET `/problems/daily`
 
 Get the daily challenge problem.
@@ -437,6 +472,7 @@ All endpoints return errors in this format:
 | POST | `/auth/login` | Login |
 | POST | `/auth/signup` | Register |
 | GET | `/problems` | List all problems |
+| GET | `/problems/:id` | Problem detail with description |
 | GET | `/problems/daily` | Daily challenge |
 | POST | `/problems/:id/like` | Like a problem |
 | POST | `/problems/:id/dislike` | Dislike a problem |
