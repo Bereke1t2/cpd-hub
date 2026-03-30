@@ -8,7 +8,7 @@ import 'package:cpd_hub/future/main/presentation/bloc/problems_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/profile_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/bloc/users_cubit.dart';
 import 'package:cpd_hub/future/main/presentation/page/home_page.dart';
-import 'package:cpd_hub/future/main/presentation/page/problems_page.dart';
+
 import 'package:cpd_hub/future/main/presentation/page/contest_page.dart';
 import 'package:cpd_hub/future/main/presentation/page/profile_page.dart';
 import 'package:cpd_hub/future/main/presentation/page/users_page.dart';
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
 
   const MyApp({super.key, required this.injection});
 
-  static const _tabRoutes = {'/', '/problems', '/contests', '/users', '/profile'};
+  static const _tabRoutes = {'/', '/explore', '/contests', '/users', '/profile'};
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +95,10 @@ class MyApp extends StatelessWidget {
         return const SignupPage();
       case '/':
         return HomePage();
+      case '/explore':
+        return const LearningHubPage();
       case '/problems':
-        return ProblemsPage();
+        return const LearningHubPage();
       case '/contests':
         return ContestPage();
       case '/profile':

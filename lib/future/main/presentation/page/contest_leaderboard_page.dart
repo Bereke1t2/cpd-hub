@@ -173,7 +173,6 @@ class _ContestLeaderboardPageState extends State<ContestLeaderboardPage> {
             color: Colors.transparent,
             child: InkWell(
               onTap: () {},
-              borderRadius: BorderRadius.circular(24),
               splashColor: ratingColor.withValues(alpha: 0.1),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12 * sc, vertical: 14 * sc),

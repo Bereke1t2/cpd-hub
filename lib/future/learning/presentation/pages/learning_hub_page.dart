@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cpd_hub/core/theme/theme_ext.dart';
 import 'package:cpd_hub/core/ui_constants.dart';
 import 'package:cpd_hub/future/main/presentation/page/base_page.dart';
+import 'package:cpd_hub/future/main/presentation/page/problems_page.dart';
 import 'package:cpd_hub/future/learning/presentation/pages/pocket_templates_page.dart';
 import 'package:cpd_hub/future/learning/presentation/pages/roadmap_paths_page.dart';
 import 'package:cpd_hub/future/learning/presentation/pages/unified_contest_calendar_page.dart';
@@ -15,135 +16,331 @@ class LearningHubPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final sc = context.sc;
 
-    final tiles = [
-      _HubTile(
-        'Interactive roadmap',
-        'Timeline curriculum — Markdown lectures, YouTube, hand-picked practice',
-        Icons.route_rounded,
-        Colors.tealAccent,
-        () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const RoadmapPathsPage())),
-      ),
-      _HubTile(
-        'Weakness radar',
-        'Skill spider chart + “Solve this next” nudges (API-driven later)',
-        Icons.radar_rounded,
-        Colors.amberAccent,
-        () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const WeaknessRadarAnalyticsPage())),
-      ),
-      _HubTile(
-        'Contest calendar',
-        'External + CPD Hub contests — remind me & open links',
-        Icons.calendar_month_rounded,
-        Colors.lightBlueAccent,
-        () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const UnifiedContestCalendarPage())),
-      ),
-      _HubTile(
-        'Pocket templates',
-        'Searchable snippets — copy to clipboard',
-        Icons.content_copy_rounded,
-        Colors.orangeAccent,
-        () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PocketTemplatesPage())),
-      ),
-    ];
-
     return BasePage(
-      showBackButton: true,
-      selectedIndex: 0,
-      title: 'Learning hub',
-      subtitle: 'Curriculum · analytics · contests · templates',
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(16 * sc, 12 * sc, 16 * sc, 100 * sc),
-        children: [
-          Container(
-            padding: EdgeInsets.all(14 * sc),
-            decoration: BoxDecoration(
-              color: UiConstants.primaryButtonColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.3)),
+      showBackButton: false,
+      selectedIndex: 1, // Explore is index 1
+      title: 'Explore',
+      subtitle: 'Your central command for CP growth',
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(16 * sc, 16 * sc, 16 * sc, 100 * sc),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeroCard(context, sc),
+            SizedBox(height: 24 * sc),
+            Text(
+              'Practice & Play',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18 * sc,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            child: Text(
-              'Go: GET /roadmaps, user_progress, tag aggregates, CLIST merge. Flutter: [RoadmapCubit] + ContestReminderService (15 min before).',
-              style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12 * sc, height: 1.35),
+            SizedBox(height: 12 * sc),
+            // Redirects to standard problems page 
+            _buildProblemsCard(context, sc),
+            SizedBox(height: 24 * sc),
+            Text(
+              'Explore Resources',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18 * sc,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-          ),
-          SizedBox(height: 18 * sc),
-          ...tiles.map((t) => Padding(
-                padding: EdgeInsets.only(bottom: 12 * sc),
-                child: _HubCard(tile: t, sc: sc),
-              )),
-        ],
+            SizedBox(height: 12 * sc),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 12 * sc,
+              crossAxisSpacing: 12 * sc,
+              childAspectRatio: 0.9,
+              children: [
+                _buildGridCard(
+                  sc: sc,
+                  title: 'Weakness Radar',
+                  subtitle: 'Targeted skill analysis',
+                  icon: Icons.radar_rounded,
+                  accentUrl: UiConstants.primaryButtonColor,
+                  imageUrl: 'assets/images/radar_bg.png', // Background image slot
+                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const WeaknessRadarAnalyticsPage())),
+                ),
+                _buildGridCard(
+                  sc: sc,
+                  title: 'Contest Calendar',
+                  subtitle: 'Upcoming CP events',
+                  icon: Icons.calendar_month_rounded,
+                  accentUrl: UiConstants.primaryButtonColor,
+                  imageUrl: 'assets/images/calendar_bg.png', // Background image slot
+                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const UnifiedContestCalendarPage())),
+                ),
+                _buildGridCard(
+                  sc: sc,
+                  title: 'Pocket Templates',
+                  subtitle: 'Searchable snippets',
+                  icon: Icons.content_copy_rounded,
+                  accentUrl: UiConstants.primaryButtonColor,
+                  imageUrl: 'assets/images/templates_bg.png', // Background image slot
+                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PocketTemplatesPage())),
+                ),
+                _buildGridCard(
+                  sc: sc,
+                  title: 'Daily Challenge',
+                  subtitle: 'Solve to keep your streak',
+                  icon: Icons.local_fire_department_rounded,
+                  accentUrl: UiConstants.primaryButtonColor,
+                  imageUrl: 'assets/images/challenge_bg.png', // Background image slot
+                  onTap: () {}, // Placeholder
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _HubTile {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color accent;
-  final VoidCallback onTap;
+  Widget _buildProblemsCard(BuildContext context, double sc) {
+    return InkWell(
+      onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const ProblemsPage())),
+      borderRadius: BorderRadius.circular(20),
+      child: Ink(
+        padding: EdgeInsets.all(16 * sc),
+        decoration: BoxDecoration(
+          color: UiConstants.primaryButtonColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          gradient: LinearGradient(
+            colors: [
+              UiConstants.primaryButtonColor.withValues(alpha: 0.9),
+              UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12 * sc),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+              ),
+              child: Icon(Icons.code_rounded, color: Colors.white, size: 28 * sc),
+            ),
+            SizedBox(width: 16 * sc),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Practice Problems',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16 * sc,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4 * sc),
+                  Text(
+                    'Access CP problems and past contests',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 13 * sc,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: Colors.white),
+          ],
+        ),
+      ),
+    );
+  }
 
-  _HubTile(this.title, this.subtitle, this.icon, this.accent, this.onTap);
-}
+  Widget _buildHeroCard(BuildContext context, double sc) {
+    return InkWell(
+      onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const RoadmapPathsPage())),
+      borderRadius: BorderRadius.circular(24),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: UiConstants.primaryButtonColor, // Restored matching colors
+          borderRadius: BorderRadius.circular(24),
+          image: const DecorationImage(
+            image: AssetImage('assets/images/roadmap_bg.png'), // Background image slot
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Container(
+          padding: EdgeInsets.all(20 * sc),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              colors: [
+                UiConstants.primaryButtonColor.withValues(alpha: 0.9),
+                UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.route_rounded, color: Colors.white, size: 32 * sc),
+                  const Spacer(),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 4 * sc),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Recommended',
+                      style: TextStyle(color: Colors.white, fontSize: 10 * sc, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16 * sc),
+              Text(
+                'Interactive Roadmap',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22 * sc,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(height: 8 * sc),
+              Text(
+                'Timeline curriculum featuring Markdown lectures, hand-picked practice, and YouTube tutorials.',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontSize: 13 * sc,
+                  height: 1.4,
+                ),
+              ),
+              SizedBox(height: 16 * sc),
+              Row(
+                children: [
+                  Text(
+                    'Start Learning',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14 * sc,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: 4 * sc),
+                  Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16 * sc),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-class _HubCard extends StatelessWidget {
-  final _HubTile tile;
-  final double sc;
-
-  const _HubCard({required this.tile, required this.sc});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildGridCard({
+    required double sc,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color accentUrl,
+    required String imageUrl,
+    required VoidCallback onTap,
+  }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        onTap: tile.onTap,
+        onTap: onTap,
         child: Ink(
           decoration: BoxDecoration(
-            color: UiConstants.infoBackgroundColor,
+            color: UiConstants.primaryButtonColor,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.12)),
-          ),
-          padding: EdgeInsets.all(16 * sc),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(12 * sc),
-                decoration: BoxDecoration(
-                  color: tile.accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(tile.icon, color: tile.accent, size: 28 * sc),
+            border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.2)),
+            gradient: LinearGradient(
+              colors: [
+                UiConstants.primaryButtonColor.withValues(alpha: 0.8),
+                UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            image: DecorationImage(
+              image: AssetImage(imageUrl),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.2), BlendMode.dstATop),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: UiConstants.primaryButtonColor.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
               ),
-              SizedBox(width: 14 * sc),
-              Expanded(
-                child: Column(
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16 * sc),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(12 * sc),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 28 * sc),
+                ),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tile.title,
+                      title,
                       style: TextStyle(
-                        color: UiConstants.mainTextColor,
-                        fontSize: 16 * sc,
-                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        fontSize: 15 * sc,
+                        fontWeight: FontWeight.bold,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 4 * sc),
                     Text(
-                      tile.subtitle,
+                      subtitle,
                       style: TextStyle(
-                        color: UiConstants.subtitleTextColor,
+                        color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 12 * sc,
-                        height: 1.3,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-              ),
-              Icon(Icons.chevron_right_rounded, color: UiConstants.subtitleTextColor.withValues(alpha: 0.4)),
-            ],
+              ],
+            ),
           ),
         ),
       ),

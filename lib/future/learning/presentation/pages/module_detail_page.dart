@@ -34,7 +34,7 @@ class ModuleDetailPage extends StatelessWidget {
     final yt = _youtubeId(module.videoUrl);
 
     return Scaffold(
-      backgroundColor: UiConstants.infoBackgroundColor.withValues(alpha: 0.9),
+      backgroundColor: UiConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -57,7 +57,7 @@ class ModuleDetailPage extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(16 * sc, 0, 16 * sc, 32 * sc),
         children: [
           if (module.videoUrl != null && module.videoUrl!.isNotEmpty) ...[
-            Text('Watch', style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12 * sc, fontWeight: FontWeight.w700)),
+            Text('VIDEO LECTURE', style: TextStyle(color: UiConstants.primaryButtonColor, fontSize: 12 * sc, letterSpacing: 1.2, fontWeight: FontWeight.bold)),
             SizedBox(height: 8 * sc),
             Material(
               borderRadius: BorderRadius.circular(16),
@@ -75,30 +75,72 @@ class ModuleDetailPage extends StatelessWidget {
                     AspectRatio(
                       aspectRatio: 16 / 9,
                       child: yt != null
-                          ? Image.network(
-                              'https://img.youtube.com/vi/$yt/hqdefault.jpg',
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
-                                color: Colors.black26,
-                                child: Icon(Icons.play_circle_filled_rounded, size: 56 * sc, color: Colors.white70),
-                              ),
+                          ? Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                Image.network(
+                                  'https://img.youtube.com/vi/$yt/hqdefault.jpg',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: UiConstants.primaryButtonColor.withValues(alpha: 0.1),
+                                  ),
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.black.withValues(alpha: 0.4),
+                                        Colors.transparent,
+                                        Colors.black.withValues(alpha: 0.6),
+                                      ],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             )
                           : Container(
                               color: Colors.black26,
                               child: Icon(Icons.play_circle_filled_rounded, size: 56 * sc, color: Colors.white70),
                             ),
                     ),
-                    Icon(Icons.play_circle_fill_rounded, size: 64 * sc, color: Colors.white.withValues(alpha: 0.9)),
+                    Container(
+                      padding: EdgeInsets.all(8 * sc),
+                      decoration: BoxDecoration(
+                        color: UiConstants.primaryButtonColor.withValues(alpha: 0.8),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: Icon(Icons.play_arrow_rounded, size: 48 * sc, color: Colors.white),
+                    ),
                   ],
                 ),
               ),
             ),
             SizedBox(height: 20 * sc),
           ],
-          Text(
-            'Quick read',
-            style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12 * sc, fontWeight: FontWeight.w700),
-          ),
+          Container(
+            padding: EdgeInsets.all(16 * sc),
+            decoration: BoxDecoration(
+              color: UiConstants.infoBackgroundColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.1)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'LESSON NOTES',
+                  style: TextStyle(color: UiConstants.primaryButtonColor, fontSize: 12 * sc, letterSpacing: 1.2, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 12 * sc),
           SizedBox(height: 8 * sc),
           MarkdownBody(
             data: module.markdownContent,
@@ -113,10 +155,13 @@ class ModuleDetailPage extends StatelessWidget {
               ),
             ),
           ),
+              ],
+            ),
+          ),
           SizedBox(height: 24 * sc),
           Text(
-            'Practice',
-            style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12 * sc, fontWeight: FontWeight.w700),
+            'PRACTICE PROBLEMS',
+            style: TextStyle(color: UiConstants.primaryButtonColor, fontSize: 12 * sc, letterSpacing: 1.2, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 10 * sc),
           ...module.linkedProblems.map((p) {
@@ -124,9 +169,7 @@ class ModuleDetailPage extends StatelessWidget {
               padding: EdgeInsets.only(bottom: 10 * sc),
               child: Material(
                 color: UiConstants.infoBackgroundColor,
-                borderRadius: BorderRadius.circular(16),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -148,7 +191,7 @@ class ModuleDetailPage extends StatelessWidget {
                     padding: EdgeInsets.all(14 * sc),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: UiConstants.borderColor.withValues(alpha: 0.15)),
+                      border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       children: [
@@ -166,8 +209,12 @@ class ModuleDetailPage extends StatelessWidget {
                               ),
                               SizedBox(height: 4 * sc),
                               Text(
-                                '${p.difficulty} · IDs sync with API later',
-                                style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 11 * sc),
+                                p.difficulty,
+                                style: TextStyle(
+                                  color: UiConstants.primaryButtonColor.withValues(alpha: 0.9), 
+                                  fontSize: 12 * sc,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),

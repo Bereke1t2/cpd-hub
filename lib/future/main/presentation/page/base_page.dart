@@ -44,7 +44,7 @@ class _BasePageState extends State<BasePage> {
 
   void _onTabTap(int index) {
     if (_selectedIndex == index) return;
-    final routes = ['/', '/problems', '/contests', '/users', '/profile'];
+    final routes = ['/', '/explore', '/contests', '/users', '/profile'];
     setState(() => _selectedIndex = index);
     Navigator.pushReplacementNamed(context, routes[index]);
   }
@@ -168,7 +168,7 @@ class _BasePageState extends State<BasePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       _buildNavItem(0, Icons.home_outlined, Icons.home_rounded, 'Home', sc),
-                      _buildNavItem(1, Icons.code_outlined, Icons.code_rounded, 'Problems', sc),
+                      _buildNavItem(1, Icons.explore_outlined, Icons.explore_rounded, 'Explore', sc),
                       _buildNavItem(2, Icons.emoji_events_outlined, Icons.emoji_events_rounded, 'Contests', sc),
                       _buildNavItem(3, Icons.people_outline_rounded, Icons.people_rounded, 'Users', sc),
                       _buildNavItem(4, Icons.person_outline_rounded, Icons.person_rounded, 'Profile', sc),

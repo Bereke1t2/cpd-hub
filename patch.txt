@@ -1,0 +1,73 @@
+--- lib/future/learning/presentation/pages/learning_hub_page.dart
++++ lib/future/learning/presentation/pages/learning_hub_page.dart
+@@ -107,37 +107,41 @@
+       child: Ink(
+         padding: EdgeInsets.all(16 * sc),
+         decoration: BoxDecoration(
+-          color: UiConstants.infoBackgroundColor,
++          color: UiConstants.primaryButtonColor,
+           borderRadius: BorderRadius.circular(20),
+-          border: Border.all(color: UiConstants.primaryButtonColor.withValues(al
+-pha: 0.3)),
+           boxShadow: [
+             BoxShadow(
+-              color: UiConstants.primaryButtonColor.withValues(alpha: 0.05),
++              color: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
+               blurRadius: 10,
+               offset: const Offset(0, 4),
+             ),
+           ],
++          gradient: LinearGradient(
++            colors: [
++              UiConstants.primaryButtonColor.withValues(alpha: 0.9),
++              UiConstants.primaryButtonColor.withValues(alpha: 0.6),
++            ],
++            begin: Alignment.topLeft,
++            end: Alignment.bottomRight,
++          ),
+         ),
+         child: Row(
+           children: [
+             Container(
+               padding: EdgeInsets.all(12 * sc),
+               decoration: BoxDecoration(
+-                color: UiConstants.primaryButtonColor.withValues(alpha: 0.15),
++                color: Colors.white.withValues(alpha: 0.2),
+                 borderRadius: BorderRadius.circular(16),
+               ),
+-              child: Icon(Icons.code_rounded, color: UiConstants.primaryButtonCo
+-lor, size: 28 * sc),
++              child: Icon(Icons.code_rounded, color: Colors.white, size: 28 * sc),
+             ),
+             SizedBox(width: 16 * sc),
+             Expanded(
+               child: Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                 children: [
+                   Text(
+                     'Practice Problems',
+                     style: TextStyle(
+-                      color: UiConstants.mainTextColor,
++                      color: Colors.white,
+                       fontSize: 16 * sc,
+                       fontWeight: FontWeight.bold,
+                     ),
+                   ),
+                   SizedBox(height: 4 * sc),
+                   Text(
+                     'Access CP problems and past contests',
+                     style: TextStyle(
+-                      color: UiConstants.subtitleTextColor,
++                      color: Colors.white.withValues(alpha: 0.9),
+                       fontSize: 13 * sc,
+                     ),
+                   ),
+                 ],
+               ),
+             ),
+-            Icon(Icons.chevron_right_rounded, color: UiConstants.subtitleTextCol
+-or),
++            const Icon(Icons.chevron_right_rounded, color: Colors.white),
+           ],
+         ),
+       ),
