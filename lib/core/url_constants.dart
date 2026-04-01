@@ -1,5 +1,5 @@
 class UrlConstants {
-  static const String baseUrl = 'http://172.17.0.1:8000/api';
+  static const String baseUrl = 'http://192.168.137.126:8000/api';
 
   // Auth
   static const String login = '$baseUrl/auth/login';

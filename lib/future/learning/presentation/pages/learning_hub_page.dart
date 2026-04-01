@@ -37,7 +37,7 @@ class LearningHubPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12 * sc),
-            // Redirects to standard problems page 
+            // Redirects to standard problems page
             _buildProblemsCard(context, sc),
             SizedBox(height: 24 * sc),
             Text(
@@ -62,35 +62,54 @@ class LearningHubPage extends StatelessWidget {
                   title: 'Weakness Radar',
                   subtitle: 'Targeted skill analysis',
                   icon: Icons.radar_rounded,
-                  accentUrl: UiConstants.primaryButtonColor,
-                  imageUrl: 'assets/images/radar_bg.png', // Background image slot
-                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const WeaknessRadarAnalyticsPage())),
+                  accentUrl: UiConstants.secondaryButtonColor,
+                  imageUrl: 'assets/images/radar_bg.png',
+                  gradientColors: [Color(0xFF6A1B9A), Color(0xFF4A148C)],
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const WeaknessRadarAnalyticsPage(),
+                    ),
+                  ),
                 ),
                 _buildGridCard(
                   sc: sc,
                   title: 'Contest Calendar',
                   subtitle: 'Upcoming CP events',
                   icon: Icons.calendar_month_rounded,
-                  accentUrl: UiConstants.primaryButtonColor,
-                  imageUrl: 'assets/images/calendar_bg.png', // Background image slot
-                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const UnifiedContestCalendarPage())),
+                  accentUrl: UiConstants.secondaryButtonColor,
+                  imageUrl: 'assets/images/calendar_bg.png',
+                  gradientColors: [Color(0xFF1565C0), Color(0xFF0D47A1)],
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const UnifiedContestCalendarPage(),
+                    ),
+                  ),
                 ),
                 _buildGridCard(
                   sc: sc,
                   title: 'Pocket Templates',
                   subtitle: 'Searchable snippets',
                   icon: Icons.content_copy_rounded,
-                  accentUrl: UiConstants.primaryButtonColor,
-                  imageUrl: 'assets/images/templates_bg.png', // Background image slot
-                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const PocketTemplatesPage())),
+                  accentUrl: UiConstants.secondaryButtonColor,
+                  imageUrl: 'assets/images/templates_bg.png',
+                  gradientColors: [Color(0xFF00695C), Color(0xFF004D40)],
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (_) => const PocketTemplatesPage(),
+                    ),
+                  ),
                 ),
                 _buildGridCard(
                   sc: sc,
                   title: 'Daily Challenge',
                   subtitle: 'Solve to keep your streak',
                   icon: Icons.local_fire_department_rounded,
-                  accentUrl: UiConstants.primaryButtonColor,
-                  imageUrl: 'assets/images/challenge_bg.png', // Background image slot
+                  accentUrl: UiConstants.secondaryButtonColor,
+                  imageUrl: 'assets/images/challenge_bg.png',
+                  gradientColors: [Color(0xFFE65100), Color(0xFFBF360C)],
                   onTap: () {}, // Placeholder
                 ),
               ],
@@ -103,24 +122,27 @@ class LearningHubPage extends StatelessWidget {
 
   Widget _buildProblemsCard(BuildContext context, double sc) {
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const ProblemsPage())),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute<void>(builder: (_) => const ProblemsPage()),
+      ),
       borderRadius: BorderRadius.circular(20),
       child: Ink(
         padding: EdgeInsets.all(16 * sc),
         decoration: BoxDecoration(
-          color: UiConstants.primaryButtonColor,
+          color: colors.first,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
+              color: UiConstants.secondaryButtonColor.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
           ],
           gradient: LinearGradient(
             colors: [
-              UiConstants.primaryButtonColor.withValues(alpha: 0.9),
-              UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+              UiConstants.secondaryButtonColor.withValues(alpha: 0.9),
+              UiConstants.secondaryButtonColor.withValues(alpha: 0.4),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -133,7 +155,11 @@ class LearningHubPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.2),
               ),
-              child: Icon(Icons.code_rounded, color: Colors.white, size: 28 * sc),
+              child: Icon(
+                Icons.code_rounded,
+                color: Colors.white,
+                size: 28 * sc,
+              ),
             ),
             SizedBox(width: 16 * sc),
             Expanded(
@@ -168,20 +194,25 @@ class LearningHubPage extends StatelessWidget {
 
   Widget _buildHeroCard(BuildContext context, double sc) {
     return InkWell(
-      onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const RoadmapPathsPage())),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute<void>(builder: (_) => const RoadmapPathsPage()),
+      ),
       borderRadius: BorderRadius.circular(24),
       child: Ink(
         decoration: BoxDecoration(
-          color: UiConstants.primaryButtonColor, // Restored matching colors
+          color: colors.first, // Restored matching colors
           borderRadius: BorderRadius.circular(24),
           image: const DecorationImage(
-            image: AssetImage('assets/images/roadmap_bg.png'), // Background image slot
+            image: AssetImage(
+              'assets/images/roadmap_bg.png',
+            ), // Background image slot
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
           ),
           boxShadow: [
             BoxShadow(
-              color: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
+              color: UiConstants.secondaryButtonColor.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -193,8 +224,8 @@ class LearningHubPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             gradient: LinearGradient(
               colors: [
-                UiConstants.primaryButtonColor.withValues(alpha: 0.9),
-                UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+                UiConstants.secondaryButtonColor.withValues(alpha: 0.9),
+                UiConstants.secondaryButtonColor.withValues(alpha: 0.4),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -208,14 +239,21 @@ class LearningHubPage extends StatelessWidget {
                   Icon(Icons.route_rounded, color: Colors.white, size: 32 * sc),
                   const Spacer(),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 4 * sc),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10 * sc,
+                      vertical: 4 * sc,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       'Recommended',
-                      style: TextStyle(color: Colors.white, fontSize: 10 * sc, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10 * sc,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -250,7 +288,11 @@ class LearningHubPage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 4 * sc),
-                  Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16 * sc),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 16 * sc,
+                  ),
                 ],
               ),
             ],
@@ -276,13 +318,15 @@ class LearningHubPage extends StatelessWidget {
         onTap: onTap,
         child: Ink(
           decoration: BoxDecoration(
-            color: UiConstants.primaryButtonColor,
+            color: colors.first,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: UiConstants.secondaryButtonColor.withValues(alpha: 0.2),
+            ),
             gradient: LinearGradient(
               colors: [
-                UiConstants.primaryButtonColor.withValues(alpha: 0.8),
-                UiConstants.primaryButtonColor.withValues(alpha: 0.4),
+                UiConstants.secondaryButtonColor.withValues(alpha: 0.8),
+                UiConstants.secondaryButtonColor.withValues(alpha: 0.4),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -290,11 +334,14 @@ class LearningHubPage extends StatelessWidget {
             image: DecorationImage(
               image: AssetImage(imageUrl),
               fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.2), BlendMode.dstATop),
+              colorFilter: ColorFilter.mode(
+                Colors.black.withValues(alpha: 0.2),
+                BlendMode.dstATop,
+              ),
             ),
             boxShadow: [
               BoxShadow(
-                color: UiConstants.primaryButtonColor.withValues(alpha: 0.2),
+                color: UiConstants.secondaryButtonColor.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
