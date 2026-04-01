@@ -130,34 +130,21 @@ class LearningHubPage extends StatelessWidget {
       child: Ink(
         padding: EdgeInsets.all(16 * sc),
         decoration: BoxDecoration(
-          color: colors.first,
+          color: UiConstants.primaryButtonColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: UiConstants.secondaryButtonColor.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-          gradient: LinearGradient(
-            colors: [
-              UiConstants.secondaryButtonColor.withValues(alpha: 0.9),
-              UiConstants.secondaryButtonColor.withValues(alpha: 0.4),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [
             Container(
               padding: EdgeInsets.all(12 * sc),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.2),
+                color: UiConstants.primaryButtonColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 Icons.code_rounded,
-                color: Colors.white,
+                color: UiConstants.primaryButtonColor,
                 size: 28 * sc,
               ),
             ),
@@ -191,7 +178,6 @@ class LearningHubPage extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildHeroCard(BuildContext context, double sc) {
     return InkWell(
       onTap: () => Navigator.push(
@@ -201,20 +187,20 @@ class LearningHubPage extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: Ink(
         decoration: BoxDecoration(
-          color: colors.first, // Restored matching colors
-          borderRadius: BorderRadius.circular(24),
-          image: const DecorationImage(
-            image: AssetImage(
-              'assets/images/roadmap_bg.png',
-            ), // Background image slot
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(Colors.black26, BlendMode.darken),
+          gradient: LinearGradient(
+            colors: [
+              UiConstants.primaryButtonColor,
+              UiConstants.infoBackgroundColor,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: UiConstants.secondaryButtonColor.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 14,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -222,14 +208,7 @@ class LearningHubPage extends StatelessWidget {
           padding: EdgeInsets.all(20 * sc),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(
-              colors: [
-                UiConstants.secondaryButtonColor.withValues(alpha: 0.9),
-                UiConstants.secondaryButtonColor.withValues(alpha: 0.4),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: UiConstants.primaryButtonColor.withValues(alpha: 0.05), // subtle overlay so text is readable
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,41 +288,38 @@ class LearningHubPage extends StatelessWidget {
     required IconData icon,
     required Color accentUrl,
     required String imageUrl,
+    List<Color>? gradientColors,
     required VoidCallback onTap,
   }) {
+    final baseColor = gradientColors?.first ?? UiConstants.primaryButtonColor;
     return Material(
       color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
         child: Ink(
           decoration: BoxDecoration(
-            color: colors.first,
+            color: baseColor.withValues(alpha: 0.25),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: UiConstants.secondaryButtonColor.withValues(alpha: 0.2),
-            ),
-            gradient: LinearGradient(
-              colors: [
-                UiConstants.secondaryButtonColor.withValues(alpha: 0.8),
-                UiConstants.secondaryButtonColor.withValues(alpha: 0.4),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+              color: baseColor.withValues(alpha: 0.6),
+              width: 1.5,
             ),
             image: DecorationImage(
               image: AssetImage(imageUrl),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
-                Colors.black.withValues(alpha: 0.2),
+                Colors.black.withValues(alpha: 0.35),
                 BlendMode.dstATop,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: UiConstants.secondaryButtonColor.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: baseColor.withValues(alpha: 0.25),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -356,10 +332,17 @@ class LearningHubPage extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(12 * sc),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: baseColor.withValues(alpha: 0.4),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: baseColor.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: Icon(icon, color: Colors.white, size: 28 * sc),
+                  child: Icon(icon, color: baseColor.withValues(alpha: 1.0), size: 28 * sc),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
