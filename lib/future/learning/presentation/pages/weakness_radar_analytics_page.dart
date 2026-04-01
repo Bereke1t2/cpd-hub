@@ -18,28 +18,57 @@ class WeaknessRadarAnalyticsPage extends StatelessWidget {
 
     return BasePage(
       showBackButton: true,
-      selectedIndex: 0,
+      selectedIndex: 1,
       title: 'Weakness radar',
-      subtitle: 'Smart analytics (API later)',
+      subtitle: 'Discover where your skills are lacking',
       body: ListView(
         padding: EdgeInsets.fromLTRB(16 * sc, 8 * sc, 16 * sc, 100 * sc),
         children: [
-          Text(
-            'Skill strength from solved / failed tags (mock). Go: aggregate submissions by tag → normalize 0–100.',
-            style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 11 * sc, height: 1.35),
+          Container(
+            padding: EdgeInsets.all(16 * sc),
+            decoration: BoxDecoration(
+              color: Color(0xFF6A1B9A).withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Color(0xFF6A1B9A).withValues(alpha: 0.4), width: 1.5),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.lightbulb_outline_rounded, color: Color(0xFFAB47BC), size: 28 * sc),
+                SizedBox(width: 12 * sc),
+                Expanded(
+                  child: Text(
+                    'Your weakness analytics map. Mastering lower scored tags will significantly increase your overall rating.',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13 * sc, height: 1.4),
+                  ),
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 16 * sc),
-          SizedBox(
-            height: 280 * sc,
+          SizedBox(height: 32 * sc),
+          Container(
+            height: 320 * sc,
+            padding: EdgeInsets.symmetric(vertical: 24 * sc),
+            decoration: BoxDecoration(
+              color: UiConstants.infoBackgroundColor.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
             child: RadarChart(
               RadarChartData(
                 radarShape: RadarShape.polygon,
-                tickCount: 4,
-                ticksTextStyle: TextStyle(color: UiConstants.subtitleTextColor.withValues(alpha: 0.5), fontSize: 9 * sc),
-                tickBorderData: const BorderSide(color: Colors.white10),
-                gridBorderData: const BorderSide(color: Colors.white10),
-                radarBorderData: BorderSide(color: UiConstants.primaryButtonColor.withValues(alpha: 0.5), width: 1.5),
-                titleTextStyle: TextStyle(color: UiConstants.mainTextColor, fontSize: 10 * sc, fontWeight: FontWeight.w600),
+                tickCount: 5,
+                ticksTextStyle: const TextStyle(color: Colors.transparent, fontSize: 0),
+                tickBorderData: const BorderSide(color: Colors.white10, width: 1),
+                gridBorderData: const BorderSide(color: Colors.white10, width: 1.5),
+                radarBorderData: BorderSide(color: Color(0xFF6A1B9A).withValues(alpha: 0.7), width: 2),
+                titleTextStyle: TextStyle(color: Colors.white, fontSize: 12 * sc, fontWeight: FontWeight.bold),
                 getTitle: (index, angle) {
                   if (index >= 0 && index < _tags.length) {
                     return RadarChartTitle(text: _tags[index], angle: angle);
@@ -48,15 +77,23 @@ class WeaknessRadarAnalyticsPage extends StatelessWidget {
                 },
                 dataSets: [
                   RadarDataSet(
-                    fillColor: UiConstants.primaryButtonColor.withValues(alpha: 0.22),
-                    borderColor: UiConstants.primaryButtonColor,
-                    borderWidth: 2.5,
+                    fillColor: Color(0xFF4A148C).withValues(alpha: 0.5),
+                    borderColor: Color(0xFFAB47BC),
+                    entryRadius: 4.0,
+                    borderWidth: 3,
                     dataEntries: values.map((v) => RadarEntry(value: v)).toList(),
                   ),
                 ],
+                radarBackgroundColor: Colors.transparent,
               ),
             ),
           ),
+          SizedBox(height: 24 * sc),
+          Text(
+            'Targeted Practice Session',
+            style: TextStyle(color: Colors.white, fontSize: 18 * sc, fontWeight: FontWeight.w800),
+          ),
+          SizedBox(height: 8 * sc),
           _solveCard(
             context,
             sc,
@@ -92,54 +129,109 @@ class WeaknessRadarAnalyticsPage extends StatelessWidget {
     required String fakeId,
     required List<String> tags,
   }) {
-    return Container(
-      margin: EdgeInsets.only(top: 14 * sc),
-      padding: EdgeInsets.all(16 * sc),
-      decoration: BoxDecoration(
-        color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.28)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.bolt_rounded, color: Colors.amberAccent, size: 22 * sc),
-              SizedBox(width: 8 * sc),
-              Text(
-                headline,
-                style: TextStyle(color: UiConstants.mainTextColor, fontSize: 15 * sc, fontWeight: FontWeight.w900),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute<void>(
+            builder: (_) => ProblemDetailsPage(
+              problemData: {
+                'title': problemTitle,
+                'difficulty': difficulty,
+                'problemId': fakeId,
+                'tags': tags,
+                'likedCount': '—',
+                'dislikedCount': '—',
+              },
+            ),
+          ),
+        );
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        margin: EdgeInsets.only(top: 14 * sc),
+        child: Ink(
+          padding: EdgeInsets.all(20 * sc),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                UiConstants.infoBackgroundColor.withValues(alpha: 0.6),
+                UiConstants.infoBackgroundColor.withValues(alpha: 0.2),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
             ],
           ),
-          SizedBox(height: 8 * sc),
-          Text(
-            body.replaceAll('**', ''),
-            style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 13 * sc, height: 1.4),
-          ),
-          SizedBox(height: 14 * sc),
-          FilledButton.tonal(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => ProblemDetailsPage(
-                    problemData: {
-                      'title': problemTitle,
-                      'difficulty': difficulty,
-                      'problemId': fakeId,
-                      'tags': tags,
-                      'likedCount': '—',
-                      'dislikedCount': '—',
-                    },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8 * sc),
+                    decoration: BoxDecoration(
+                      color: Colors.amberAccent.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.bolt_rounded, color: Colors.amberAccent, size: 20 * sc),
                   ),
-                ),
-              );
-            },
-            child: Text('Open: $problemTitle'),
+                  SizedBox(width: 12 * sc),
+                  Expanded(
+                    child: Text(
+                      headline,
+                      style: TextStyle(color: Colors.white, fontSize: 16 * sc, fontWeight: FontWeight.w800),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10 * sc, vertical: 4 * sc),
+                    decoration: BoxDecoration(
+                      color: difficulty == 'Easy' 
+                          ? Colors.green.withValues(alpha: 0.2)
+                          : (difficulty == 'Medium' ? Colors.orange.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2)),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: difficulty == 'Easy' ? Colors.green : (difficulty == 'Medium' ? Colors.orange : Colors.red),
+                      )
+                    ),
+                    child: Text(
+                      difficulty,
+                      style: TextStyle(
+                        color: difficulty == 'Easy' ? Colors.greenAccent : (difficulty == 'Medium' ? Colors.orangeAccent : Colors.redAccent),
+                        fontSize: 10 * sc,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16 * sc),
+              Text(
+                body.replaceAll('**', ''),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13 * sc, height: 1.5),
+              ),
+              SizedBox(height: 20 * sc),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    problemTitle,
+                    style: TextStyle(color: Colors.white, fontSize: 15 * sc, fontWeight: FontWeight.bold),
+                  ),
+                  Icon(Icons.arrow_forward_rounded, color: Colors.white.withValues(alpha: 0.6), size: 20 * sc),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
