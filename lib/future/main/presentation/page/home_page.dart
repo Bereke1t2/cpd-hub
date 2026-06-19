@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/daily_problem/daily_problem_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
 
 import '../../../../core/ui_constants.dart';
 import '../widget/info_box.dart';
@@ -34,7 +35,14 @@ class HomePage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              const WelcomeBackBox(name: 'Bereket'),
+              BlocBuilder<SessionBloc, SessionState>(
+                builder: (context, state) {
+                  final name = state is SessionAuthenticated
+                      ? state.user.fullName
+                      : '';
+                  return WelcomeBackBox(name: name);
+                },
+              ),
               const StreakProgressBox(
                 currentStreak: 7,
                 problemsSolved: 42,
