@@ -9,6 +9,12 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # docs/templates/*.dart are copy-paste scaffolds, not compiled source.
+  # They reference packages/paths that only exist once a phase is implemented.
+  exclude:
+    - docs/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
