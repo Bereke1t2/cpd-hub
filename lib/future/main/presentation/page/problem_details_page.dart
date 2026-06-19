@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lab_portal/core/ui_constants.dart';
-import 'package:lab_portal/future/main/domain/entitiy/problem_entitiy.dart';
+import 'package:lab_portal/future/main/domain/entity/problem_entity.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 
 class ProblemDetailsPage extends StatelessWidget {
