@@ -1,4 +1,4 @@
-import '../../domain/entitiy/leaderboard_entry_entity.dart';
+import '../../domain/entity/leaderboard_entry_entity.dart';
 
 class LeaderboardEntryModel extends LeaderboardEntryEntity {
   const LeaderboardEntryModel({

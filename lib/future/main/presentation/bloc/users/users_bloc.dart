@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../domain/entitiy/user_entity.dart';
+import '../../../domain/entity/user_entity.dart';
 import '../../../domain/usecase/get_users.dart';
 
 part 'users_event.dart';

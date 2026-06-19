@@ -1,6 +1,6 @@
-import '../../domain/entitiy/contest_entitiy.dart';
+import '../../domain/entity/contest_entity.dart';
 
-class ContestModel extends ContestEntitiy {
+class ContestModel extends ContestEntity {
   const ContestModel({
     required super.title,
     required super.contestUrl,

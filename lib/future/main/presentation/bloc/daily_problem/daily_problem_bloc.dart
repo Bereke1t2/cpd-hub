@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../domain/entitiy/daily_problem_entitiy.dart';
-import '../../../domain/usecase/get_daily_problm.dart';
+import '../../../domain/entity/daily_problem_entity.dart';
+import '../../../domain/usecase/get_daily_problem.dart';
 
 part 'daily_problem_event.dart';
 part 'daily_problem_state.dart';

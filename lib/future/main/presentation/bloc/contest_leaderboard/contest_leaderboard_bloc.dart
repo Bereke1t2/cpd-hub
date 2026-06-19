@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../domain/entitiy/leaderboard_entry_entity.dart';
+import '../../../domain/entity/leaderboard_entry_entity.dart';
 import '../../../domain/usecase/get_contest_leaderboard.dart';
 
 part 'contest_leaderboard_event.dart';

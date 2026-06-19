@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/failure.dart';
-import '../entitiy/user_entity.dart';
+import '../entity/user_entity.dart';
 import '../repository/main_repo.dart';
 
 class GetUsers {

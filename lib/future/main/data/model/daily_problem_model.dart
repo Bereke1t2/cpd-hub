@@ -1,6 +1,6 @@
-import 'package:lab_portal/future/main/domain/entitiy/daily_problem_entitiy.dart';
+import 'package:lab_portal/future/main/domain/entity/daily_problem_entity.dart';
 
-class DailyProblemModel extends DailyProblemEntitiy {
+class DailyProblemModel extends DailyProblemEntity {
   const DailyProblemModel({
     required super.title,
     required super.difficulty,

@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/failure.dart';
-import '../entitiy/leaderboard_entry_entity.dart';
+import '../entity/leaderboard_entry_entity.dart';
 import '../repository/main_repo.dart';
 
 class GetContestLeaderboard {

@@ -1,4 +1,4 @@
-import '../../domain/entitiy/problem_entitiy.dart';
+import '../../domain/entity/problem_entity.dart';
 
 class ProblemModel extends ProblemEntity {
   const ProblemModel({
