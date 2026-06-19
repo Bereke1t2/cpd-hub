@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:lab_portal/core/network.dart';
+import 'package:lab_portal/core/network/dio_client.dart';
+import 'package:lab_portal/core/storage/token_store.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_contests_data_source.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_daily_problem_data_source.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_problems_data_source.dart';
@@ -23,43 +27,70 @@ import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/con
 final GetIt getIt = GetIt.instance;
 
 void configureDependencies() {
-  // ---- core ----
+  // ---- core infrastructure ----
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(),
+  );
+  getIt.registerLazySingleton<TokenStore>(
+    () => TokenStore(getIt<FlutterSecureStorage>()),
+  );
+  getIt.registerLazySingleton<Dio>(
+    () => buildDio(getIt<FlutterSecureStorage>()),
+  );
 
-  // TODO (Phase 2): replace with RemoteDataSourceImpl(getIt<Dio>()).
-  getIt.registerLazySingleton<RemoteDataSource>(() => RemoteDataSourceImpl());
+  // ---- remote data source (uses Dio; mock-flag routing is in the repo) ----
+  getIt.registerLazySingleton<RemoteDataSource>(
+    () => RemoteDataSourceImpl(getIt<Dio>()),
+  );
 
-  // ---- mock data sources (singletons so each page shares the same instance) ----
-  getIt.registerLazySingleton<MockUsersDataSource>(() => MockUsersDataSourceImpl());
-  getIt.registerLazySingleton<MockProblemsDataSource>(() => MockProblemsDataSourceImpl());
-  getIt.registerLazySingleton<MockContestsDataSource>(() => MockContestsDataSourceImpl());
-  getIt.registerLazySingleton<MockDailyProblemDataSource>(() => MockDailyProblemDataSourceImpl());
+  // ---- mock data sources ----
+  getIt.registerLazySingleton<MockUsersDataSource>(
+    () => MockUsersDataSourceImpl(),
+  );
+  getIt.registerLazySingleton<MockProblemsDataSource>(
+    () => MockProblemsDataSourceImpl(),
+  );
+  getIt.registerLazySingleton<MockContestsDataSource>(
+    () => MockContestsDataSourceImpl(),
+  );
+  getIt.registerLazySingleton<MockDailyProblemDataSource>(
+    () => MockDailyProblemDataSourceImpl(),
+  );
   getIt.registerLazySingleton<MockContestLeaderboardDataSource>(
-      () => MockContestLeaderboardDataSourceImpl());
+    () => MockContestLeaderboardDataSourceImpl(),
+  );
 
-  // ---- repository (single instance across the app) ----
-  getIt.registerLazySingleton<MainRepo>(() => MainRepoImpl(
-        getIt<RemoteDataSource>(),
-        getIt<NetworkInfo>(),
-        getIt<MockUsersDataSource>(),
-        getIt<MockProblemsDataSource>(),
-        getIt<MockContestsDataSource>(),
-        getIt<MockDailyProblemDataSource>(),
-        getIt<MockContestLeaderboardDataSource>(),
-      ));
+  // ---- repository (single shared instance) ----
+  getIt.registerLazySingleton<MainRepo>(
+    () => MainRepoImpl(
+      getIt<RemoteDataSource>(),
+      getIt<NetworkInfo>(),
+      getIt<MockUsersDataSource>(),
+      getIt<MockProblemsDataSource>(),
+      getIt<MockContestsDataSource>(),
+      getIt<MockDailyProblemDataSource>(),
+      getIt<MockContestLeaderboardDataSource>(),
+    ),
+  );
 
-  // ---- usecases ----
+  // ---- usecases (factory: rebuilt cheaply per screen) ----
   getIt.registerFactory(() => GetProblems(getIt<MainRepo>()));
   getIt.registerFactory(() => GetContests(getIt<MainRepo>()));
   getIt.registerFactory(() => GetDailyProblems(getIt<MainRepo>()));
   getIt.registerFactory(() => GetUsers(getIt<MainRepo>()));
   getIt.registerFactory(() => GetContestLeaderboard(getIt<MainRepo>()));
 
-  // ---- blocs (new instance per screen) ----
+  // ---- blocs (factory: new instance per screen) ----
   getIt.registerFactory(() => ProblemsBloc(getProblems: getIt<GetProblems>()));
   getIt.registerFactory(() => ContestsBloc(getContests: getIt<GetContests>()));
-  getIt.registerFactory(() => DailyProblemBloc(getDailyProblems: getIt<GetDailyProblems>()));
+  getIt.registerFactory(
+    () => DailyProblemBloc(getDailyProblems: getIt<GetDailyProblems>()),
+  );
   getIt.registerFactory(() => UsersBloc(getUsers: getIt<GetUsers>()));
   getIt.registerFactory(
-      () => ContestLeaderboardBloc(getContestLeaderboard: getIt<GetContestLeaderboard>()));
+    () => ContestLeaderboardBloc(
+      getContestLeaderboard: getIt<GetContestLeaderboard>(),
+    ),
+  );
 }
