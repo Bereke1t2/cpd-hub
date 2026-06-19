@@ -29,6 +29,34 @@ class ProblemEntity extends Equatable {
     this.numberOfSolvedPeople = 0,
   });
 
+  ProblemEntity copyWith({
+    String? title,
+    String? difficulty,
+    List<String>? tags,
+    int? numberOfLikes,
+    int? numberOfDislikes,
+    String? problemUrl,
+    String? problemId,
+    bool? isLiked,
+    bool? isDisliked,
+    bool? isSolved,
+    String? description,
+    int? numberOfSolvedPeople,
+  }) => ProblemEntity(
+    title: title ?? this.title,
+    difficulty: difficulty ?? this.difficulty,
+    tags: tags ?? this.tags,
+    numberOfLikes: numberOfLikes ?? this.numberOfLikes,
+    numberOfDislikes: numberOfDislikes ?? this.numberOfDislikes,
+    problemUrl: problemUrl ?? this.problemUrl,
+    problemId: problemId ?? this.problemId,
+    isLiked: isLiked ?? this.isLiked,
+    isDisliked: isDisliked ?? this.isDisliked,
+    isSolved: isSolved ?? this.isSolved,
+    description: description ?? this.description,
+    numberOfSolvedPeople: numberOfSolvedPeople ?? this.numberOfSolvedPeople,
+  );
+
   @override
   List<Object?> get props => [
         title,
