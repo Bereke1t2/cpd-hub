@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/future/main/presentation/bloc/profile/profile_bloc.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import '../../../../core/ui_constants.dart';
 
@@ -79,6 +82,13 @@ class ProfilePage extends StatelessWidget {
     });
   }
 
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || name.isEmpty) return '?';
+    if (parts.length == 1) return parts[0].substring(0, min(2, parts[0].length)).toUpperCase();
+    return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+  }
+
   Color _ratingColor(int rating) {
     if (rating >= 2400) return const Color(0xFFFF0000);
     if (rating >= 2000) return const Color(0xFFFF8F00);
@@ -91,9 +101,39 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rating = 1520;
-    final rank = 'Gold';
-    final division = 'Div2';
+    return BlocProvider(
+      create: (_) => getIt<ProfileBloc>()..add(const ProfileStarted()),
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) => _buildBody(context, state),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, ProfileState state) {
+    // Resolve user data: real from BLoC, or sensible defaults while loading.
+    final int rating;
+    final String rank;
+    final String division;
+    final String fullName;
+    final String username;
+    final String bio;
+
+    if (state is ProfileLoaded) {
+      rating   = state.user.rating;
+      rank     = state.user.rank;
+      division = state.user.division;
+      fullName = state.user.fullName;
+      username = state.user.username;
+      bio      = state.user.bio;
+    } else {
+      rating   = 0;
+      rank     = '—';
+      division = '—';
+      fullName = state is ProfileLoading ? 'Loading…' : 'Profile';
+      username = '';
+      bio      = '';
+    }
+
     final ratingColor = _ratingColor(rating);
 
     final days = 168;
@@ -114,7 +154,7 @@ class ProfilePage extends StatelessWidget {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: _topHeader(rating: rating, ratingColor: ratingColor, rank: rank, division: division),
+                child: _topHeader(rating: rating, ratingColor: ratingColor, rank: rank, division: division, fullName: fullName, username: username, bio: bio),
               ),
             ),
             SliverToBoxAdapter(
@@ -167,7 +207,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _topHeader({required int rating, required Color ratingColor, required String rank, required String division}) {
+  Widget _topHeader({required int rating, required Color ratingColor, required String rank, required String division, required String fullName, required String username, required String bio}) {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -201,7 +241,7 @@ class ProfilePage extends StatelessWidget {
             child: CircleAvatar(
               radius: 42,
               backgroundColor: Colors.white.withOpacity(0.55),
-              child: Text('JD', style: TextStyle(color: ratingColor, fontSize: 20, fontWeight: FontWeight.w900)),
+              child: Text(_initials(fullName), style: TextStyle(color: ratingColor, fontSize: 20, fontWeight: FontWeight.w900)),
             ),
           ),
           const SizedBox(width: 16),
@@ -213,9 +253,9 @@ class ProfilePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('John Doe', style: _h1),
+                        Text(fullName.isEmpty ? '—' : fullName, style: _h1),
                         const SizedBox(height: 2),
-                        Text('@johndoe', style: _caption),
+                        if (username.isNotEmpty) Text('@$username', style: _caption),
                       ],
                     ),
                   ),
@@ -228,7 +268,7 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'Build consistency. Solve smarter every day.',
+                bio.isNotEmpty ? bio : 'Build consistency. Solve smarter every day.',
                 style: TextStyle(color: _muted, height: 1.25, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
