@@ -28,7 +28,9 @@ import 'package:lab_portal/future/main/domain/usecase/get_daily_problem.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_problems.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_users.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_contest_leaderboard.dart';
+import 'package:lab_portal/future/main/domain/usecase/get_profile.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contests/contests_bloc.dart';
+import 'package:lab_portal/future/main/presentation/bloc/profile/profile_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/daily_problem/daily_problem_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/users/users_bloc.dart';
@@ -119,6 +121,7 @@ void configureDependencies() {
   getIt.registerFactory(() => GetDailyProblems(getIt<MainRepo>()));
   getIt.registerFactory(() => GetUsers(getIt<MainRepo>()));
   getIt.registerFactory(() => GetContestLeaderboard(getIt<MainRepo>()));
+  getIt.registerFactory(() => GetProfile(getIt<MainRepo>()));
 
   // ---- blocs ----
   getIt.registerFactory(() => ProblemsBloc(getProblems: getIt<GetProblems>()));
@@ -131,5 +134,8 @@ void configureDependencies() {
     () => ContestLeaderboardBloc(
       getContestLeaderboard: getIt<GetContestLeaderboard>(),
     ),
+  );
+  getIt.registerFactory(
+    () => ProfileBloc(getProfile: getIt<GetProfile>()),
   );
 }
