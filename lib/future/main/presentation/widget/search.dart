@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 
-class SearchBox extends StatelessWidget {
+class SearchBox extends StatefulWidget {
   final String hintText;
   final ValueChanged<String>? onChanged;
   const SearchBox({super.key, required this.hintText, this.onChanged});
+
+  @override
+  State<SearchBox> createState() => _SearchBoxState();
+}
+
+class _SearchBoxState extends State<SearchBox> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _clear() {
+    _controller.clear();
+    widget.onChanged?.call('');
+    FocusScope.of(context).unfocus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,25 +50,26 @@ class SearchBox extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
-              onChanged: onChanged,
+              controller: _controller,
+              onChanged: widget.onChanged,
               style: const TextStyle(color: UiConstants.mainTextColor),
               decoration: InputDecoration(
-                hintText: hintText,
+                hintText: widget.hintText,
                 hintStyle: const TextStyle(color: UiConstants.subtitleTextColor),
                 border: InputBorder.none,
                 isDense: true,
               ),
             ),
           ),
-          IconButton(
-            tooltip: 'Clear',
-            onPressed: () {
-              FocusScope.of(context).unfocus();
-            },
-            icon: const Icon(
-              Icons.close_rounded,
-              size: 18,
-              color: UiConstants.subtitleTextColor,
+          Tooltip(
+            message: 'Clear',
+            child: IconButton(
+              onPressed: _clear,
+              icon: const Icon(
+                Icons.close_rounded,
+                size: 18,
+                color: UiConstants.subtitleTextColor,
+              ),
             ),
           ),
         ],
