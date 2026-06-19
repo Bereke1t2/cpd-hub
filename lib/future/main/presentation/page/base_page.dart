@@ -135,19 +135,11 @@ class _BasePageState extends State<BasePage> {
             selectedIconTheme: const IconThemeData(size: 30),
             unselectedIconTheme: const IconThemeData(size: 24),
             onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-              if (index == 0) {
-                Navigator.pushReplacementNamed(context, '/');
-              } else if (index == 1) {
-                Navigator.pushReplacementNamed(context, '/problems');
-              }else if (index == 2) {
-                Navigator.pushReplacementNamed(context, '/contests');
-              } else if (index == 3) {
-                Navigator.pushReplacementNamed(context, '/users');
-              } else if (index == 4) {
-                Navigator.pushReplacementNamed(context, '/profile');
+              if (index == _selectedIndex) return; // guard: no-op on current tab
+              setState(() => _selectedIndex = index);
+              const routes = ['/', '/problems', '/contests', '/users', '/profile'];
+              if (index < routes.length) {
+                Navigator.pushReplacementNamed(context, routes[index]);
               }
             },
             items: [
@@ -164,14 +156,14 @@ class _BasePageState extends State<BasePage> {
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(IconData(0xe0cc, fontFamily: 'MaterialIcons')),
+                icon: const Icon(Icons.code_outlined),
                 activeIcon: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: UiConstants.primaryButtonColor.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: Icon(IconData(0xe0cc, fontFamily: 'MaterialIcons')),
+                  child: const Icon(Icons.code_outlined),
                 ),
                 label: 'Problems',
               ),
