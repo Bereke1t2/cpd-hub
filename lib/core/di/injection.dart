@@ -5,6 +5,16 @@ import 'package:get_it/get_it.dart';
 import 'package:lab_portal/core/network.dart';
 import 'package:lab_portal/core/network/dio_client.dart';
 import 'package:lab_portal/core/storage/token_store.dart';
+import 'package:lab_portal/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:lab_portal/features/auth/data/repository/auth_repository_impl.dart';
+import 'package:lab_portal/features/auth/domain/repository/auth_repository.dart';
+import 'package:lab_portal/features/auth/domain/usecase/get_current_user_usecase.dart';
+import 'package:lab_portal/features/auth/domain/usecase/login_usecase.dart';
+import 'package:lab_portal/features/auth/domain/usecase/logout_usecase.dart';
+import 'package:lab_portal/features/auth/domain/usecase/register_usecase.dart';
+import 'package:lab_portal/features/auth/presentation/bloc/login/login_bloc.dart';
+import 'package:lab_portal/features/auth/presentation/bloc/register/register_bloc.dart';
+import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_contests_data_source.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_daily_problem_data_source.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_problems_data_source.dart';
@@ -39,7 +49,36 @@ void configureDependencies() {
     () => buildDio(getIt<FlutterSecureStorage>()),
   );
 
-  // ---- remote data source (uses Dio; mock-flag routing is in the repo) ----
+  // ---- auth feature ----
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(getIt<Dio>()),
+  );
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      getIt<AuthRemoteDataSource>(),
+      getIt<TokenStore>(),
+    ),
+  );
+  getIt.registerFactory(() => Login(getIt<AuthRepository>()));
+  getIt.registerFactory(() => Register(getIt<AuthRepository>()));
+  getIt.registerFactory(() => Logout(getIt<AuthRepository>()));
+  getIt.registerFactory(() => GetCurrentUser(getIt<AuthRepository>()));
+
+  // SessionBloc is a singleton — one instance for the lifetime of the app.
+  getIt.registerLazySingleton<SessionBloc>(
+    () => SessionBloc(
+      getCurrentUser: getIt<GetCurrentUser>(),
+      logout: getIt<Logout>(),
+    ),
+  );
+  getIt.registerFactory(
+    () => LoginBloc(login: getIt<Login>()),
+  );
+  getIt.registerFactory(
+    () => RegisterBloc(register: getIt<Register>()),
+  );
+
+  // ---- main remote data source ----
   getIt.registerLazySingleton<RemoteDataSource>(
     () => RemoteDataSourceImpl(getIt<Dio>()),
   );
@@ -61,7 +100,7 @@ void configureDependencies() {
     () => MockContestLeaderboardDataSourceImpl(),
   );
 
-  // ---- repository (single shared instance) ----
+  // ---- main repository ----
   getIt.registerLazySingleton<MainRepo>(
     () => MainRepoImpl(
       getIt<RemoteDataSource>(),
@@ -74,14 +113,14 @@ void configureDependencies() {
     ),
   );
 
-  // ---- usecases (factory: rebuilt cheaply per screen) ----
+  // ---- usecases ----
   getIt.registerFactory(() => GetProblems(getIt<MainRepo>()));
   getIt.registerFactory(() => GetContests(getIt<MainRepo>()));
   getIt.registerFactory(() => GetDailyProblems(getIt<MainRepo>()));
   getIt.registerFactory(() => GetUsers(getIt<MainRepo>()));
   getIt.registerFactory(() => GetContestLeaderboard(getIt<MainRepo>()));
 
-  // ---- blocs (factory: new instance per screen) ----
+  // ---- blocs ----
   getIt.registerFactory(() => ProblemsBloc(getProblems: getIt<GetProblems>()));
   getIt.registerFactory(() => ContestsBloc(getContests: getIt<GetContests>()));
   getIt.registerFactory(
