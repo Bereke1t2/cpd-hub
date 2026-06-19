@@ -2,14 +2,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/ui_constants.dart';
-import 'package:lab_portal/future/main/domain/entitiy/contest_entitiy.dart';
+import 'package:lab_portal/future/main/domain/entity/contest_entity.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/contest_leaderboard_bloc.dart';
-import 'package:lab_portal/future/main/presentation/di/main_di.dart';
+import 'package:lab_portal/core/di/injection.dart';
 
 import 'base_page.dart';
 
 class ContestLeaderboardPage extends StatelessWidget {
-  final ContestEntitiy contest;
+  final ContestEntity contest;
   const ContestLeaderboardPage({super.key, required this.contest});
 
   Color _rankColor(int rank) {
@@ -310,7 +310,7 @@ class ContestLeaderboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => MainDI.buildContestLeaderboardBloc()..add(ContestLeaderboardStarted(contest.contestUrl)),
+      create: (_) => getIt<ContestLeaderboardBloc>()..add(ContestLeaderboardStarted(contest.contestUrl)),
       child: BasePage(
         title: 'Leaderboard',
         subtitle: contest.title,

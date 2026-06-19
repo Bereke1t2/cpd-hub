@@ -4,8 +4,8 @@ import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import 'package:lab_portal/future/main/presentation/page/problem_details_page.dart';
 import 'package:lab_portal/future/main/presentation/widget/search.dart';
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
-import 'package:lab_portal/future/main/presentation/di/main_di.dart';
-import 'package:lab_portal/future/main/domain/entitiy/problem_entitiy.dart';
+import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/future/main/domain/entity/problem_entity.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 
 class ProblemsPage extends StatefulWidget {
@@ -22,7 +22,7 @@ class _ProblemsPageState extends State<ProblemsPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => MainDI.buildProblemsBloc()..add(ProblemsStarted()),
+      create: (_) => getIt<ProblemsBloc>()..add(ProblemsStarted()),
       child: BasePage(
         selectedIndex: 1,
         title: 'Problems',
@@ -37,82 +37,100 @@ class _ProblemsPageState extends State<ProblemsPage> {
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: contentWidth),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 8),
-                    // Search + filters bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: SearchBox(
-                              hintText: 'Search problems by title, tag or id...',
-                              onChanged: (value) => context
-                                  .read<ProblemsBloc>()
-                                  .add(ProblemsSearchChanged(value)),
+                // ensure Column has a bounded height so Expanded works correctly
+                child: SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      // Search + filters bar
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: SearchBox(
+                                hintText: 'Search problems by title, tag or id...',
+                                onChanged: (value) => context
+                                    .read<ProblemsBloc>()
+                                    .add(ProblemsSearchChanged(value)),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            flex: 2,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                _difficultyFilter(),
-                                const SizedBox(width: 8),
-                                _sortMenu(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Problems list / grid
-                    Expanded(
-                      child: BlocBuilder<ProblemsBloc, ProblemsState>(
-                        builder: (context, state) {
-                          if (state is ProblemsLoading || state is ProblemsInitial) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-
-                          if (state is ProblemsError) {
-                            return Center(child: Text(state.message));
-                          }
-
-                          final problems = (state as ProblemsLoaded).problems;
-
-                          final filtered = _applyFilters(problems);
-
-                          if (filtered.isEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              flex: 2,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  Icon(Icons.search_off, size: 64, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
-                                  const SizedBox(height: 12),
-                                  const Text('No problems found', style: TextStyle(fontSize: 16)),
-                                  const SizedBox(height: 6),
-                                  const Text('Try changing your search or filters.', style: TextStyle(color: Color(0xFF9E9E9E))),
+                                  _difficultyFilter(),
+                                  const SizedBox(width: 8),
+                                  _sortMenu(),
                                 ],
                               ),
-                            );
-                          }
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12),
 
-                          if (isWide) {
-                            // beautiful masonry-like grid for wide screens
-                            return GridView.builder(
+                      // Problems list / grid
+                      Expanded(
+                        child: BlocBuilder<ProblemsBloc, ProblemsState>(
+                          builder: (context, state) {
+                            if (state is ProblemsLoading || state is ProblemsInitial) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+
+                            if (state is ProblemsError) {
+                              return Center(child: Text(state.message));
+                            }
+
+                            final problems = (state as ProblemsLoaded).problems;
+
+                            final filtered = _applyFilters(problems);
+
+                            if (filtered.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.search_off, size: 64, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
+                                    const SizedBox(height: 12),
+                                    const Text('No problems found', style: TextStyle(fontSize: 16)),
+                                    const SizedBox(height: 6),
+                                    const Text('Try changing your search or filters.', style: TextStyle(color: Color(0xFF9E9E9E))),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            if (isWide) {
+                              // beautiful masonry-like grid for wide screens
+                              return GridView.builder(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  childAspectRatio: 3.2,
+                                ),
+                                itemCount: filtered.length,
+                                itemBuilder: (context, index) {
+                                  final p = filtered[index];
+                                  return ProblemCard(
+                                    problem: p,
+                                    onTap: () => _openDetails(context, p),
+                                  );
+                                },
+                              );
+                            }
+
+                            // Narrow: single column list
+                            return ListView.separated(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 12,
-                                crossAxisSpacing: 12,
-                                childAspectRatio: 3.2,
-                              ),
                               itemCount: filtered.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 8),
                               itemBuilder: (context, index) {
                                 final p = filtered[index];
                                 return ProblemCard(
@@ -121,25 +139,11 @@ class _ProblemsPageState extends State<ProblemsPage> {
                                 );
                               },
                             );
-                          }
-
-                          // Narrow: single column list
-                          return ListView.separated(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                            itemCount: filtered.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
-                            itemBuilder: (context, index) {
-                              final p = filtered[index];
-                              return ProblemCard(
-                                problem: p,
-                                onTap: () => _openDetails(context, p),
-                              );
-                            },
-                          );
-                        },
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );

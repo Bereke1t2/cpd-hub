@@ -3,7 +3,7 @@ import 'package:lab_portal/future/main/presentation/widget/problem_box.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/daily_problem/daily_problem_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
-import 'package:lab_portal/future/main/presentation/di/main_di.dart';
+import 'package:lab_portal/core/di/injection.dart';
 
 import '../../../../core/ui_constants.dart';
 import '../widget/info_box.dart';
@@ -21,10 +21,10 @@ class HomePage extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (_) =>
-              MainDI.buildDailyProblemBloc()..add(DailyProblemStarted()),
+              getIt<DailyProblemBloc>()..add(DailyProblemStarted()),
         ),
         BlocProvider(
-          create: (_) => MainDI.buildProblemsBloc()..add(ProblemsStarted()),
+          create: (_) => getIt<ProblemsBloc>()..add(ProblemsStarted()),
         ),
       ],
       child: BasePage(

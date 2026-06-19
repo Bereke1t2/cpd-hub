@@ -3,7 +3,7 @@ import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import 'package:lab_portal/future/main/presentation/widget/contest_box.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contests/contests_bloc.dart';
-import 'package:lab_portal/future/main/presentation/di/main_di.dart';
+import 'package:lab_portal/core/di/injection.dart';
 
 import '../widget/bar_box.dart';
 import 'package:lab_portal/future/main/presentation/page/contest_leaderboard_page.dart';
@@ -14,7 +14,7 @@ class ContestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => MainDI.buildContestsBloc()..add(ContestsStarted()),
+      create: (_) => getIt<ContestsBloc>()..add(ContestsStarted()),
       child: BasePage(
         title: "Contests",
         selectedIndex: 2,
