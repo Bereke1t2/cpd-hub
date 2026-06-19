@@ -31,6 +31,12 @@ class UiConstants {
   static const Color borderColor = Color(0xFF333333); // Dark border color for cards and sections
   static const Color shadowColor = Color(0x80000000); // Semi-transparent black for shadows
 
+  // Shared shadow + border used by cards across the app.
+  static const List<BoxShadow> cardShadow = [
+    BoxShadow(color: shadowColor, blurRadius: 12, offset: Offset(0, 4)),
+  ];
+  static Border get cardBorder => Border.all(color: borderColor);
+
   static Color getUserRatingColor(int rating) {
     if (rating >= 2000) {
       return const Color(0xFFFF5722); // Red for Expert
