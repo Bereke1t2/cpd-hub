@@ -1,4 +1,6 @@
 import 'package:dartz/dartz.dart';
+import 'package:lab_portal/core/config/app_config.dart';
+import 'package:lab_portal/core/error/exceptions.dart';
 import 'package:lab_portal/future/main/data/dataSources/remote/remote_data_source.dart';
 import 'package:lab_portal/future/main/data/model/contest_model.dart';
 import 'package:lab_portal/future/main/data/model/info_model.dart';
@@ -36,137 +38,123 @@ class MainRepoImpl implements MainRepo {
     this.mockContestLeaderboardDataSource,
   );
 
-  @override
-  Future<Either<void, Failure>> dislikeProblem(String problemId) async {
+  // ---- helpers ----
+
+  /// Checks connectivity then executes [call], mapping exceptions → Failures.
+  /// Convention: Left = success, Right = Failure.
+  Future<Either<T, Failure>> _remote<T>(Future<T> Function() call) async {
     if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
+      return right(NetworkFailure('No internet connection.'));
     }
     try {
-      final result = await remoteDataSource.dislikeProblem(problemId);
-      return left(result);
+      return left(await call());
+    } on UnauthorizedException catch (e) {
+      return right(AuthenticationFailure(e.message));
+    } on NotFoundException catch (e) {
+      return right(NotFoundFailure(e.message));
+    } on ValidationException catch (e) {
+      return right(ValidationFailure(e.message));
+    } on NetworkException catch (e) {
+      return right(NetworkFailure(e.message));
+    } on AppException catch (e) {
+      return right(ServerFailure(e.message));
+    } catch (_) {
+      return right(ServerFailure('Something went wrong.'));
+    }
+  }
+
+  Future<Either<T, Failure>> _mock<T>(Future<T> Function() call) async {
+    try {
+      return left(await call());
     } catch (e) {
       return right(ServerFailure(e.toString()));
     }
   }
 
+  // ---- problems ----
+
   @override
-  Future<Either<void, Failure>> likeProblem(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
+  Future<Either<List<ProblemModel>, Failure>> getProblems() {
+    if (AppConfig.useMock) {
+      return _mock(() => mockProblemsDataSource.getProblems());
     }
-    try {
-      final result = await remoteDataSource.likeProblem(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+    return _remote(() => remoteDataSource.getProblems());
   }
 
   @override
-  Future<Either<InfoModel, Failure>> getInfo() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getInfo();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
-  }
+  Future<Either<void, Failure>> likeProblem(String problemId) =>
+      _remote(() => remoteDataSource.likeProblem(problemId));
 
   @override
-  Future<Either<List<ProblemModel>, Failure>> getProblems() async {
-    try {
-      final result = await mockProblemsDataSource.getProblems();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
-  }
+  Future<Either<void, Failure>> dislikeProblem(String problemId) =>
+      _remote(() => remoteDataSource.dislikeProblem(problemId));
 
   @override
-  Future<Either<UserModel, Failure>> getProfile() async {
-    if (!(await network.isConnected)) {
-      return Future.value(right(NetworkFailure("No Internet Connection")));
-    }
-    try {
-      final result = await remoteDataSource.getProfile();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
-  }
+  Future<Either<void, Failure>> markProblemAsSolved(String problemId) =>
+      _remote(() => remoteDataSource.markProblemAsSolved(problemId));
 
   @override
-  Future<Either<List<ContestModel>, Failure>> getContests() async {
-    try {
-      final result = await mockContestsDataSource.getContests();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
-  }
+  Future<Either<void, Failure>> unmarkProblemAsSolved(String problemId) =>
+      _remote(() => remoteDataSource.unmarkProblemAsSolved(problemId));
+
+  // ---- daily problem ----
 
   @override
-  Future<Either<DailyProblemModel, Failure>> getDailyProblems() async {
-    try {
-      final result = await mockDailyProblemDataSource.getDailyProblem();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
+  Future<Either<DailyProblemModel, Failure>> getDailyProblems() {
+    if (AppConfig.useMock) {
+      return _mock(() => mockDailyProblemDataSource.getDailyProblem());
     }
+    return _remote(() => remoteDataSource.getDailyProblems());
   }
 
-  @override
-  Future<Either<void, Failure>> markProblemAsSolved(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
-    }
-    try {
-      final result = await remoteDataSource.markProblemAsSolved(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
-  }
+  // ---- contests ----
 
   @override
-  Future<Either<void, Failure>> unmarkProblemAsSolved(String problemId) async {
-    if (!(await network.isConnected)) {
-      return right(NetworkFailure("No Internet Connection"));
+  Future<Either<List<ContestModel>, Failure>> getContests() {
+    if (AppConfig.useMock) {
+      return _mock(() => mockContestsDataSource.getContests());
     }
-    try {
-      final result = await remoteDataSource.unmarkProblemAsSolved(problemId);
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<List<UserEntity>, Failure>> getUsers() async {
-    // Users are currently mocked in data-layer (as requested).
-    // When API is ready, replace this with remoteDataSource.getUsers().
-    try {
-      final result = await mockUsersDataSource.getUsers();
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
-    }
+    return _remote(() => remoteDataSource.getContests());
   }
 
   @override
   Future<Either<List<LeaderboardEntryEntity>, Failure>> getContestLeaderboard(
     String contestUrl,
-  ) async {
-    try {
-      final result = await mockContestLeaderboardDataSource.getLeaderboard(
-        contestUrl,
+  ) {
+    if (AppConfig.useMock) {
+      return _mock(
+        () => mockContestLeaderboardDataSource.getLeaderboard(contestUrl),
       );
-      return left(result);
-    } catch (e) {
-      return right(ServerFailure(e.toString()));
     }
+    return _remote(() => remoteDataSource.getContestLeaderboard(contestUrl));
+  }
+
+  // ---- users ----
+
+  @override
+  Future<Either<List<UserEntity>, Failure>> getUsers() {
+    if (AppConfig.useMock) {
+      return _mock(() => mockUsersDataSource.getUsers());
+    }
+    return _remote(() => remoteDataSource.getUsers());
+  }
+
+  // ---- profile ----
+
+  @override
+  Future<Either<UserModel, Failure>> getProfile() =>
+      _remote(() => remoteDataSource.getProfile());
+
+  // ---- info ----
+
+  @override
+  Future<Either<InfoModel, Failure>> getInfo() {
+    if (AppConfig.useMock) {
+      // Placeholder until the backend info endpoint is live.
+      return Future.value(
+        left(const InfoModel(title: 'CPD Hub', description: 'Welcome!')),
+      );
+    }
+    return _remote(() => remoteDataSource.getInfo());
   }
 }
