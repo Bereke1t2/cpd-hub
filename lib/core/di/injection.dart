@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:lab_portal/core/network.dart';
 import 'package:lab_portal/core/network/dio_client.dart';
@@ -29,6 +30,11 @@ import 'package:lab_portal/future/main/domain/usecase/get_problems.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_users.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_contest_leaderboard.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_profile.dart';
+import 'package:lab_portal/future/main/presentation/bloc/bookmarks/bookmarks_cubit.dart';
+import 'package:lab_portal/future/main/domain/usecase/like_it.dart';
+import 'package:lab_portal/future/main/domain/usecase/dislike_it.dart';
+import 'package:lab_portal/future/main/domain/usecase/make_it_solved.dart';
+import 'package:lab_portal/future/main/domain/usecase/unmark_solved.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contests/contests_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/profile/profile_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/daily_problem/daily_problem_bloc.dart';
@@ -38,9 +44,15 @@ import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/con
 
 final GetIt getIt = GetIt.instance;
 
-void configureDependencies() {
+Future<void> configureDependencies() async {
   // ---- core infrastructure ----
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
+
+  final prefs = await SharedPreferences.getInstance();
+  getIt.registerLazySingleton<SharedPreferences>(() => prefs);
+  getIt.registerLazySingleton<BookmarksCubit>(
+    () => BookmarksCubit(getIt<SharedPreferences>()),
+  );
   getIt.registerLazySingleton<FlutterSecureStorage>(
     () => const FlutterSecureStorage(),
   );
@@ -122,9 +134,19 @@ void configureDependencies() {
   getIt.registerFactory(() => GetUsers(getIt<MainRepo>()));
   getIt.registerFactory(() => GetContestLeaderboard(getIt<MainRepo>()));
   getIt.registerFactory(() => GetProfile(getIt<MainRepo>()));
+  getIt.registerFactory(() => LikeIt(getIt<MainRepo>()));
+  getIt.registerFactory(() => DislikeIt(getIt<MainRepo>()));
+  getIt.registerFactory(() => MakeItSolved(getIt<MainRepo>()));
+  getIt.registerFactory(() => UnmarkSolved(getIt<MainRepo>()));
 
   // ---- blocs ----
-  getIt.registerFactory(() => ProblemsBloc(getProblems: getIt<GetProblems>()));
+  getIt.registerFactory(() => ProblemsBloc(
+    getProblems: getIt<GetProblems>(),
+    likeIt: getIt<LikeIt>(),
+    dislikeIt: getIt<DislikeIt>(),
+    makeItSolved: getIt<MakeItSolved>(),
+    unmarkSolved: getIt<UnmarkSolved>(),
+  ));
   getIt.registerFactory(() => ContestsBloc(getContests: getIt<GetContests>()));
   getIt.registerFactory(
     () => DailyProblemBloc(getDailyProblems: getIt<GetDailyProblems>()),
