@@ -8,6 +8,10 @@ class RouteNames {
   static const String users = '/users';
   static const String profile = '/profile';
 
+  // ---- auth ----
+  static const String login = '/login';
+  static const String register = '/register';
+
   // ---- detail screens (take arguments) ----
   static const String problemDetails = '/problem';
   static const String userDetails = '/user';
