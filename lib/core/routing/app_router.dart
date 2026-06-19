@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:lab_portal/future/main/presentation/page/home_page.dart';
+import 'package:lab_portal/future/main/presentation/page/problems_page.dart';
+import 'package:lab_portal/future/main/presentation/page/contest_page.dart';
+import 'package:lab_portal/future/main/presentation/page/users_page.dart';
+import 'package:lab_portal/future/main/presentation/page/profile_page.dart';
+import 'package:lab_portal/future/main/presentation/page/problem_details_page.dart';
+import 'package:lab_portal/future/main/presentation/page/user_details_page.dart';
+import 'package:lab_portal/future/main/presentation/page/contest_leaderboard_page.dart';
+import 'package:lab_portal/future/main/domain/entity/problem_entity.dart';
+import 'package:lab_portal/future/main/domain/entity/user_entity.dart';
+import 'package:lab_portal/future/main/domain/entity/contest_entity.dart';
+import 'route_names.dart';
+
+class AppRouter {
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case RouteNames.home:
+        return _page(const HomePage(), settings);
+      case RouteNames.problems:
+        return _page(const ProblemsPage(), settings);
+      case RouteNames.contests:
+        return _page(const ContestPage(), settings);
+      case RouteNames.users:
+        return _page(const UsersPage(), settings);
+      case RouteNames.profile:
+        return _page(const ProfilePage(), settings);
+
+      case RouteNames.problemDetails:
+        final problem = settings.arguments as ProblemEntity;
+        return _page(ProblemDetailsPage(problem: problem), settings);
+
+      case RouteNames.userDetails:
+        final user = settings.arguments as UserEntity;
+        return _page(UserDetailsPage(user: user), settings);
+
+      case RouteNames.contestLeaderboard:
+        final contest = settings.arguments as ContestEntity;
+        return _page(ContestLeaderboardPage(contest: contest), settings);
+
+      default:
+        return _page(
+          const Scaffold(body: Center(child: Text('Page not found'))),
+          settings,
+        );
+    }
+  }
+
+  static MaterialPageRoute<dynamic> _page(Widget child, RouteSettings settings) =>
+      MaterialPageRoute(builder: (_) => child, settings: settings);
+}
