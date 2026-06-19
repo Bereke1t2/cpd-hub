@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../domain/entitiy/contest_entitiy.dart';
+import '../../../domain/entity/contest_entity.dart';
 import '../../../domain/usecase/get_contests.dart';
 
 part 'contests_event.dart';
@@ -10,7 +10,7 @@ part 'contests_state.dart';
 class ContestsBloc extends Bloc<ContestsEvent, ContestsState> {
   final GetContests getContests;
 
-  List<ContestEntitiy> _all = const [];
+  List<ContestEntity> _all = const [];
 
   ContestsBloc({required this.getContests}) : super(const ContestsInitial()) {
     on<ContestsStarted>(_onStarted);

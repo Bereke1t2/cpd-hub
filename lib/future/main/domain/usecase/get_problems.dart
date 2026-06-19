@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import 'package:lab_portal/core/failure.dart';
 
-import '../entitiy/problem_entitiy.dart';
+import '../entity/problem_entity.dart';
 import '../repository/main_repo.dart';
 
 class GetProblems {

@@ -9,8 +9,8 @@ import 'package:lab_portal/future/main/data/dataSources/mock/mock_contests_data_
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_daily_problem_data_source.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_problems_data_source.dart';
 import 'package:lab_portal/future/main/data/dataSources/mock/mock_contest_leaderboard_data_source.dart';
-import 'package:lab_portal/future/main/domain/entitiy/user_entity.dart';
-import 'package:lab_portal/future/main/domain/entitiy/leaderboard_entry_entity.dart';
+import 'package:lab_portal/future/main/domain/entity/user_entity.dart';
+import 'package:lab_portal/future/main/domain/entity/leaderboard_entry_entity.dart';
 
 import '../../../../core/failure.dart';
 import '../../../../core/network.dart';

@@ -1,4 +1,4 @@
-import 'package:lab_portal/future/main/domain/entitiy/user_entity.dart';
+import 'package:lab_portal/future/main/domain/entity/user_entity.dart';
 
 class UserModel extends UserEntity {
   const UserModel({

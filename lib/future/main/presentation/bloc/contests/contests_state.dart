@@ -14,7 +14,7 @@ final class ContestsLoading extends ContestsState {
 }
 
 final class ContestsLoaded extends ContestsState {
-  final List<ContestEntitiy> contests;
+  final List<ContestEntity> contests;
   final String filter;
 
   const ContestsLoaded({required this.contests, this.filter = 'All'});

@@ -14,7 +14,7 @@ final class DailyProblemLoading extends DailyProblemState {
 }
 
 final class DailyProblemLoaded extends DailyProblemState {
-  final DailyProblemEntitiy daily;
+  final DailyProblemEntity daily;
   const DailyProblemLoaded(this.daily);
 }
 

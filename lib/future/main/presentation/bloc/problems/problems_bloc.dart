@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
-import '../../../domain/entitiy/problem_entitiy.dart';
+import '../../../domain/entity/problem_entity.dart';
 import '../../../domain/usecase/get_problems.dart';
 
 part 'problems_event.dart';
