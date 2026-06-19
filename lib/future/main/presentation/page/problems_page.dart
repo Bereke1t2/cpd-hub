@@ -23,7 +23,17 @@ class _ProblemsPageState extends State<ProblemsPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<ProblemsBloc>()..add(ProblemsStarted()),
-      child: BasePage(
+      child: BlocListener<ProblemsBloc, ProblemsState>(
+        listener: (context, state) {
+          if (state is ProblemsActionError) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+            ));
+          }
+        },
+        child: BasePage(
         selectedIndex: 1,
         title: 'Problems',
         subtitle: 'Explore and solve coding challenges',
@@ -148,9 +158,10 @@ class _ProblemsPageState extends State<ProblemsPage> {
               ),
             );
           },
-        ),
-      ),
-    );
+        ),      // LayoutBuilder
+      ),        // BasePage
+      ),        // BlocListener
+    );          // BlocProvider
   }
 
   List<ProblemEntity> _applyFilters(List<ProblemEntity> problems) {
