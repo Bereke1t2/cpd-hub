@@ -50,6 +50,7 @@ class _RegisterViewState extends State<_RegisterView> {
             fullName: _nameCtrl.text.trim(),
             email: _emailCtrl.text.trim(),
             password: _passwordCtrl.text,
+            confirmPassword: _confirmCtrl.text,
           ),
         );
   }

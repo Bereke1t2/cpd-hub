@@ -12,11 +12,13 @@ class Register {
     required String fullName,
     required String email,
     required String password,
+    String confirmPassword = '',
   }) =>
       repo.register(
         username: username,
         fullName: fullName,
         email: email,
         password: password,
+        confirmPassword: confirmPassword.isEmpty ? password : confirmPassword,
       );
 }
