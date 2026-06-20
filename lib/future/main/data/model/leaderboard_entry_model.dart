@@ -11,13 +11,16 @@ class LeaderboardEntryModel extends LeaderboardEntryEntity {
   });
 
   factory LeaderboardEntryModel.fromJson(Map<String, dynamic> json) {
+    // Go backend LeaderboardEntry: rank, username, rating, score, penalty, solvedCount
+    // Mobile entity uses: position, username, solved, penalty, oldRating, newRating
+    final rating = (json['rating'] ?? 0) as int;
     return LeaderboardEntryModel(
-      position: json['position'] ?? 0,
-      username: json['username'] ?? '',
-      solved: json['solved'] ?? 0,
-      penalty: json['penalty'] ?? 0,
-      oldRating: json['oldRating'] ?? 0,
-      newRating: json['newRating'] ?? 0,
+      position: (json['rank'] ?? json['position'] ?? 0) as int,
+      username: (json['username'] ?? '') as String,
+      solved: (json['score'] ?? json['solvedCount'] ?? json['solved'] ?? 0) as int,
+      penalty: (json['penalty'] ?? 0) as int,
+      oldRating: (json['oldRating'] ?? rating) as int,
+      newRating: (json['newRating'] ?? rating) as int,
     );
   }
 }

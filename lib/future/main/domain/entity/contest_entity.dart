@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 class ContestEntity extends Equatable {
+  /// Backend contest ID used for leaderboard lookup (e.g. "codeforces-1932").
+  final String id;
   final String title;
   final String contestUrl;
   final String startTime;
@@ -11,6 +13,7 @@ class ContestEntity extends Equatable {
   final bool isParticipating;
 
   const ContestEntity({
+    required this.id,
     required this.title,
     required this.contestUrl,
     required this.startTime,
@@ -23,6 +26,7 @@ class ContestEntity extends Equatable {
 
   @override
   List<Object?> get props => [
+        id,
         title,
         contestUrl,
         startTime,

@@ -150,11 +150,17 @@ class MainRepoImpl implements MainRepo {
   @override
   Future<Either<InfoModel, Failure>> getInfo() {
     if (AppConfig.useMock) {
-      // Placeholder until the backend info endpoint is live.
       return Future.value(
         left(const InfoModel(title: 'CPD Hub', description: 'Welcome!')),
       );
     }
-    return _remote(() => remoteDataSource.getInfo());
+    // Backend returns a list; take the first item (or a default).
+    return _remote(() async {
+      final list = await remoteDataSource.getInfoList();
+      if (list.isEmpty) {
+        return const InfoModel(title: 'CPD Hub', description: 'Welcome!');
+      }
+      return list.first;
+    });
   }
 }

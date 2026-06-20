@@ -8,10 +8,10 @@
 class AppConfig {
   AppConfig._();
 
-  /// Base URL of the Django REST backend.
+  /// Base URL of the Go backend (Gin, default :8080).
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:8000/api',
+    defaultValue: 'http://192.168.202.96:8080/api',
   );
 
   /// When true, the repository serves mock data and makes no network calls.

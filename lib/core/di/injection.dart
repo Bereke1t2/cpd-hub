@@ -89,7 +89,7 @@ Future<void> configureDependencies() async {
 
   // ---- auth feature ----
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(getIt<Dio>()),
+    () => AuthRemoteDataSourceImpl(getIt<Dio>(), getIt<TokenStore>()),
   );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
@@ -118,7 +118,7 @@ Future<void> configureDependencies() async {
 
   // ---- main remote data source ----
   getIt.registerLazySingleton<RemoteDataSource>(
-    () => RemoteDataSourceImpl(getIt<Dio>()),
+    () => RemoteDataSourceImpl(getIt<Dio>(), getIt<TokenStore>()),
   );
 
   // ---- mock data sources ----
