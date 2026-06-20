@@ -4,10 +4,13 @@ import 'package:lab_portal/core/theme/app_spacing.dart';
 import 'package:lab_portal/core/theme/app_text_styles.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/core/widgets/ui_kit.dart';
+import 'package:lab_portal/features/consistency/presentation/cubit/goals/goals_cubit.dart';
+import 'package:lab_portal/features/consistency/presentation/cubit/streak/streak_cubit.dart';
+import 'package:lab_portal/features/consistency/presentation/widget/goal_bar.dart';
+import 'package:lab_portal/features/consistency/presentation/widget/streak_ring.dart';
 import 'package:lab_portal/features/learning/domain/entity/topic_entity.dart';
 import 'package:lab_portal/features/learning/domain/service/learning_path_engine.dart';
 import 'package:lab_portal/features/learning/presentation/bloc/topics/topics_bloc.dart';
-import 'package:lab_portal/features/learning/presentation/page/skill_tree_page.dart';
 import 'package:lab_portal/features/learning/presentation/page/topic_detail_page.dart';
 import 'package:lab_portal/future/main/presentation/widget/problem_box.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,9 +21,7 @@ import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
 
-import '../../../../core/ui_constants.dart';
 import '../widget/info_box.dart';
-import '../widget/streak_progress_box.dart';
 import '../widget/todays_problem_box.dart';
 import '../widget/welcomback_box.dart';
 import 'base_page.dart';
@@ -42,6 +43,8 @@ class HomePage extends StatelessWidget {
         BlocProvider(
           create: (_) => getIt<TopicsBloc>()..add(const TopicsStarted()),
         ),
+        BlocProvider.value(value: getIt<StreakCubit>()..load()),
+        BlocProvider.value(value: getIt<GoalsCubit>()..load()),
       ],
       child: BasePage(
         selectedIndex: 0,
@@ -58,11 +61,7 @@ class HomePage extends StatelessWidget {
                   return WelcomeBackBox(name: name);
                 },
               ),
-              const StreakProgressBox(
-                currentStreak: 7,
-                problemsSolved: 42,
-                totalProblems: 100,
-              ),
+              const _ConsistencyHub(),
               const _ContinueLearningCard(),
               const InfoBox(
                 title: 'Problem Solving',
@@ -216,6 +215,55 @@ class HomePage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Live streak + weekly goal hub replacing the hardcoded StreakProgressBox.
+class _ConsistencyHub extends StatelessWidget {
+  const _ConsistencyHub();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      child: Column(
+        children: [
+          BlocBuilder<StreakCubit, StreakState>(
+            builder: (context, state) {
+              if (state is! StreakLoaded) return const SizedBox.shrink();
+              final s = state.streak;
+              return GestureDetector(
+                onTap: () =>
+                    Navigator.pushNamed(context, RouteNames.consistency),
+                child: StreakRing(
+                  current: s.current,
+                  longest: s.longest,
+                  freezesAvailable: s.freezesAvailable,
+                  weekRatio: s.weekRatio,
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          BlocBuilder<GoalsCubit, GoalsState>(
+            builder: (context, state) {
+              if (state is! GoalsLoaded) return const SizedBox.shrink();
+              final g = state.goal;
+              return GestureDetector(
+                onTap: () =>
+                    Navigator.pushNamed(context, RouteNames.consistency),
+                child: GoalBar(
+                  label: g.label,
+                  progress: g.progress,
+                  target: g.target,
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
