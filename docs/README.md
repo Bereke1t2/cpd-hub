@@ -81,6 +81,20 @@ New rules we add:
 | 7 | [`phases/phase-7-new-features.md`](./phases/phase-7-new-features.md) | Notifications, settings, attendance, submission flow, deep-linkable details | 5, 6 |
 | 8 | [`phases/phase-8-testing-release.md`](./phases/phase-8-testing-release.md) | Unit/bloc/widget tests, CI, flavors, release checklist | all |
 
+### CP-specific learning track (phases 9–11)
+
+These extend the app from a problem browser into a learning platform tailored to competitive programmers.
+They build on the production foundation above and can be sequenced after Phase 6.
+
+| Phase | File | Goal | Depends on |
+|-------|------|------|-----------|
+| 9 | [`phases/phase-9-structured-learning.md`](./phases/phase-9-structured-learning.md) | Topic dependency graph (DAG), skill tree, "what to learn next/before", topic mini-courses + Tracks | 4, 6 |
+| 10 | [`phases/phase-10-consistency-engine.md`](./phases/phase-10-consistency-engine.md) | First-class streaks, weekly goals, rating-ordered ladders, consistency leaderboard, reminders | 9, 5, 7.B |
+| 11 | [`phases/phase-11-smart-practice.md`](./phases/phase-11-smart-practice.md) | Per-topic strength analysis, next-problem recommender, spaced-repetition review, upsolving tracker | 9, 10, 5 |
+
+Build **9 before 10 before 11** — the topic graph is the backbone ladders, goals, and recommendations all
+reference. Each ships mock-first behind the existing data-source interface, like every prior phase.
+
 Phases 5 and 6 can run in parallel once 4 is merged. Phase 3 can start as soon as the Dio client (Phase 2) exists.
 
 ---
