@@ -11,6 +11,11 @@ Phase 5 (interactions), Phase 6 (`AsyncView`).
 > Everything here is derived analytics. It must degrade gracefully: with little history, fall back to the
 > Phase-9 "available frontier" and Phase-10 ladder rather than inventing confident-looking recommendations.
 
+> **Read [`../01-ui-design-language.md`](../01-ui-design-language.md) §6** (the "For You" spec). Reuse
+> [`templates/ui_kit.dart`](../templates/ui_kit.dart) — `RecommendationCard` is a `GradientCard` with a
+> mandatory `reason` line; the review queue uses `StatusChip`; strength on Profile reuses `GoalBar` rows or
+> a radar. No new card styles.
+
 ---
 
 ## Checklist
