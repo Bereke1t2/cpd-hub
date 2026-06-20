@@ -63,6 +63,7 @@ class HomePage extends StatelessWidget {
               ),
               const _ConsistencyHub(),
               const _ContinueLearningCard(),
+              const _ForYouEntryCard(),
               const InfoBox(
                 title: 'Problem Solving',
                 description: 'Let\'s tackle today\'s challenges together!',
@@ -264,6 +265,54 @@ class _ConsistencyHub extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Entry card that navigates to /for-you.
+class _ForYouEntryCard extends StatelessWidget {
+  const _ForYouEntryCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+      child: GradientCard(
+        accent: UiConstants.problemTextColor,
+        onTap: () => Navigator.pushNamed(context, RouteNames.forYou),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: UiConstants.problemTextColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.auto_awesome_rounded,
+                  color: UiConstants.problemTextColor, size: 20),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('For You',
+                      style: TextStyle(
+                          color: UiConstants.mainTextColor,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15)),
+                  Text('Recommendations, reviews & upsolves',
+                      style: TextStyle(
+                          color: UiConstants.subtitleTextColor, fontSize: 12)),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded,
+                color: UiConstants.subtitleTextColor),
+          ],
+        ),
       ),
     );
   }

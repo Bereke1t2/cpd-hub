@@ -23,4 +23,7 @@ class RouteNames {
 
   // ---- phase 10: consistency ----
   static const String consistency = '/consistency';
+
+  // ---- phase 11: smart practice ----
+  static const String forYou = '/for-you';
 }
