@@ -314,7 +314,7 @@ class ContestLeaderboardPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<ContestLeaderboardBloc>()..add(ContestLeaderboardStarted(contest.contestUrl)),
+      create: (_) => getIt<ContestLeaderboardBloc>()..add(ContestLeaderboardStarted(contest.id)),
       child: BasePage(
         title: 'Leaderboard',
         subtitle: contest.title,
@@ -381,7 +381,7 @@ class ContestLeaderboardPage extends StatelessWidget {
                   isEmpty: (d) => d.isEmpty,
                   onRetry: () => context
                       .read<ContestLeaderboardBloc>()
-                      .add(ContestLeaderboardStarted(contest.contestUrl)),
+                      .add(ContestLeaderboardStarted(contest.id)),
                   emptyMessage: 'No results yet',
                   emptySubtitle: 'The leaderboard will appear once the contest ends.',
                   builder: (entries) => LayoutBuilder(builder: (context, constraints) {
