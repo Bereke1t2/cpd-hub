@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/features/consistency/presentation/cubit/streak/streak_cubit.dart';
 import 'package:lab_portal/future/main/presentation/bloc/profile/profile_bloc.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import '../../../../core/ui_constants.dart';
@@ -101,8 +102,13 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<ProfileBloc>()..add(const ProfileStarted()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => getIt<ProfileBloc>()..add(const ProfileStarted()),
+        ),
+        BlocProvider.value(value: getIt<StreakCubit>()..load()),
+      ],
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) => _buildBody(context, state),
       ),
@@ -138,7 +144,19 @@ class ProfilePage extends StatelessWidget {
 
     final days = 168;
     final contributions = _generateMockContributions(days);
-    final attendance = _generateMockAttendance(days);
+    // Use real active days from StreakCubit; fall back to mock while loading.
+    final streakState = context.watch<StreakCubit>().state;
+    final activeDays = streakState is StreakLoaded
+        ? streakState.streak.activeDays
+        : <DateTime>[];
+    final today = DateTime.now();
+    final attendance = List<int>.generate(days, (i) {
+      final d = DateTime(today.year, today.month, today.day - (days - 1 - i));
+      return activeDays.any(
+              (a) => a.year == d.year && a.month == d.month && a.day == d.day)
+          ? 1
+          : 0;
+    });
 
     final ratingHistory = <int>[1180, 1210, 1260, 1290, 1330, 1380, 1410, 1470, 1490, 1510, 1500, rating];
 

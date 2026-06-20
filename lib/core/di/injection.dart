@@ -42,6 +42,19 @@ import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.
 import 'package:lab_portal/future/main/presentation/bloc/users/users_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/contest_leaderboard_bloc.dart';
 // ---- phase 9: learning ----
+import 'package:lab_portal/features/consistency/data/datasources/consistency_data_source.dart';
+import 'package:lab_portal/features/consistency/data/datasources/mock/mock_consistency_data_source.dart';
+import 'package:lab_portal/features/consistency/data/repository/consistency_repository_impl.dart';
+import 'package:lab_portal/features/consistency/domain/repository/consistency_repository.dart';
+import 'package:lab_portal/features/consistency/domain/service/streak_engine.dart';
+import 'package:lab_portal/features/consistency/domain/usecase/get_goal.dart';
+import 'package:lab_portal/features/consistency/domain/usecase/get_ladders.dart';
+import 'package:lab_portal/features/consistency/domain/usecase/get_streak.dart';
+import 'package:lab_portal/features/consistency/domain/usecase/save_goal.dart';
+import 'package:lab_portal/features/consistency/domain/usecase/save_streak.dart';
+import 'package:lab_portal/features/consistency/presentation/bloc/ladder/ladder_bloc.dart';
+import 'package:lab_portal/features/consistency/presentation/cubit/goals/goals_cubit.dart';
+import 'package:lab_portal/features/consistency/presentation/cubit/streak/streak_cubit.dart';
 import 'package:lab_portal/features/learning/data/datasources/learning_data_source.dart';
 import 'package:lab_portal/features/learning/data/datasources/mock/mock_learning_data_source.dart';
 import 'package:lab_portal/features/learning/data/repository/learning_repository_impl.dart';
@@ -190,4 +203,37 @@ Future<void> configureDependencies() async {
         engine: getIt<LearningPathEngine>(),
       ));
   getIt.registerFactory(() => TracksBloc(getTracks: getIt<GetTracks>()));
+
+  // ---- phase 10: consistency ----
+  getIt.registerLazySingleton<ConsistencyDataSource>(
+    () => MockConsistencyDataSource(getIt<SharedPreferences>()),
+  );
+  getIt.registerLazySingleton<ConsistencyRepository>(
+    () => ConsistencyRepositoryImpl(getIt<ConsistencyDataSource>()),
+  );
+  getIt.registerLazySingleton<StreakEngine>(() => const StreakEngine());
+  getIt.registerFactory(() => GetStreak(getIt<ConsistencyRepository>()));
+  getIt.registerFactory(() => SaveStreak(getIt<ConsistencyRepository>()));
+  getIt.registerFactory(() => GetGoal(getIt<ConsistencyRepository>()));
+  getIt.registerFactory(() => SaveGoal(getIt<ConsistencyRepository>()));
+  getIt.registerFactory(() => GetLadders(getIt<ConsistencyRepository>()));
+  getIt.registerLazySingleton<StreakCubit>(
+    () => StreakCubit(
+      getStreak: getIt<GetStreak>(),
+      saveStreak: getIt<SaveStreak>(),
+      engine: getIt<StreakEngine>(),
+    ),
+  );
+  getIt.registerLazySingleton<GoalsCubit>(
+    () => GoalsCubit(
+      getGoal: getIt<GetGoal>(),
+      saveGoal: getIt<SaveGoal>(),
+    ),
+  );
+  getIt.registerFactory(
+    () => LadderBloc(
+      getLadders: getIt<GetLadders>(),
+      repo: getIt<ConsistencyRepository>(),
+    ),
+  );
 }
