@@ -27,7 +27,7 @@ class TracksPage extends StatelessWidget {
       child: BasePage(
         title: 'Tracks',
         subtitle: 'Goal-oriented learning paths',
-        selectedIndex: 1,
+        selectedIndex: 2,
         body: BlocBuilder<TracksBloc, TracksState>(
           builder: (context, tracksState) =>
               BlocBuilder<TopicsBloc, TopicsState>(

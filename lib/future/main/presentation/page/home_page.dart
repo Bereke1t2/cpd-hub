@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:lab_portal/core/routing/route_names.dart';
+import 'package:lab_portal/core/theme/app_spacing.dart';
+import 'package:lab_portal/core/theme/app_text_styles.dart';
+import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/ui_kit.dart';
+import 'package:lab_portal/features/learning/domain/entity/topic_entity.dart';
+import 'package:lab_portal/features/learning/domain/service/learning_path_engine.dart';
+import 'package:lab_portal/features/learning/presentation/bloc/topics/topics_bloc.dart';
+import 'package:lab_portal/features/learning/presentation/page/skill_tree_page.dart';
+import 'package:lab_portal/features/learning/presentation/page/topic_detail_page.dart';
 import 'package:lab_portal/future/main/presentation/widget/problem_box.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/widgets/async_view.dart';
@@ -29,6 +39,9 @@ class HomePage extends StatelessWidget {
         BlocProvider(
           create: (_) => getIt<ProblemsBloc>()..add(ProblemsStarted()),
         ),
+        BlocProvider(
+          create: (_) => getIt<TopicsBloc>()..add(const TopicsStarted()),
+        ),
       ],
       child: BasePage(
         selectedIndex: 0,
@@ -50,6 +63,7 @@ class HomePage extends StatelessWidget {
                 problemsSolved: 42,
                 totalProblems: 100,
               ),
+              const _ContinueLearningCard(),
               const InfoBox(
                 title: 'Problem Solving',
                 description: 'Let\'s tackle today\'s challenges together!',
@@ -201,6 +215,117 @@ class HomePage extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Compact "Continue Learning" card shown on Home.
+/// Shows up to 3 available topics from TopicsBloc, with a "See all" link to
+/// the full skill tree. Hidden when loading or when the frontier is empty.
+class _ContinueLearningCard extends StatelessWidget {
+  const _ContinueLearningCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TopicsBloc, TopicsState>(
+      builder: (context, state) {
+        if (state is! TopicsLoaded) return const SizedBox.shrink();
+        final frontier = state.frontier;
+        if (frontier.isEmpty) return const SizedBox.shrink();
+        final shown = frontier.take(3).toList();
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+          child: GradientCard(
+            accent: UiConstants.ratingTextColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const SectionHeader(
+                      'Continue Learning',
+                      icon: Icons.school_rounded,
+                      accent: UiConstants.ratingTextColor,
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(
+                          context, RouteNames.learn),
+                      child: const Text(
+                        'See all →',
+                        style: TextStyle(
+                          color: UiConstants.primaryButtonColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                for (final topic in shown)
+                  _FrontierRow(
+                    topic: topic,
+                    progress: state.progress[topic.id]!,
+                    allProgress: state.progress,
+                  ),
+                const SizedBox(height: AppSpacing.xxs),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _FrontierRow extends StatelessWidget {
+  final TopicEntity topic;
+  final TopicProgress progress;
+  final Map<String, TopicProgress> allProgress;
+
+  const _FrontierRow({
+    required this.topic,
+    required this.progress,
+    required this.allProgress,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TopicDetailPage(
+            topic: topic,
+            progress: progress,
+            allProgress: allProgress,
+          ),
+        ),
+      ),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          children: [
+            const Icon(Icons.play_circle_fill_rounded,
+                size: 18, color: UiConstants.ratingTextColor),
+            const SizedBox(width: AppSpacing.xs),
+            Expanded(
+              child: Text(topic.name, style: AppTextStyles.body),
+            ),
+            Text(
+              topic.category,
+              style: AppTextStyles.caption,
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            const Icon(Icons.chevron_right_rounded,
+                size: 16, color: UiConstants.subtitleTextColor),
+          ],
         ),
       ),
     );

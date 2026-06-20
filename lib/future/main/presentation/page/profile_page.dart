@@ -145,7 +145,7 @@ class ProfilePage extends StatelessWidget {
     return BasePage(
       title: 'Profile',
       subtitle: 'Overview & activity',
-      selectedIndex: 4,
+      selectedIndex: 5,
       body: LayoutBuilder(builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 980;
         return CustomScrollView(
