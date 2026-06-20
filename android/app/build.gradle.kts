@@ -8,8 +8,9 @@ plugins {
 android {
     namespace = "com.example.lab_portal"
     compileSdk = flutter.compileSdkVersion
-    // Use explicit NDK version required by some plugins (e.g. connectivity_plus)
-    ndkVersion = "27.0.12077973"
+    // Use highest NDK version required by any plugin (jni requires 28.2.13676358).
+    // NDK versions are backward-compatible so this is safe.
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
