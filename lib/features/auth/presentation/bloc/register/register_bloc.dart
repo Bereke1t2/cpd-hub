@@ -23,6 +23,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       fullName: event.fullName,
       email: event.email,
       password: event.password,
+      confirmPassword: event.confirmPassword,
     );
     result.fold(
       (user) => emit(RegisterSuccess(user)),

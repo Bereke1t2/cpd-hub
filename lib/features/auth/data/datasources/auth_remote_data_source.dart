@@ -11,6 +11,7 @@ abstract class AuthRemoteDataSource {
     required String fullName,
     required String email,
     required String password,
+    required String confirmPassword,
   });
   Future<AuthUserModel> me();
   Future<void> logout();
@@ -22,9 +23,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   AuthRemoteDataSourceImpl(this._dio, this._tokenStore);
 
-  // Go backend: POST /api/auth/login
-  // body:     { email, password }
-  // response: { token, user: { username, fullName } }
+  // POST /api/auth/login
+  // Backend domain.LoginRequest: { email, password }
+  // Note: backend uses email as the "username" key in the DB query.
   @override
   Future<AuthTokenModel> login(String email, String password) async {
     final res = await _dio.post(
@@ -33,48 +34,49 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
     final json = res.data as Map<String, dynamic>;
     final token = AuthTokenModel.fromJson(json);
-    // Cache user identity so me() works offline (no /me endpoint in Go backend).
-    final user = json['user'] as Map<String, dynamic>? ?? {};
+    final user = (json['user'] as Map<String, dynamic>?) ?? {};
     await _tokenStore.saveUser(
-      username: (user['username'] ?? '') as String,
+      username: (user['username'] ?? email) as String,
       fullName: (user['fullName'] ?? '') as String,
       email: email,
     );
     return token;
   }
 
-  // Go backend: POST /api/auth/signup
-  // body:     { username, fullName, email, password }
-  // response: { token, user: { username, fullName } }
+  // POST /api/auth/signup
+  // Backend domain.SignupRequest: { fullName, email, password, confirmPassword }
+  // Note: backend has NO username field — it uses email as the internal username.
+  // We still accept username from the caller for caching but do not send it.
   @override
   Future<AuthTokenModel> register({
     required String username,
     required String fullName,
     required String email,
     required String password,
+    required String confirmPassword,
   }) async {
     final res = await _dio.post(
       UrlConstants.signupUrl,
       data: {
-        'username': username,
         'fullName': fullName,
         'email': email,
         'password': password,
+        'confirmPassword': confirmPassword, // required by backend validation
       },
     );
     final json = res.data as Map<String, dynamic>;
     final token = AuthTokenModel.fromJson(json);
-    final user = json['user'] as Map<String, dynamic>? ?? {};
+    final user = (json['user'] as Map<String, dynamic>?) ?? {};
+    // Backend returns email as username in AuthResponse.
     await _tokenStore.saveUser(
-      username: (user['username'] ?? username) as String,
+      username: (user['username'] ?? email) as String,
       fullName: (user['fullName'] ?? fullName) as String,
       email: email,
     );
     return token;
   }
 
-  // The Go backend has no /me endpoint. Restore the user from the data
-  // cached in TokenStore during the last successful login/signup.
+  // No /me endpoint in the Go backend — read from TokenStore cache set on login/signup.
   @override
   Future<AuthUserModel> me() async {
     final storedUsername = await _tokenStore.readUsername();
@@ -91,7 +93,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
   }
 
-  // Go backend has no logout endpoint — clearing the local token is sufficient.
+  // No logout endpoint — token is cleared locally in the repository.
   @override
   Future<void> logout() async {}
 }
