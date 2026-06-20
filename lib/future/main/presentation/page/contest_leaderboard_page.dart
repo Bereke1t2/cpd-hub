@@ -318,7 +318,7 @@ class ContestLeaderboardPage extends StatelessWidget {
       child: BasePage(
         title: 'Leaderboard',
         subtitle: contest.title,
-        selectedIndex: 2,
+        selectedIndex: 3,
         body: Column(
           children: [
             Padding(

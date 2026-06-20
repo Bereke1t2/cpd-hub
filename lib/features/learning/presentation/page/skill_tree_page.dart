@@ -24,7 +24,7 @@ class SkillTreePage extends StatelessWidget {
       child: BasePage(
         title: 'Learn',
         subtitle: 'Your CP curriculum',
-        selectedIndex: 1, // sits under the Problems tab for now
+        selectedIndex: 2,
         body: BlocBuilder<TopicsBloc, TopicsState>(
           builder: (context, state) => AsyncView<TopicsLoaded>(
             isLoading: state is TopicsLoading || state is TopicsInitial,

@@ -19,7 +19,7 @@ class ContestPage extends StatelessWidget {
       create: (_) => getIt<ContestsBloc>()..add(ContestsStarted()),
       child: BasePage(
         title: "Contests",
-        selectedIndex: 2,
+        selectedIndex: 3,
         subtitle: "Upcoming contests",
         body: Column(
           children: [

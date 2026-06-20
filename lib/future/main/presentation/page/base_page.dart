@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lab_portal/core/routing/route_names.dart';
 import '../../../../core/ui_constants.dart';
 
 class BasePage extends StatefulWidget {
@@ -137,7 +138,14 @@ class _BasePageState extends State<BasePage> {
             onTap: (index) {
               if (index == _selectedIndex) return; // guard: no-op on current tab
               setState(() => _selectedIndex = index);
-              const routes = ['/', '/problems', '/contests', '/users', '/profile'];
+              const routes = [
+                RouteNames.home,
+                RouteNames.problems,
+                RouteNames.learn,
+                RouteNames.contests,
+                RouteNames.users,
+                RouteNames.profile,
+              ];
               if (index < routes.length) {
                 Navigator.pushReplacementNamed(context, routes[index]);
               }
@@ -166,6 +174,18 @@ class _BasePageState extends State<BasePage> {
                   child: const Icon(Icons.code_outlined),
                 ),
                 label: 'Problems',
+              ),
+              BottomNavigationBarItem(
+                icon: const Icon(Icons.school_outlined),
+                activeIcon: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: UiConstants.primaryButtonColor.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(Icons.school_rounded),
+                ),
+                label: 'Learn',
               ),
               BottomNavigationBarItem(
                 icon: const Icon(Icons.emoji_events_outlined),
