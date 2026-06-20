@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lab_portal/features/learning/presentation/page/skill_tree_page.dart';
+import 'package:lab_portal/features/learning/presentation/page/tracks_page.dart';
 import 'package:lab_portal/future/main/presentation/page/home_page.dart';
 import 'package:lab_portal/future/main/presentation/page/problems_page.dart';
 import 'package:lab_portal/future/main/presentation/page/contest_page.dart';
@@ -37,6 +39,12 @@ class AppRouter {
       case RouteNames.contestLeaderboard:
         final contest = settings.arguments as ContestEntity;
         return _page(ContestLeaderboardPage(contest: contest), settings);
+
+      // ---- phase 9: learning ----
+      case RouteNames.learn:
+        return _page(const SkillTreePage(), settings);
+      case RouteNames.tracks:
+        return _page(const TracksPage(), settings);
 
       default:
         return _page(
