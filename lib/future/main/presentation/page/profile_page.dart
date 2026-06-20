@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/features/consistency/presentation/cubit/streak/streak_cubit.dart';
+import 'package:lab_portal/features/learning/domain/entity/topic_entity.dart';
+import 'package:lab_portal/features/learning/domain/service/learning_path_engine.dart';
+import 'package:lab_portal/features/learning/presentation/bloc/topics/topics_bloc.dart';
+import 'package:lab_portal/features/practice/domain/service/strength_analyzer.dart';
+import 'package:lab_portal/features/practice/domain/entity/solve_history.dart';
+import 'package:lab_portal/features/practice/presentation/widget/strength_category_bar.dart';
 import 'package:lab_portal/future/main/presentation/bloc/profile/profile_bloc.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import '../../../../core/ui_constants.dart';
@@ -108,6 +114,9 @@ class ProfilePage extends StatelessWidget {
           create: (_) => getIt<ProfileBloc>()..add(const ProfileStarted()),
         ),
         BlocProvider.value(value: getIt<StreakCubit>()..load()),
+        BlocProvider(
+          create: (_) => getIt<TopicsBloc>()..add(const TopicsStarted()),
+        ),
       ],
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) => _buildBody(context, state),
@@ -382,6 +391,31 @@ class ProfilePage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        // ── Strength by category (Phase 11) ──────────────────────────────
+        BlocBuilder<TopicsBloc, TopicsState>(
+          builder: (context, topicsState) {
+            if (topicsState is! TopicsLoaded) return const SizedBox.shrink();
+            final strengths = const StrengthAnalyzer().analyze(
+              topicsState.topics,
+              topicsState.progress,
+              SolveHistory.empty(),
+            );
+            if (strengths.isEmpty) return const SizedBox.shrink();
+            return Container(
+              padding: const EdgeInsets.all(14),
+              decoration: _card(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sectionHeader('Strengths'),
+                  const SizedBox(height: 12),
+                  StrengthCategoryBars(strengths: strengths),
+                ],
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(14),
           decoration: _card(),
