@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lab_portal/future/main/presentation/widget/problem_box.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_portal/core/widgets/async_view.dart';
+import 'package:lab_portal/future/main/domain/entity/daily_problem_entity.dart';
 import 'package:lab_portal/future/main/presentation/bloc/daily_problem/daily_problem_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
@@ -58,22 +60,13 @@ class HomePage extends StatelessWidget {
                     'Join the contest and test your skills against others!... to participate, click the button below. follow this 3 rules: 1. No plagiarism 2. No external help 3. Submit within the time limit',
               ),
               BlocBuilder<DailyProblemBloc, DailyProblemState>(
-                builder: (context, state) {
-                  if (state is DailyProblemLoading ||
-                      state is DailyProblemInitial) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (state is DailyProblemError) {
-                    return Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(state.message),
-                    );
-                  }
-                  final daily = (state as DailyProblemLoaded).daily;
-                  return TodaysProblemBox(
+                builder: (context, state) => AsyncView<DailyProblemEntity>(
+                  isLoading: state is DailyProblemLoading || state is DailyProblemInitial,
+                  error: state is DailyProblemError ? state.message : null,
+                  data: state is DailyProblemLoaded ? state.daily : null,
+                  onRetry: () => context.read<DailyProblemBloc>().add(DailyProblemStarted()),
+                  emptyMessage: 'No daily problem today',
+                  builder: (daily) => TodaysProblemBox(
                     problemTitle: daily.title,
                     solved: daily.numberOfSolvedPeople.toDouble(),
                     tags: daily.tags,
@@ -82,8 +75,8 @@ class HomePage extends StatelessWidget {
                     difficulty: daily.difficulty,
                     isLiked: daily.isLiked,
                     isDisliked: daily.isDisliked,
-                  );
-                },
+                  ),
+                ),
               ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -138,29 +131,20 @@ class HomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 12.0),
                     BlocBuilder<ProblemsBloc, ProblemsState>(
-                      builder: (context, state) {
-                        if (state is ProblemsLoading ||
-                            state is ProblemsInitial) {
-                          return const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        if (state is ProblemsError) {
-                          return Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Text(state.message),
-                          );
-                        }
-
-                        final problems =
-                            (state as ProblemsLoaded).problems.take(5).toList();
-
-                        return ListView.separated(
+                      builder: (context, state) => AsyncView<List>(
+                        isLoading: state is ProblemsLoading || state is ProblemsInitial,
+                        error: state is ProblemsError ? state.message : null,
+                        data: state is ProblemsLoaded
+                            ? state.problems.take(5).toList()
+                            : null,
+                        isEmpty: (d) => d.isEmpty,
+                        onRetry: () => context.read<ProblemsBloc>().add(ProblemsStarted()),
+                        emptyMessage: 'No problems yet',
+                        builder: (problems) => ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: problems.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 0),
+                          separatorBuilder: (_, __) => const SizedBox.shrink(),
                           itemBuilder: (context, index) {
                             final p = problems[index];
                             return ProblemBox(
@@ -168,8 +152,8 @@ class HomePage extends StatelessWidget {
                               difficulty: p.difficulty,
                             );
                           },
-                        );
-                      },
+                        ),
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {
