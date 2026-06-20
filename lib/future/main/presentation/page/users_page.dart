@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/core/routing/route_names.dart';
 import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/async_view.dart';
 import 'package:lab_portal/future/main/domain/entity/user_entity.dart';
 import 'package:lab_portal/future/main/presentation/bloc/users/users_bloc.dart';
 
@@ -93,63 +94,35 @@ class _UsersPageState extends State<UsersPage> {
               const SizedBox(height: 12),
               Expanded(
                 child: BlocBuilder<UsersBloc, UsersState>(
-                  builder: (context, state) {
-                    if (state is UsersLoading || state is UsersInitial) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (state is UsersError) {
-                      return Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.error_outline,
-                                size: 48,
-                                color: UiConstants.subtitleTextColor),
-                            const SizedBox(height: 12),
-                            Text(state.message,
-                                style: const TextStyle(
-                                    color: UiConstants.subtitleTextColor)),
-                            const SizedBox(height: 16),
-                            FilledButton.tonal(
-                              onPressed: () => context
-                                  .read<UsersBloc>()
-                                  .add(UsersStarted()),
-                              child: const Text('Retry'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    final users = _applyDivisionFilter(
-                        (state as UsersLoaded).users);
-
-                    if (users.isEmpty) {
-                      return const Center(
-                        child: Text('No users found',
-                            style: TextStyle(
-                                color: UiConstants.subtitleTextColor)),
-                      );
-                    }
-
-                    return LayoutBuilder(builder: (context, constraints) {
-                      final cross = constraints.maxWidth > 900
-                          ? 3
-                          : (constraints.maxWidth > 600 ? 2 : 1);
-                      return GridView.builder(
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: cross,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 3.6,
-                        ),
-                        itemCount: users.length,
-                        itemBuilder: (context, index) =>
-                            _userCard(context, users[index]),
-                      );
-                    });
-                  },
+                  builder: (context, state) => AsyncView<List<UserEntity>>(
+                    isLoading: state is UsersLoading || state is UsersInitial,
+                    error: state is UsersError ? state.message : null,
+                    data: state is UsersLoaded
+                        ? _applyDivisionFilter(state.users)
+                        : null,
+                    isEmpty: (d) => d.isEmpty,
+                    onRetry: () => context.read<UsersBloc>().add(UsersStarted()),
+                    emptyMessage: 'No users found',
+                    emptySubtitle: 'Try adjusting your search or division filter.',
+                    builder: (users) => LayoutBuilder(
+                      builder: (context, constraints) {
+                        final cross = constraints.maxWidth > 900
+                            ? 3
+                            : (constraints.maxWidth > 600 ? 2 : 1);
+                        return GridView.builder(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: cross,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 3.6,
+                          ),
+                          itemCount: users.length,
+                          itemBuilder: (context, index) =>
+                              _userCard(context, users[index]),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
