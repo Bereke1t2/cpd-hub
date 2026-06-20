@@ -7,9 +7,9 @@ import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.
 import 'package:lab_portal/features/auth/presentation/page/login_page.dart';
 import 'package:lab_portal/future/main/presentation/page/home_page.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  configureDependencies();
+  await configureDependencies();
   runApp(const MyApp());
 }
 

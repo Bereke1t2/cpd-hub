@@ -24,3 +24,11 @@ final class ProblemsError extends ProblemsState {
   final String message;
   const ProblemsError(this.message);
 }
+
+/// Transient state emitted after a failed write action (like/dislike/solve).
+/// The BLoC immediately re-emits ProblemsLoaded after this so the UI
+/// can listen for it to show a snackbar then continue displaying the list.
+final class ProblemsActionError extends ProblemsState {
+  final String message;
+  const ProblemsActionError(this.message);
+}

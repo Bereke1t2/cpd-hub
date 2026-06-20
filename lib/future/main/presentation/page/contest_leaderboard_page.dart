@@ -5,6 +5,10 @@ import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/future/main/domain/entity/contest_entity.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/contest_leaderboard_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/core/widgets/async_view.dart';
+import 'package:lab_portal/future/main/domain/entity/leaderboard_entry_entity.dart';
+import 'package:lab_portal/future/main/presentation/page/user_details_page.dart';
+import 'package:lab_portal/future/main/domain/entity/user_entity.dart';
 
 import 'base_page.dart';
 
@@ -314,7 +318,7 @@ class ContestLeaderboardPage extends StatelessWidget {
       child: BasePage(
         title: 'Leaderboard',
         subtitle: contest.title,
-        selectedIndex: 2,
+        selectedIndex: 3,
         body: Column(
           children: [
             Padding(
@@ -370,22 +374,17 @@ class ContestLeaderboardPage extends StatelessWidget {
             ),
             Expanded(
               child: BlocBuilder<ContestLeaderboardBloc, ContestLeaderboardState>(
-                builder: (context, state) {
-                  if (state is ContestLeaderboardLoading || state is ContestLeaderboardInitial) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (state is ContestLeaderboardError) {
-                    return Center(child: Padding(padding: const EdgeInsets.all(16), child: Text(state.message)));
-                  }
-
-                  final entries = (state as ContestLeaderboardLoaded).entries;
-                  if (entries.isEmpty) {
-                    return const Center(
-                      child: Padding(padding: EdgeInsets.all(16), child: Text('No users found for this contest leaderboard yet.', textAlign: TextAlign.center)),
-                    );
-                  }
-
-                  return LayoutBuilder(builder: (context, constraints) {
+                builder: (context, state) => AsyncView<List<LeaderboardEntryEntity>>(
+                  isLoading: state is ContestLeaderboardLoading || state is ContestLeaderboardInitial,
+                  error: state is ContestLeaderboardError ? state.message : null,
+                  data: state is ContestLeaderboardLoaded ? state.entries : null,
+                  isEmpty: (d) => d.isEmpty,
+                  onRetry: () => context
+                      .read<ContestLeaderboardBloc>()
+                      .add(ContestLeaderboardStarted(contest.contestUrl)),
+                  emptyMessage: 'No results yet',
+                  emptySubtitle: 'The leaderboard will appear once the contest ends.',
+                  builder: (entries) => LayoutBuilder(builder: (context, constraints) {
                     final w = constraints.maxWidth;
                     final isCompact = w < 520;
 
@@ -464,9 +463,9 @@ class ContestLeaderboardPage extends StatelessWidget {
                         ],
                       ),
                     );
-                  });
-                },
-              ),
+                  }),  // LayoutBuilder
+                ),     // AsyncView builder
+              ),       // BlocBuilder
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_portal/core/widgets/async_view.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import 'package:lab_portal/future/main/presentation/page/problem_details_page.dart';
 import 'package:lab_portal/future/main/presentation/widget/search.dart';
@@ -23,7 +24,17 @@ class _ProblemsPageState extends State<ProblemsPage> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<ProblemsBloc>()..add(ProblemsStarted()),
-      child: BasePage(
+      child: BlocListener<ProblemsBloc, ProblemsState>(
+        listener: (context, state) {
+          if (state is ProblemsActionError) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+            ));
+          }
+        },
+        child: BasePage(
         selectedIndex: 1,
         title: 'Problems',
         subtitle: 'Explore and solve coding challenges',
@@ -77,45 +88,56 @@ class _ProblemsPageState extends State<ProblemsPage> {
                       // Problems list / grid
                       Expanded(
                         child: BlocBuilder<ProblemsBloc, ProblemsState>(
-                          builder: (context, state) {
-                            if (state is ProblemsLoading || state is ProblemsInitial) {
-                              return const Center(child: CircularProgressIndicator());
-                            }
+                          builder: (context, state) => AsyncView<List<ProblemEntity>>(
+                            isLoading: state is ProblemsLoading || state is ProblemsInitial,
+                            error: state is ProblemsError ? state.message : null,
+                            data: state is ProblemsLoaded ? state.problems : null,
+                            onRetry: () => context.read<ProblemsBloc>().add(ProblemsStarted()),
+                            emptyMessage: 'No problems yet',
+                            builder: (problems) {
+                              final filtered = _applyFilters(problems);
 
-                            if (state is ProblemsError) {
-                              return Center(child: Text(state.message));
-                            }
+                              if (filtered.isEmpty) {
+                                return Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.search_off, size: 64, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
+                                      const SizedBox(height: 12),
+                                      const Text('No problems found', style: TextStyle(fontSize: 16)),
+                                      const SizedBox(height: 6),
+                                      const Text('Try changing your search or filters.', style: TextStyle(color: Color(0xFF9E9E9E))),
+                                    ],
+                                  ),
+                                );
+                              }
 
-                            final problems = (state as ProblemsLoaded).problems;
+                              if (isWide) {
+                                // grid for wide screens
+                                return GridView.builder(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 12,
+                                    crossAxisSpacing: 12,
+                                    childAspectRatio: 3.2,
+                                  ),
+                                  itemCount: filtered.length,
+                                  itemBuilder: (context, index) {
+                                    final p = filtered[index];
+                                    return ProblemCard(
+                                      problem: p,
+                                      onTap: () => _openDetails(context, p),
+                                    );
+                                  },
+                                );
+                              }
 
-                            final filtered = _applyFilters(problems);
-
-                            if (filtered.isEmpty) {
-                              return Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.search_off, size: 64, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
-                                    const SizedBox(height: 12),
-                                    const Text('No problems found', style: TextStyle(fontSize: 16)),
-                                    const SizedBox(height: 6),
-                                    const Text('Try changing your search or filters.', style: TextStyle(color: Color(0xFF9E9E9E))),
-                                  ],
-                                ),
-                              );
-                            }
-
-                            if (isWide) {
-                              // beautiful masonry-like grid for wide screens
-                              return GridView.builder(
+                              // Narrow: single column list
+                              return ListView.separated(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 12,
-                                  crossAxisSpacing: 12,
-                                  childAspectRatio: 3.2,
-                                ),
                                 itemCount: filtered.length,
+                                separatorBuilder: (_, __) => const SizedBox(height: 8),
                                 itemBuilder: (context, index) {
                                   final p = filtered[index];
                                   return ProblemCard(
@@ -124,22 +146,8 @@ class _ProblemsPageState extends State<ProblemsPage> {
                                   );
                                 },
                               );
-                            }
-
-                            // Narrow: single column list
-                            return ListView.separated(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              itemCount: filtered.length,
-                              separatorBuilder: (_, __) => const SizedBox(height: 8),
-                              itemBuilder: (context, index) {
-                                final p = filtered[index];
-                                return ProblemCard(
-                                  problem: p,
-                                  onTap: () => _openDetails(context, p),
-                                );
-                              },
-                            );
-                          },
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -148,9 +156,10 @@ class _ProblemsPageState extends State<ProblemsPage> {
               ),
             );
           },
-        ),
-      ),
-    );
+        ),      // LayoutBuilder
+      ),        // BasePage
+      ),        // BlocListener
+    );          // BlocProvider
   }
 
   List<ProblemEntity> _applyFilters(List<ProblemEntity> problems) {

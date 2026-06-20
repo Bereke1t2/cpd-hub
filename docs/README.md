@@ -72,6 +72,7 @@ New rules we add:
 | Phase | File | Goal | Depends on |
 |-------|------|------|-----------|
 | 0 | [`00-conventions-and-design-system.md`](./00-conventions-and-design-system.md) | Tokens, naming, the `Either`-on-Left gotcha, DI/router conventions | — |
+| 0b | [`01-ui-design-language.md`](./01-ui-design-language.md) | How to compose tokens into a consistent modern look + per-screen specs for phases 9–11 | 0 |
 | 1 | [`phases/phase-1-foundation.md`](./phases/phase-1-foundation.md) | Cleanup, design-system tokens, `get_it`, central router, fix `info_entitity` typo, remove dead `MainBloc` | 0 |
 | 2 | [`phases/phase-2-networking.md`](./phases/phase-2-networking.md) | Dio client, env config, exceptions, real `RemoteDataSource` (read endpoints) | 1 |
 | 3 | [`phases/phase-3-auth.md`](./phases/phase-3-auth.md) | Auth feature: login/register, secure token storage, auth gate, session BLoC | 1, 2 |
@@ -80,6 +81,20 @@ New rules we add:
 | 6 | [`phases/phase-6-ui-ux.md`](./phases/phase-6-ui-ux.md) | Async-state widget, retry/empty states, `UserDetailsPage`, theme toggle, a11y, search-clear fix | 1, 4 |
 | 7 | [`phases/phase-7-new-features.md`](./phases/phase-7-new-features.md) | Notifications, settings, attendance, submission flow, deep-linkable details | 5, 6 |
 | 8 | [`phases/phase-8-testing-release.md`](./phases/phase-8-testing-release.md) | Unit/bloc/widget tests, CI, flavors, release checklist | all |
+
+### CP-specific learning track (phases 9–11)
+
+These extend the app from a problem browser into a learning platform tailored to competitive programmers.
+They build on the production foundation above and can be sequenced after Phase 6.
+
+| Phase | File | Goal | Depends on |
+|-------|------|------|-----------|
+| 9 | [`phases/phase-9-structured-learning.md`](./phases/phase-9-structured-learning.md) | Topic dependency graph (DAG), skill tree, "what to learn next/before", topic mini-courses + Tracks | 4, 6 |
+| 10 | [`phases/phase-10-consistency-engine.md`](./phases/phase-10-consistency-engine.md) | First-class streaks, weekly goals, rating-ordered ladders, consistency leaderboard, reminders | 9, 5, 7.B |
+| 11 | [`phases/phase-11-smart-practice.md`](./phases/phase-11-smart-practice.md) | Per-topic strength analysis, next-problem recommender, spaced-repetition review, upsolving tracker | 9, 10, 5 |
+
+Build **9 before 10 before 11** — the topic graph is the backbone ladders, goals, and recommendations all
+reference. Each ships mock-first behind the existing data-source interface, like every prior phase.
 
 Phases 5 and 6 can run in parallel once 4 is merged. Phase 3 can start as soon as the Dio client (Phase 2) exists.
 
