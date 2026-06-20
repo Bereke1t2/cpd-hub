@@ -41,6 +41,17 @@ import 'package:lab_portal/future/main/presentation/bloc/daily_problem/daily_pro
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/users/users_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/contest_leaderboard_bloc.dart';
+// ---- phase 9: learning ----
+import 'package:lab_portal/features/learning/data/datasources/learning_data_source.dart';
+import 'package:lab_portal/features/learning/data/datasources/mock/mock_learning_data_source.dart';
+import 'package:lab_portal/features/learning/data/repository/learning_repository_impl.dart';
+import 'package:lab_portal/features/learning/domain/repository/learning_repository.dart';
+import 'package:lab_portal/features/learning/domain/service/learning_path_engine.dart';
+import 'package:lab_portal/features/learning/domain/usecase/get_lesson.dart';
+import 'package:lab_portal/features/learning/domain/usecase/get_topics.dart';
+import 'package:lab_portal/features/learning/domain/usecase/get_tracks.dart';
+import 'package:lab_portal/features/learning/presentation/bloc/topics/topics_bloc.dart';
+import 'package:lab_portal/features/learning/presentation/bloc/tracks/tracks_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -160,4 +171,23 @@ Future<void> configureDependencies() async {
   getIt.registerFactory(
     () => ProfileBloc(getProfile: getIt<GetProfile>()),
   );
+
+  // ---- phase 9: learning ----
+  getIt.registerLazySingleton<LearningDataSource>(
+    () => MockLearningDataSource(),
+  );
+  getIt.registerLazySingleton<LearningRepository>(
+    () => LearningRepositoryImpl(getIt<LearningDataSource>()),
+  );
+  getIt.registerLazySingleton<LearningPathEngine>(
+    () => const LearningPathEngine(),
+  );
+  getIt.registerFactory(() => GetTopics(getIt<LearningRepository>()));
+  getIt.registerFactory(() => GetTracks(getIt<LearningRepository>()));
+  getIt.registerFactory(() => GetLesson(getIt<LearningRepository>()));
+  getIt.registerFactory(() => TopicsBloc(
+        getTopics: getIt<GetTopics>(),
+        engine: getIt<LearningPathEngine>(),
+      ));
+  getIt.registerFactory(() => TracksBloc(getTracks: getIt<GetTracks>()));
 }
