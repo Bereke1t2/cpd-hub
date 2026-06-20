@@ -12,6 +12,12 @@ and blocks nothing already working.
 > This is the structural backbone for Phases 10 (ladders/streaks reference topics) and 11 (recommendations
 > and strength analysis are per-topic). Build it first.
 
+> **Before building any screen, read [`../01-ui-design-language.md`](../01-ui-design-language.md)** (§6 has
+> the skill-tree / topic-detail / tracks specs) and compose with these templates:
+> - [`templates/ui_kit.dart`](../templates/ui_kit.dart) — shared modern widgets (copy to `core/widgets/`).
+> - [`templates/learning_path_engine.dart`](../templates/learning_path_engine.dart) — the §9.4 engine, ready to paste.
+> - [`templates/skill_tree_widgets.dart`](../templates/skill_tree_widgets.dart) — `TopicNode`, `UpNextStrip`, `TopicStatusStyle` for §9.6.
+
 ---
 
 ## Checklist

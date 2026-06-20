@@ -13,6 +13,14 @@ Phase 6 (`AsyncView`).
 > Pairs with Phase 9: structure tells you *what* to solve, consistency makes you *keep* solving. A ladder
 > is the join of the two — an ordered queue you climb one problem a day.
 
+> **Read [`../01-ui-design-language.md`](../01-ui-design-language.md) §6** (consistency hub / ladder /
+> leaderboard specs) and build with these templates:
+> - [`templates/ui_kit.dart`](../templates/ui_kit.dart) — shared modern widgets.
+> - [`templates/streak_engine.dart`](../templates/streak_engine.dart) — the §10.3 pure engine (assumes
+>   `StreakEntity.copyWith`; add it per the §10.2 sketch).
+> - [`templates/consistency_widgets.dart`](../templates/consistency_widgets.dart) — `StreakRing`, `GoalBar`,
+>   `LadderRungTile` for §10.6 and §10.9.
+
 ---
 
 ## Checklist

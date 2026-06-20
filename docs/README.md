@@ -72,6 +72,7 @@ New rules we add:
 | Phase | File | Goal | Depends on |
 |-------|------|------|-----------|
 | 0 | [`00-conventions-and-design-system.md`](./00-conventions-and-design-system.md) | Tokens, naming, the `Either`-on-Left gotcha, DI/router conventions | — |
+| 0b | [`01-ui-design-language.md`](./01-ui-design-language.md) | How to compose tokens into a consistent modern look + per-screen specs for phases 9–11 | 0 |
 | 1 | [`phases/phase-1-foundation.md`](./phases/phase-1-foundation.md) | Cleanup, design-system tokens, `get_it`, central router, fix `info_entitity` typo, remove dead `MainBloc` | 0 |
 | 2 | [`phases/phase-2-networking.md`](./phases/phase-2-networking.md) | Dio client, env config, exceptions, real `RemoteDataSource` (read endpoints) | 1 |
 | 3 | [`phases/phase-3-auth.md`](./phases/phase-3-auth.md) | Auth feature: login/register, secure token storage, auth gate, session BLoC | 1, 2 |
