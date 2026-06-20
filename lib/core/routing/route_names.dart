@@ -16,4 +16,11 @@ class RouteNames {
   static const String problemDetails = '/problem';
   static const String userDetails = '/user';
   static const String contestLeaderboard = '/contest-leaderboard';
+
+  // ---- phase 9: learning ----
+  static const String learn = '/learn';
+  static const String tracks = '/tracks';
+
+  // ---- phase 10: consistency ----
+  static const String consistency = '/consistency';
 }
