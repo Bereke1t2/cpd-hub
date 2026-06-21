@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_portal/core/theme/app_colors.dart';
+import 'package:lab_portal/core/theme/app_dimens.dart';
+import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/app_card.dart';
+import 'package:lab_portal/core/widgets/app_chip.dart';
+import 'package:lab_portal/core/widgets/app_text.dart';
 import 'package:lab_portal/core/widgets/async_view.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 import 'package:lab_portal/future/main/presentation/page/problem_details_page.dart';
@@ -7,7 +13,6 @@ import 'package:lab_portal/future/main/presentation/widget/search.dart';
 import 'package:lab_portal/future/main/presentation/bloc/problems/problems_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/future/main/domain/entity/problem_entity.dart';
-import 'package:lab_portal/core/ui_constants.dart';
 
 class ProblemsPage extends StatefulWidget {
   const ProblemsPage({super.key});
@@ -35,143 +40,138 @@ class _ProblemsPageState extends State<ProblemsPage> {
           }
         },
         child: BasePage(
-        selectedIndex: 1,
-        title: 'Problems',
-        subtitle: 'Explore and solve coding challenges',
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            final maxWidth = constraints.maxWidth;
-            final isWide = maxWidth >= 900;
-            final contentWidth = isWide ? 960.0 : maxWidth;
-
-            return Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: contentWidth),
-                // ensure Column has a bounded height so Expanded works correctly
-                child: SizedBox(
-                  height: constraints.maxHeight,
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 8),
-                      // Search + filters bar
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 3,
-                              child: SearchBox(
-                                hintText: 'Search problems by title, tag or id...',
-                                onChanged: (value) => context
-                                    .read<ProblemsBloc>()
-                                    .add(ProblemsSearchChanged(value)),
-                              ),
+          selectedIndex: 1,
+          title: 'Problems',
+          subtitle: 'Explore and solve coding challenges',
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth >= 900;
+              return SizedBox(
+                height: constraints.maxHeight,
+                child: Column(
+                  children: [
+                    const SizedBox(height: AppDimens.sm),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.sm),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: SearchBox(
+                              hintText: 'Search problems…',
+                              onChanged: (v) => context
+                                  .read<ProblemsBloc>()
+                                  .add(ProblemsSearchChanged(v)),
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              flex: 2,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  _difficultyFilter(),
-                                  const SizedBox(width: 8),
-                                  _sortMenu(),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Problems list / grid
-                      Expanded(
-                        child: BlocBuilder<ProblemsBloc, ProblemsState>(
-                          builder: (context, state) => AsyncView<List<ProblemEntity>>(
-                            isLoading: state is ProblemsLoading || state is ProblemsInitial,
-                            error: state is ProblemsError ? state.message : null,
-                            data: state is ProblemsLoaded ? state.problems : null,
-                            onRetry: () => context.read<ProblemsBloc>().add(ProblemsStarted()),
-                            emptyMessage: 'No problems yet',
-                            builder: (problems) {
-                              final filtered = _applyFilters(problems);
-
-                              if (filtered.isEmpty) {
-                                return Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.search_off, size: 64, color: UiConstants.subtitleTextColor.withOpacity(0.6)),
-                                      const SizedBox(height: 12),
-                                      const Text('No problems found', style: TextStyle(fontSize: 16)),
-                                      const SizedBox(height: 6),
-                                      const Text('Try changing your search or filters.', style: TextStyle(color: Color(0xFF9E9E9E))),
-                                    ],
-                                  ),
-                                );
-                              }
-
-                              if (isWide) {
-                                // grid for wide screens
-                                return GridView.builder(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    mainAxisSpacing: 12,
-                                    crossAxisSpacing: 12,
-                                    childAspectRatio: 3.2,
-                                  ),
-                                  itemCount: filtered.length,
-                                  itemBuilder: (context, index) {
-                                    final p = filtered[index];
-                                    return ProblemCard(
-                                      problem: p,
-                                      onTap: () => _openDetails(context, p),
-                                    );
-                                  },
-                                );
-                              }
-
-                              // Narrow: single column list
-                              return ListView.separated(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                itemCount: filtered.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: 8),
-                                itemBuilder: (context, index) {
-                                  final p = filtered[index];
-                                  return ProblemCard(
-                                    problem: p,
-                                    onTap: () => _openDetails(context, p),
-                                  );
-                                },
-                              );
-                            },
                           ),
+                          const SizedBox(width: AppDimens.sm),
+                          _difficultyFilter(),
+                          const SizedBox(width: AppDimens.sm),
+                          _sortMenu(),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppDimens.md),
+                    Expanded(
+                      child: BlocBuilder<ProblemsBloc, ProblemsState>(
+                        builder: (context, state) =>
+                            AsyncView<List<ProblemEntity>>(
+                          isLoading: state is ProblemsLoading ||
+                              state is ProblemsInitial,
+                          error: state is ProblemsError
+                              ? state.message
+                              : null,
+                          data: state is ProblemsLoaded
+                              ? state.problems
+                              : null,
+                          onRetry: () => context
+                              .read<ProblemsBloc>()
+                              .add(ProblemsStarted()),
+                          emptyMessage: 'No problems yet',
+                          builder: (problems) {
+                            final filtered = _applyFilters(problems);
+                            if (filtered.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.search_off,
+                                        size: 56,
+                                        color: UiConstants.subtitleTextColor
+                                            .withValues(alpha: 0.6)),
+                                    const SizedBox(height: AppDimens.md),
+                                    AppText.title('No problems found'),
+                                    const SizedBox(height: AppDimens.xs),
+                                    AppText.caption(
+                                        'Try changing your search or filters.'),
+                                  ],
+                                ),
+                              );
+                            }
+                            if (isWide) {
+                              return GridView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: AppDimens.md,
+                                    vertical: AppDimens.sm),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: AppDimens.md,
+                                  crossAxisSpacing: AppDimens.md,
+                                  childAspectRatio: 3.2,
+                                ),
+                                itemCount: filtered.length,
+                                itemBuilder: (context, index) =>
+                                    RepaintBoundary(
+                                  child: ProblemCard(
+                                    problem: filtered[index],
+                                    onTap: () => _openDetails(
+                                        context, filtered[index]),
+                                  ),
+                                ),
+                              );
+                            }
+                            return ListView.separated(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: AppDimens.md,
+                                  vertical: AppDimens.sm),
+                              itemCount: filtered.length,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: AppDimens.sm),
+                              itemBuilder: (context, index) =>
+                                  RepaintBoundary(
+                                child: ProblemCard(
+                                  problem: filtered[index],
+                                  onTap: () =>
+                                      _openDetails(context, filtered[index]),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
-            );
-          },
-        ),      // LayoutBuilder
-      ),        // BasePage
-      ),        // BlocListener
-    );          // BlocProvider
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 
   List<ProblemEntity> _applyFilters(List<ProblemEntity> problems) {
     var list = List<ProblemEntity>.from(problems);
     if (_filterDifficulty != 'All') {
-      list = list.where((p) => p.difficulty.toLowerCase() == _filterDifficulty.toLowerCase()).toList();
+      list = list
+          .where((p) =>
+              p.difficulty.toLowerCase() == _filterDifficulty.toLowerCase())
+          .toList();
     }
-    // simple sort
-    if (_sortBy == 'Newest') {
-      // assume problems come newest-first already
-    } else if (_sortBy == 'Popular') {
-      list.sort((a, b) => (b.numberOfLikes).compareTo(a.numberOfLikes));
+    if (_sortBy == 'Popular') {
+      list.sort((a, b) => b.numberOfLikes.compareTo(a.numberOfLikes));
     }
     return list;
   }
@@ -179,25 +179,26 @@ class _ProblemsPageState extends State<ProblemsPage> {
   void _openDetails(BuildContext context, ProblemEntity p) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ProblemDetailsPage(problem: p),
-      ),
+      MaterialPageRoute(builder: (_) => ProblemDetailsPage(problem: p)),
     );
   }
 
   Widget _difficultyFilter() {
-    final options = ['All', 'Easy', 'Medium', 'Hard'];
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.sm, vertical: AppDimens.xs),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.06)),
+        borderRadius: AppDimens.brMd,
+        border: Border.all(
+            color: UiConstants.primaryButtonColor.withValues(alpha: 0.08)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _filterDifficulty,
-          items: options.map((o) => DropdownMenuItem(value: o, child: Text(o))).toList(),
+          items: ['All', 'Easy', 'Medium', 'Hard']
+              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+              .toList(),
           onChanged: (v) => setState(() => _filterDifficulty = v ?? 'All'),
           iconEnabledColor: UiConstants.primaryButtonColor,
         ),
@@ -206,18 +207,21 @@ class _ProblemsPageState extends State<ProblemsPage> {
   }
 
   Widget _sortMenu() {
-    final options = ['Newest', 'Popular'];
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppDimens.sm, vertical: AppDimens.xs),
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.06)),
+        borderRadius: AppDimens.brMd,
+        border: Border.all(
+            color: UiConstants.primaryButtonColor.withValues(alpha: 0.08)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _sortBy,
-          items: options.map((o) => DropdownMenuItem(value: o, child: Text(o))).toList(),
+          items: ['Newest', 'Popular']
+              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+              .toList(),
           onChanged: (v) => setState(() => _sortBy = v ?? 'Newest'),
           iconEnabledColor: UiConstants.primaryButtonColor,
         ),
@@ -226,64 +230,42 @@ class _ProblemsPageState extends State<ProblemsPage> {
   }
 }
 
-// Small, self-contained card used by the ProblemsPage to render each problem
 class ProblemCard extends StatelessWidget {
   final ProblemEntity problem;
   final VoidCallback? onTap;
 
   const ProblemCard({super.key, required this.problem, this.onTap});
 
-  Color _difficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':
-        return const Color(0xFF43A047);
-      case 'medium':
-        return const Color(0xFFFFA726);
-      case 'hard':
-        return const Color(0xFFE53935);
-      default:
-        return UiConstants.subtitleTextColor;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final diffColor = _difficultyColor(problem.difficulty);
+    final diffColor = AppColors.difficulty(problem.difficulty);
+    final diffBg = AppColors.difficultyBg(problem.difficulty);
 
-    final card = Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: UiConstants.infoBackgroundColor,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.04)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+    return AppCard(
+      onTap: onTap,
       child: Row(
         children: [
-          // difficulty badge
+          // Difficulty badge
           Container(
-            width: 56,
-            height: 56,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: diffColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: diffColor.withOpacity(0.18)),
+              color: diffBg,
+              borderRadius: AppDimens.brSm,
+              border: Border.all(color: diffColor.withValues(alpha: 0.30)),
             ),
             child: Center(
               child: Text(
                 problem.difficulty[0].toUpperCase(),
-                style: TextStyle(color: diffColor, fontSize: 20, fontWeight: FontWeight.w900),
+                style: TextStyle(
+                    color: diffColor,
+                    fontSize: AppDimens.fH1,
+                    fontWeight: FontWeight.w900),
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          // main content
+          const SizedBox(width: AppDimens.md),
+          // Main content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,87 +273,71 @@ class ProblemCard extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        problem.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: UiConstants.mainTextColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
+                      child: AppText.title(problem.title,
+                          maxLines: 2, overflow: TextOverflow.ellipsis),
                     ),
-                    const SizedBox(width: 8),
-                    Icon(Icons.star_border, size: 18, color: UiConstants.subtitleTextColor),
+                    const SizedBox(width: AppDimens.sm),
+                    Icon(Icons.star_border,
+                        size: AppDimens.iconSm,
+                        color: UiConstants.subtitleTextColor),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: problem.tags.take(4).map((t) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: UiConstants.primaryButtonColor.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(t, style: const TextStyle(color: UiConstants.primaryButtonColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 10),
+                const SizedBox(height: AppDimens.sm),
+                if (problem.tags.isNotEmpty)
+                  Wrap(
+                    spacing: AppDimens.xs,
+                    runSpacing: AppDimens.xs,
+                    children: problem.tags.take(4).map((t) {
+                      return AppChip(t,
+                          color: UiConstants.primaryButtonColor,
+                          backgroundColor: UiConstants.primaryButtonColor
+                              .withValues(alpha: 0.08));
+                    }).toList(),
+                  ),
+                const SizedBox(height: AppDimens.sm),
                 Row(
                   children: [
-                    Icon(Icons.people_outline, size: 14, color: UiConstants.subtitleTextColor),
-                    const SizedBox(width: 6),
-                    Text('${problem.numberOfSolvedPeople} solved', style: const TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12)),
-                    const SizedBox(width: 12),
-                    Icon(Icons.thumb_up_outlined, size: 14, color: UiConstants.subtitleTextColor),
-                    const SizedBox(width: 6),
-                    Text('${problem.numberOfLikes}', style: const TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12)),
-                    const SizedBox(width: 12),
-                    Icon(Icons.access_time, size: 14, color: UiConstants.subtitleTextColor),
-                    const SizedBox(width: 6),
-                    Text('~10m', style: const TextStyle(color: UiConstants.subtitleTextColor, fontSize: 12)),
+                    Icon(Icons.people_outline,
+                        size: 13, color: UiConstants.subtitleTextColor),
+                    const SizedBox(width: AppDimens.xs),
+                    Flexible(
+                      child: AppText.caption(
+                          '${problem.numberOfSolvedPeople} solved'),
+                    ),
+                    const SizedBox(width: AppDimens.md),
+                    Icon(Icons.thumb_up_outlined,
+                        size: 13, color: UiConstants.subtitleTextColor),
+                    const SizedBox(width: AppDimens.xs),
+                    AppText.caption('${problem.numberOfLikes}'),
                   ],
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          // action column
+          const SizedBox(width: AppDimens.sm),
+          // Action
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               GestureDetector(
                 onTap: onTap,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimens.md, vertical: AppDimens.sm),
                   decoration: BoxDecoration(
                     color: UiConstants.primaryButtonColor,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: AppDimens.brSm,
                   ),
-                  child: const Icon(Icons.play_arrow, color: Colors.white),
+                  child:
+                      const Icon(Icons.play_arrow, color: Colors.white, size: AppDimens.iconMd),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                problem.difficulty,
-                style: TextStyle(color: diffColor, fontWeight: FontWeight.w800),
-              ),
+              const SizedBox(height: AppDimens.xs),
+              AppChip(problem.difficulty, color: diffColor, backgroundColor: diffBg),
             ],
-          )
+          ),
         ],
       ),
-    );
-
-    if (onTap == null) return card;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: card,
     );
   }
 }
