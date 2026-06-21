@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for streaming lesson videos (release builds). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="lab_portal"
         android:name="${applicationName}"

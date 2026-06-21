@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-
-import '../../../../core/ui_constants.dart';
+import 'package:lab_portal/core/theme/app_dimens.dart';
+import 'package:lab_portal/core/ui_constants.dart';
 
 class BarBox extends StatelessWidget {
   final String text;
   final bool isSelected;
   final VoidCallback? onTap;
+
   const BarBox({
     super.key,
     required this.text,
@@ -17,23 +18,25 @@ class BarBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(999),
+      borderRadius: const BorderRadius.all(Radius.circular(AppDimens.rPill)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.lg, vertical: AppDimens.sm),
         decoration: BoxDecoration(
           color: isSelected
-              ? UiConstants.primaryButtonColor.withOpacity(0.92)
+              ? UiConstants.primaryButtonColor.withValues(alpha: 0.92)
               : UiConstants.infoBackgroundColor,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius:
+              const BorderRadius.all(Radius.circular(AppDimens.rPill)),
           border: Border.all(
             color: isSelected
-                ? UiConstants.primaryButtonColor.withOpacity(0.55)
-                : UiConstants.primaryButtonColor.withOpacity(0.18),
+                ? UiConstants.primaryButtonColor.withValues(alpha: 0.55)
+                : UiConstants.primaryButtonColor.withValues(alpha: 0.18),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.10),
+              color: Colors.black.withValues(alpha: 0.10),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -42,11 +45,9 @@ class BarBox extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppDimens.fBody,
             fontWeight: FontWeight.w700,
-            color: isSelected
-                ? Colors.white.withValues(alpha: 0.92)
-                : Colors.white.withValues(alpha: 0.82),
+            color: Colors.white.withValues(alpha: isSelected ? 0.92 : 0.82),
           ),
         ),
       ),

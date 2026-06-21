@@ -26,7 +26,7 @@ class ContestsBloc extends Bloc<ContestsEvent, ContestsState> {
     result.fold(
       (contests) {
         _all = contests;
-        emit(ContestsLoaded(contests: contests));
+        emit(ContestsLoaded(all: contests));
       },
       (failure) => emit(ContestsError(failure.message)),
     );
@@ -36,7 +36,10 @@ class ContestsBloc extends Bloc<ContestsEvent, ContestsState> {
     ContestsFilterChanged event,
     Emitter<ContestsState> emit,
   ) {
-    // With real API, filter could be server-driven. For now, keep it local.
-    emit(ContestsLoaded(contests: _all, filter: event.filter));
+    final current = state is ContestsLoaded
+        ? (state as ContestsLoaded).platform
+        : 'All';
+    if (current == event.filter) return;
+    emit(ContestsLoaded(all: _all, platform: event.filter));
   }
 }

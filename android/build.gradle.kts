@@ -13,20 +13,27 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 
-// Force all plugin subprojects to compile with Java 11 so the
-// "source value 8 is obsolete" javac warnings disappear.
+// Align Java + Kotlin JVM targets to 17 across all plugin subprojects.
 subprojects {
     afterEvaluate {
         plugins.withId("com.android.library") {
             extensions.configure<com.android.build.gradle.LibraryExtension> {
                 compileOptions {
-                    sourceCompatibility = JavaVersion.VERSION_11
-                    targetCompatibility = JavaVersion.VERSION_11
+                    sourceCompatibility = JavaVersion.VERSION_17
+                    targetCompatibility = JavaVersion.VERSION_17
+                }
+            }
+        }
+        plugins.withId("org.jetbrains.kotlin.android") {
+            extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
                 }
             }
         }
     }
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
