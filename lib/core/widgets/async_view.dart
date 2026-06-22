@@ -99,7 +99,7 @@ class _Placeholder extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: iconColor.withOpacity(0.7)),
+            Icon(icon, size: 56, color: iconColor.withValues(alpha: 0.7)),
             const SizedBox(height: 16),
             Text(
               title,
@@ -127,7 +127,7 @@ class _Placeholder extends StatelessWidget {
                 onPressed: onAction,
                 style: FilledButton.styleFrom(
                   backgroundColor:
-                      UiConstants.primaryButtonColor.withOpacity(0.15),
+                      UiConstants.primaryButtonColor.withValues(alpha: 0.15),
                   foregroundColor: UiConstants.primaryButtonColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

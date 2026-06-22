@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-
 import 'package:lab_portal/core/error/exceptions.dart';
+import 'package:lab_portal/core/storage/token_store.dart';
 import 'package:lab_portal/core/url_constants.dart';
 import '../../model/contest_model.dart';
 import '../../model/daily_problem_model.dart';
@@ -13,11 +13,11 @@ abstract class RemoteDataSource {
   Future<UserModel> getUserInfo();
   Future<DailyProblemModel> getDailyProblems();
   Future<List<ProblemModel>> getProblems();
-  Future<InfoModel> getInfo();
+  Future<List<InfoModel>> getInfoList();
   Future<List<ContestModel>> getContests();
   Future<UserModel> getProfile();
   Future<List<UserModel>> getUsers();
-  Future<List<LeaderboardEntryModel>> getContestLeaderboard(String contestUrl);
+  Future<List<LeaderboardEntryModel>> getContestLeaderboard(String contestId);
   Future<void> likeProblem(String problemId);
   Future<void> dislikeProblem(String problemId);
   Future<void> markProblemAsSolved(String problemId);
@@ -26,26 +26,18 @@ abstract class RemoteDataSource {
 
 class RemoteDataSourceImpl implements RemoteDataSource {
   final Dio _dio;
-  RemoteDataSourceImpl(this._dio);
+  final TokenStore _tokenStore;
 
-  // ---- helpers ----
+  RemoteDataSourceImpl(this._dio, this._tokenStore);
+
+  // ── helpers ───────────────────────────────────────────────────────────────
 
   List<T> _parseList<T>(
     dynamic data,
     T Function(Map<String, dynamic>) fromJson,
   ) {
     if (data is List) {
-      return data
-          .whereType<Map<String, dynamic>>()
-          .map(fromJson)
-          .toList();
-    }
-    // Django paginated response: { "results": [...] }
-    if (data is Map<String, dynamic> && data['results'] is List) {
-      return (data['results'] as List)
-          .whereType<Map<String, dynamic>>()
-          .map(fromJson)
-          .toList();
+      return data.whereType<Map<String, dynamic>>().map(fromJson).toList();
     }
     return [];
   }
@@ -55,17 +47,21 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     throw const ServerException('Unexpected response format');
   }
 
-  // ---- user ----
+  // ── user / profile ────────────────────────────────────────────────────────
 
   @override
   Future<UserModel> getUserInfo() async {
-    final res = await _dio.get(UrlConstants.getUserInfoUrl);
+    final username = await _tokenStore.readUsername() ?? '';
+    if (username.isEmpty) throw const ServerException('Not authenticated');
+    final res = await _dio.get(UrlConstants.userProfileUrl(username));
     return UserModel.fromJson(_asMap(res.data));
   }
 
   @override
   Future<UserModel> getProfile() async {
-    final res = await _dio.get(UrlConstants.getProfileUrl);
+    final username = await _tokenStore.readUsername() ?? '';
+    if (username.isEmpty) throw const ServerException('Not authenticated');
+    final res = await _dio.get(UrlConstants.userProfileUrl(username));
     return UserModel.fromJson(_asMap(res.data));
   }
 
@@ -75,7 +71,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     return _parseList(res.data, UserModel.fromJson);
   }
 
-  // ---- problems ----
+  // ── problems ──────────────────────────────────────────────────────────────
 
   @override
   Future<List<ProblemModel>> getProblems() async {
@@ -89,39 +85,32 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     return DailyProblemModel.fromJson(_asMap(res.data));
   }
 
+  // Problem interactions — use path params, not body params.
+  // POST /api/problems/:id/like
   @override
   Future<void> likeProblem(String problemId) async {
-    await _dio.post(
-      UrlConstants.likeProblemUrl,
-      data: {'problem_id': problemId},
-    );
+    await _dio.post(UrlConstants.problemLikeUrl(problemId));
   }
 
+  // POST /api/problems/:id/dislike
   @override
   Future<void> dislikeProblem(String problemId) async {
-    await _dio.post(
-      UrlConstants.dislikeProblemUrl,
-      data: {'problem_id': problemId},
-    );
+    await _dio.post(UrlConstants.problemDislikeUrl(problemId));
   }
 
+  // POST /api/problems/:id/solve
   @override
   Future<void> markProblemAsSolved(String problemId) async {
-    await _dio.post(
-      UrlConstants.markProblemAsSolvedUrl,
-      data: {'problem_id': problemId},
-    );
+    await _dio.post(UrlConstants.problemSolveUrl(problemId));
   }
 
+  // DELETE /api/problems/:id/solve
   @override
   Future<void> unmarkProblemAsSolved(String problemId) async {
-    await _dio.post(
-      UrlConstants.unmarkProblemAsSolvedUrl,
-      data: {'problem_id': problemId},
-    );
+    await _dio.delete(UrlConstants.problemSolveUrl(problemId));
   }
 
-  // ---- contests ----
+  // ── contests ──────────────────────────────────────────────────────────────
 
   @override
   Future<List<ContestModel>> getContests() async {
@@ -129,22 +118,22 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     return _parseList(res.data, ContestModel.fromJson);
   }
 
+  // GET /api/contests/:id/leaderboard
+  // contestId = ContestEntity.id (e.g. "codeforces-1932")
   @override
   Future<List<LeaderboardEntryModel>> getContestLeaderboard(
-    String contestUrl,
+    String contestId,
   ) async {
-    final res = await _dio.get(
-      UrlConstants.getContestLeaderboardUrl,
-      queryParameters: {'contest_url': contestUrl},
-    );
+    final res =
+        await _dio.get(UrlConstants.contestLeaderboardUrl(contestId));
     return _parseList(res.data, LeaderboardEntryModel.fromJson);
   }
 
-  // ---- info ----
+  // ── info ──────────────────────────────────────────────────────────────────
 
   @override
-  Future<InfoModel> getInfo() async {
+  Future<List<InfoModel>> getInfoList() async {
     final res = await _dio.get(UrlConstants.getInfoUrl);
-    return InfoModel.fromJson(_asMap(res.data));
+    return _parseList(res.data, InfoModel.fromJson);
   }
 }

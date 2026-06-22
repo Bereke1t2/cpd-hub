@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:dartz/dartz.dart';
 import 'package:lab_portal/core/config/app_config.dart';
 import 'package:lab_portal/core/error/exceptions.dart';
@@ -48,17 +49,22 @@ class MainRepoImpl implements MainRepo {
     }
     try {
       return left(await call());
-    } on UnauthorizedException catch (e) {
-      return right(AuthenticationFailure(e.message));
-    } on NotFoundException catch (e) {
-      return right(NotFoundFailure(e.message));
-    } on ValidationException catch (e) {
-      return right(ValidationFailure(e.message));
-    } on NetworkException catch (e) {
-      return right(NetworkFailure(e.message));
-    } on AppException catch (e) {
-      return right(ServerFailure(e.message));
-    } catch (_) {
+    } catch (raw) {
+      // Dio wraps AppException inside DioException.error — unwrap.
+      final e = raw is DioException ? (raw.error ?? raw) : raw;
+      if (e is UnauthorizedException) return right(AuthenticationFailure(e.message));
+      if (e is NotFoundException)     return right(NotFoundFailure(e.message));
+      if (e is ValidationException)   return right(ValidationFailure(e.message));
+      if (e is NetworkException)      return right(NetworkFailure(e.message));
+      if (e is AppException)          return right(ServerFailure(e.message));
+      if (raw is DioException) {
+        final data = raw.response?.data;
+        String? msg;
+        if (data is Map) msg = (data['message'] ?? data['error']) as String?;
+        return right(ServerFailure(
+          msg?.isNotEmpty == true ? msg! : 'Something went wrong (${raw.response?.statusCode}).',
+        ));
+      }
       return right(ServerFailure('Something went wrong.'));
     }
   }
@@ -150,11 +156,17 @@ class MainRepoImpl implements MainRepo {
   @override
   Future<Either<InfoModel, Failure>> getInfo() {
     if (AppConfig.useMock) {
-      // Placeholder until the backend info endpoint is live.
       return Future.value(
         left(const InfoModel(title: 'CPD Hub', description: 'Welcome!')),
       );
     }
-    return _remote(() => remoteDataSource.getInfo());
+    // Backend returns a list; take the first item (or a default).
+    return _remote(() async {
+      final list = await remoteDataSource.getInfoList();
+      if (list.isEmpty) {
+        return const InfoModel(title: 'CPD Hub', description: 'Welcome!');
+      }
+      return list.first;
+    });
   }
 }

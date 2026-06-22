@@ -77,6 +77,16 @@ import 'package:lab_portal/features/learning/domain/usecase/get_topics.dart';
 import 'package:lab_portal/features/learning/domain/usecase/get_tracks.dart';
 import 'package:lab_portal/features/learning/presentation/bloc/topics/topics_bloc.dart';
 import 'package:lab_portal/features/learning/presentation/bloc/tracks/tracks_bloc.dart';
+// ---- phase 15: courses ----
+import 'package:lab_portal/features/courses/data/datasources/courses_data_source.dart';
+import 'package:lab_portal/features/courses/data/datasources/mock/mock_courses_data_source.dart';
+import 'package:lab_portal/features/courses/data/repository/courses_repository_impl.dart';
+import 'package:lab_portal/features/courses/domain/repository/courses_repository.dart';
+import 'package:lab_portal/features/courses/domain/usecase/get_courses.dart';
+import 'package:lab_portal/features/courses/domain/usecase/get_course_detail.dart';
+import 'package:lab_portal/features/courses/domain/usecase/mark_lesson_complete.dart';
+import 'package:lab_portal/features/courses/presentation/bloc/courses/courses_bloc.dart';
+import 'package:lab_portal/features/courses/presentation/bloc/course_detail/course_detail_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -101,7 +111,7 @@ Future<void> configureDependencies() async {
 
   // ---- auth feature ----
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(getIt<Dio>()),
+    () => AuthRemoteDataSourceImpl(getIt<Dio>(), getIt<TokenStore>()),
   );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
@@ -130,7 +140,7 @@ Future<void> configureDependencies() async {
 
   // ---- main remote data source ----
   getIt.registerLazySingleton<RemoteDataSource>(
-    () => RemoteDataSourceImpl(getIt<Dio>()),
+    () => RemoteDataSourceImpl(getIt<Dio>(), getIt<TokenStore>()),
   );
 
   // ---- mock data sources ----
@@ -279,6 +289,25 @@ Future<void> configureDependencies() async {
       analyzer: getIt<StrengthAnalyzer>(),
       recommender: getIt<Recommender>(),
       scheduler: getIt<Sm2Scheduler>(),
+  // ---- phase 15: courses ----
+  getIt.registerLazySingleton<CoursesDataSource>(
+    () => MockCoursesDataSource(),
+  );
+  getIt.registerLazySingleton<CoursesRepository>(
+    () => CoursesRepositoryImpl(dataSource: getIt<CoursesDataSource>()),
+  );
+  getIt.registerFactory(() => GetCourses(getIt<CoursesRepository>()));
+  getIt.registerFactory(
+      () => GetCourseDetail(getIt<CoursesRepository>()));
+  getIt.registerFactory(
+      () => MarkLessonComplete(getIt<CoursesRepository>()));
+  getIt.registerFactory(
+    () => CoursesBloc(getCourses: getIt<GetCourses>()),
+  );
+  getIt.registerFactory(
+    () => CourseDetailBloc(
+      getCourseDetail: getIt<GetCourseDetail>(),
+      markLessonComplete: getIt<MarkLessonComplete>(),
     ),
   );
 }

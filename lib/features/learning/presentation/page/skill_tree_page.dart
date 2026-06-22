@@ -60,6 +60,54 @@ class _Body extends StatelessWidget {
 
     return CustomScrollView(
       slivers: [
+        // Courses banner — taps to CoursesPage.
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: AppSpacing.pageH.add(const EdgeInsets.only(top: 12)),
+            child: GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/courses'),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      UiConstants.primaryButtonColor,
+                      UiConstants.primaryDark,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.play_lesson_outlined,
+                        color: Colors.white, size: 32),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Courses',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900)),
+                          Text('Video · Article · PDF lessons',
+                              style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded,
+                        color: Colors.white70),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
         // Overall progress bar + Up-next strip.
         SliverToBoxAdapter(
           child: Padding(
