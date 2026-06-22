@@ -12,6 +12,7 @@ class AppConfig {
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: 'http://192.168.202.96:8000/api',
+
   );
 
   /// When true, the repository serves mock data and makes no network calls.

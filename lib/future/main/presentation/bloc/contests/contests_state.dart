@@ -14,10 +14,22 @@ final class ContestsLoading extends ContestsState {
 }
 
 final class ContestsLoaded extends ContestsState {
-  final List<ContestEntity> contests;
-  final String filter;
+  /// All contests (unfiltered) — used to derive the platform chip list.
+  final List<ContestEntity> all;
 
-  const ContestsLoaded({required this.contests, this.filter = 'All'});
+  /// Active platform filter; 'All' means no filter.
+  final String platform;
+
+  const ContestsLoaded({required this.all, this.platform = 'All'});
+
+  /// Filtered view used by the UI.
+  List<ContestEntity> get contests => platform == 'All'
+      ? all
+      : all.where((c) => c.platform == platform).toList();
+
+  /// Distinct platforms from the full list, sorted alphabetically.
+  List<String> get platforms =>
+      ({'All', ...all.map((c) => c.platform)}).toList()..sort();
 }
 
 final class ContestsError extends ContestsState {

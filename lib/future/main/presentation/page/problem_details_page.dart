@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/core/theme/app_colors.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/future/main/domain/entity/problem_entity.dart';
 import 'package:lab_portal/future/main/domain/usecase/like_it.dart';
@@ -30,14 +31,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
 
   // ---- helpers ----
 
-  Color _difficultyColor(String difficulty) {
-    switch (difficulty.toLowerCase()) {
-      case 'easy':   return const Color(0xFF43A047);
-      case 'medium': return const Color(0xFFFFA726);
-      case 'hard':   return const Color(0xFFE53935);
-      default:       return UiConstants.subtitleTextColor;
-    }
-  }
+  Color _difficultyColor(String difficulty) => AppColors.difficulty(difficulty);
 
   void _snack(String msg) {
     if (!mounted) return;
@@ -203,7 +197,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
               color: UiConstants.infoBackgroundColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                  color: UiConstants.primaryButtonColor.withOpacity(0.06)),
+                  color: UiConstants.primaryButtonColor.withValues(alpha: 0.06)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +208,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: diffColor.withOpacity(0.12),
+                        color: diffColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(Icons.bar_chart, color: diffColor, size: 22),
@@ -235,10 +229,10 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: diffColor.withOpacity(0.14),
+                                color: diffColor.withValues(alpha: 0.14),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                    color: diffColor.withOpacity(0.28)),
+                                    color: diffColor.withValues(alpha: 0.28)),
                               ),
                               child: Text(_p.difficulty,
                                   style: TextStyle(
@@ -285,7 +279,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
                           style: const TextStyle(
                               fontSize: 12, fontWeight: FontWeight.w600)),
                       backgroundColor:
-                          UiConstants.primaryButtonColor.withOpacity(0.08),
+                          UiConstants.primaryButtonColor.withValues(alpha: 0.08),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8)),
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -311,7 +305,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
             color: UiConstants.infoBackgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: UiConstants.primaryButtonColor.withOpacity(0.06)),
+                color: UiConstants.primaryButtonColor.withValues(alpha: 0.06)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -320,7 +314,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: UiConstants.primaryButtonColor.withOpacity(0.10),
+                    color: UiConstants.primaryButtonColor.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(Icons.description_outlined,
@@ -349,7 +343,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -428,7 +422,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     side: BorderSide(
-                        color: UiConstants.primaryButtonColor.withOpacity(0.18)),
+                        color: UiConstants.primaryButtonColor.withValues(alpha: 0.18)),
                   ),
                 ),
               ]),
@@ -450,7 +444,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
             color: UiConstants.infoBackgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: UiConstants.primaryButtonColor.withOpacity(0.06)),
+                color: UiConstants.primaryButtonColor.withValues(alpha: 0.06)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -472,7 +466,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
             color: UiConstants.infoBackgroundColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-                color: UiConstants.primaryButtonColor.withOpacity(0.06)),
+                color: UiConstants.primaryButtonColor.withValues(alpha: 0.06)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,7 +573,7 @@ class _ProblemDetailsPageState extends State<ProblemDetailsPage> {
             height: 26,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: UiConstants.primaryButtonColor.withOpacity(0.12),
+              color: UiConstants.primaryButtonColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text('$number',
