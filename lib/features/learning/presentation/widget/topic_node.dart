@@ -84,6 +84,8 @@ class TopicNode extends StatelessWidget {
                 Text(
                   '${progress.solved}/${progress.total} problems · ${topic.category}',
                   style: AppTextStyles.caption,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 if (locked && progress.unmetPrerequisiteIds.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.xxs),
@@ -100,11 +102,7 @@ class TopicNode extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.xs),
-          StatusChip(
-            label: style.label,
-            icon: style.icon,
-            color: style.color,
-          ),
+          StatusChip(label: style.label, icon: style.icon, color: style.color),
         ],
       ),
     );
