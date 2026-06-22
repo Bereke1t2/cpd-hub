@@ -27,6 +27,15 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: UiConstants.primaryButtonColor,
           useMaterial3: true,
+          // Dark defaults so route transitions never flash a white canvas
+          // behind the (dark) pages.
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: UiConstants.backgroundColor,
+          canvasColor: UiConstants.backgroundColor,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: UiConstants.primaryButtonColor,
+            brightness: Brightness.dark,
+          ).copyWith(surface: UiConstants.backgroundColor),
         ),
         home: const _AuthGate(),
         onGenerateRoute: AppRouter.onGenerateRoute,
