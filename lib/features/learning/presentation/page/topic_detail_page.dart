@@ -65,91 +65,103 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
     return Scaffold(
       backgroundColor: UiConstants.backgroundColor,
+      // Blended, title-less bar so the hero below carries the topic identity
+      // (no more duplicated name in the bar + the card).
       appBar: AppBar(
-        backgroundColor: UiConstants.infoBackgroundColor,
+        backgroundColor: UiConstants.backgroundColor,
         foregroundColor: UiConstants.mainTextColor,
         elevation: 0,
-        title: Text(
-          topic.name,
-          style: AppTextStyles.title,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        scrolledUnderElevation: 0,
       ),
       body: CustomScrollView(
         slivers: [
-          // ── Header: progress + meta + status ──────────────────────────────
+          // ── Hero: category · name · status · difficulty · summary · progress
           SliverToBoxAdapter(
             child: Padding(
-              padding: _sectionPad,
+              padding: const EdgeInsets.fromLTRB(
+                  AppDimens.lg, AppDimens.lg, AppDimens.lg, 0),
               child: GradientCard(
-                child: Row(
+                accent: style.color,
+                padding: const EdgeInsets.all(AppDimens.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ProgressRing(
-                      ratio: progress.ratio,
-                      size: 56,
-                      stroke: 6,
-                      color: UiConstants.primaryButtonColor,
-                      center: Text(
-                        '${progress.solved}/${progress.total}',
-                        style: AppTextStyles.caption.copyWith(
-                          color: UiConstants.primaryButtonColor,
-                          fontWeight: FontWeight.w900,
+                    // Overline — category, in muted small caps.
+                    Text(
+                      topic.category.toUpperCase(),
+                      style: AppTextStyles.caption.copyWith(
+                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w700,
+                        color: style.color,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppDimens.xs),
+                    Text(
+                      topic.name,
+                      style: AppTextStyles.hero,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppDimens.md),
+                    // Status + difficulty — Wrap so they never overflow.
+                    Wrap(
+                      spacing: AppDimens.sm,
+                      runSpacing: AppDimens.xs,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        StatusChip(
+                          label: style.label,
+                          icon: style.icon,
+                          color: style.color,
+                        ),
+                        _DifficultyChip(level: topic.difficulty),
+                      ],
+                    ),
+                    if (topic.summary.trim().isNotEmpty) ...[
+                      const SizedBox(height: AppDimens.md),
+                      Text(
+                        topic.summary,
+                        style: AppTextStyles.body.copyWith(
+                          color: UiConstants.subtitleTextColor,
+                          height: 1.55,
                         ),
                       ),
+                    ],
+                    const SizedBox(height: AppDimens.lg),
+                    // Progress — a linear bar reads as "how far am I" instantly.
+                    Row(
+                      children: [
+                        Text('PROGRESS',
+                            style: AppTextStyles.micro.copyWith(
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                            )),
+                        const Spacer(),
+                        Text(
+                          '${progress.solved} / ${progress.total} solved',
+                          style: AppTextStyles.caption.copyWith(
+                            color: UiConstants.primaryButtonColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: AppDimens.md),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(topic.category, style: AppTextStyles.caption),
-                          const SizedBox(height: AppDimens.xxs),
-                          Text(
-                            topic.name,
-                            style: AppTextStyles.title,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: AppDimens.sm),
-                          // Wrap keeps the pills on screen no matter the width.
-                          Wrap(
-                            spacing: AppDimens.sm,
-                            runSpacing: AppDimens.xs,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              StatPill(
-                                'Level',
-                                '${topic.difficulty} / 5',
-                                color: UiConstants.primaryButtonColor,
-                              ),
-                              StatusChip(
-                                label: style.label,
-                                icon: style.icon,
-                                color: style.color,
-                              ),
-                            ],
-                          ),
-                        ],
+                    const SizedBox(height: AppDimens.sm),
+                    ClipRRect(
+                      borderRadius: AppDimens.brSm,
+                      child: LinearProgressIndicator(
+                        value: progress.ratio.clamp(0.0, 1.0),
+                        minHeight: 8,
+                        backgroundColor: UiConstants.primaryButtonColor
+                            .withValues(alpha: 0.12),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                            UiConstants.primaryButtonColor),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ),
-          ),
-
-          // ── About ─────────────────────────────────────────────────────────
-          _section(
-            child: GradientCard(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SectionHeader('About',
-                      icon: Icons.info_outline_rounded),
-                  const SizedBox(height: AppDimens.xs),
-                  Text(topic.summary, style: AppTextStyles.body),
-                ],
               ),
             ),
           ),
@@ -268,6 +280,49 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
       );
 }
 
+/// Difficulty as 1–5 filled dots — calmer and more "grown-up" than a
+/// "Level 3 / 5" text pill, and self-contained so it can't overflow.
+class _DifficultyChip extends StatelessWidget {
+  final int level;
+  const _DifficultyChip({required this.level});
+
+  @override
+  Widget build(BuildContext context) {
+    const c = UiConstants.primaryButtonColor;
+    final clamped = level.clamp(0, 5);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimens.sm,
+        vertical: AppDimens.xs,
+      ),
+      decoration: BoxDecoration(
+        color: c.withValues(alpha: 0.12),
+        borderRadius: AppDimens.brSm,
+        border: Border.all(color: c.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.bolt_rounded, size: 13, color: c),
+          const SizedBox(width: 6),
+          for (var i = 0; i < 5; i++)
+            Padding(
+              padding: EdgeInsets.only(right: i == 4 ? 0 : 3),
+              child: Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: i < clamped ? c : c.withValues(alpha: 0.25),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Concept (lesson body + key ideas) ─────────────────────────────────────────
 class _ConceptCard extends StatelessWidget {
   final LessonEntity lesson;
@@ -275,6 +330,13 @@ class _ConceptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Split the body into paragraphs for a calmer reading rhythm.
+    final paragraphs = lesson.body
+        .split('\n')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .toList();
+
     return GradientCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,26 +344,156 @@ class _ConceptCard extends StatelessWidget {
           const SectionHeader('Concept',
               icon: Icons.lightbulb_outline_rounded),
           const SizedBox(height: AppDimens.xs),
-          Text(lesson.body, style: AppTextStyles.body),
+          for (var i = 0; i < paragraphs.length; i++)
+            Padding(
+              padding: EdgeInsets.only(
+                  bottom: i == paragraphs.length - 1 ? 0 : AppDimens.sm),
+              child: _ArticleText(paragraphs[i]),
+            ),
+
+          // Code sample.
+          if (lesson.code != null && lesson.code!.trim().isNotEmpty) ...[
+            const SizedBox(height: AppDimens.md),
+            _CodeBlock(code: lesson.code!, language: lesson.codeLang),
+          ],
+
+          // Key ideas.
           if (lesson.keyIdeas.isNotEmpty) ...[
+            const SizedBox(height: AppDimens.md),
+            Text('KEY IDEAS',
+                style: AppTextStyles.caption.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                )),
             const SizedBox(height: AppDimens.sm),
-            const Divider(color: UiConstants.borderColor),
-            const SizedBox(height: AppDimens.xs),
             for (final idea in lesson.keyIdeas)
               Padding(
-                padding: const EdgeInsets.only(bottom: AppDimens.xs),
+                padding: const EdgeInsets.only(bottom: AppDimens.sm),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('•  ',
-                        style: TextStyle(
-                            color: UiConstants.primaryButtonColor,
-                            fontWeight: FontWeight.w900)),
-                    Expanded(child: Text(idea, style: AppTextStyles.body)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 3),
+                      child: Icon(Icons.check_circle_rounded,
+                          size: 15,
+                          color: UiConstants.primaryButtonColor
+                              .withValues(alpha: 0.9)),
+                    ),
+                    const SizedBox(width: AppDimens.sm),
+                    Expanded(child: _ArticleText(idea)),
                   ],
                 ),
               ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Body text that renders `inline code` (backtick-wrapped) in a monospace
+/// pill and *emphasis* (asterisk-wrapped) in italic — comfortable line height.
+class _ArticleText extends StatelessWidget {
+  final String text;
+  const _ArticleText(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    const base = TextStyle(
+      color: UiConstants.mainTextColor,
+      fontSize: AppDimens.fBody,
+      height: 1.6,
+    );
+    final spans = <InlineSpan>[];
+    // Tokenize on `code` and *emphasis*.
+    final re = RegExp(r'`([^`]+)`|\*([^*]+)\*');
+    var last = 0;
+    for (final m in re.allMatches(text)) {
+      if (m.start > last) {
+        spans.add(TextSpan(text: text.substring(last, m.start)));
+      }
+      if (m.group(1) != null) {
+        spans.add(TextSpan(
+          text: ' ${m.group(1)} ',
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontSize: AppDimens.fBody - 0.5,
+            color: UiConstants.primaryButtonColor,
+            backgroundColor: UiConstants.backgroundColor,
+            height: 1.5,
+          ),
+        ));
+      } else {
+        spans.add(TextSpan(
+          text: m.group(2),
+          style: const TextStyle(fontStyle: FontStyle.italic),
+        ));
+      }
+      last = m.end;
+    }
+    if (last < text.length) {
+      spans.add(TextSpan(text: text.substring(last)));
+    }
+    return Text.rich(TextSpan(style: base, children: spans));
+  }
+}
+
+/// A horizontally-scrollable monospace code block with a small header.
+class _CodeBlock extends StatelessWidget {
+  final String code;
+  final String? language;
+  const _CodeBlock({required this.code, this.language});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: UiConstants.backgroundColor,
+        borderRadius: AppDimens.brSm,
+        border: Border.all(
+            color: UiConstants.primaryButtonColor.withValues(alpha: 0.18)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header: language label + faux window dots.
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.md, vertical: AppDimens.xs),
+            color: UiConstants.primaryButtonColor.withValues(alpha: 0.08),
+            child: Row(
+              children: [
+                Icon(Icons.code_rounded,
+                    size: 14,
+                    color: UiConstants.primaryButtonColor
+                        .withValues(alpha: 0.9)),
+                const SizedBox(width: AppDimens.xs),
+                Text(
+                  (language ?? 'code').toUpperCase(),
+                  style: AppTextStyles.micro.copyWith(
+                    color: UiConstants.primaryButtonColor,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Code (scrolls sideways for long lines).
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.all(AppDimens.md),
+            child: Text(
+              code,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: AppDimens.fBody,
+                height: 1.5,
+                color: UiConstants.mainTextColor,
+              ),
+            ),
+          ),
         ],
       ),
     );

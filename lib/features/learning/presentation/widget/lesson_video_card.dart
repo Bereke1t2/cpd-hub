@@ -1,13 +1,12 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:lab_portal/core/theme/app_dimens.dart';
 import 'package:lab_portal/core/ui_constants.dart';
-import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../domain/entity/lesson_entity.dart';
 
-/// An inline, tap-to-play video for a lesson. The network controller is only
-/// created once the user taps play, so a page with several videos doesn't
-/// buffer them all at once.
+/// An inline, tap-to-play YouTube video for a lesson. The player (a webview)
+/// is only created once the user taps play, so a page with several videos
+/// doesn't spin up multiple webviews at once.
 class LessonVideoCard extends StatefulWidget {
   final LessonVideo video;
   const LessonVideoCard({super.key, required this.video});
@@ -17,48 +16,34 @@ class LessonVideoCard extends StatefulWidget {
 }
 
 class _LessonVideoCardState extends State<LessonVideoCard> {
-  VideoPlayerController? _controller;
-  ChewieController? _chewie;
+  YoutubePlayerController? _controller;
+  String? _videoId;
   bool _started = false;
-  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoId = YoutubePlayerController.convertUrlToId(widget.video.url);
+  }
 
   @override
   void dispose() {
-    _chewie?.dispose();
-    _controller?.dispose();
+    _controller?.close();
     super.dispose();
   }
 
-  Future<void> _start() async {
+  void _start() {
+    final id = _videoId;
+    if (id == null) return;
+    _controller = YoutubePlayerController.fromVideoId(
+      videoId: id,
+      autoPlay: true,
+      params: const YoutubePlayerParams(
+        showFullscreenButton: true,
+        strictRelatedVideos: true,
+      ),
+    );
     setState(() => _started = true);
-    final controller =
-        VideoPlayerController.networkUrl(Uri.parse(widget.video.url));
-    try {
-      await controller.initialize();
-      if (!mounted) {
-        await controller.dispose();
-        return;
-      }
-      setState(() {
-        _controller = controller;
-        _chewie = ChewieController(
-          videoPlayerController: controller,
-          autoPlay: true,
-          looping: false,
-          aspectRatio: controller.value.aspectRatio,
-          materialProgressColors: ChewieProgressColors(
-            playedColor: UiConstants.primaryButtonColor,
-            handleColor: UiConstants.primaryButtonColor,
-            bufferedColor: UiConstants.primaryButtonColor.withValues(alpha: 0.3),
-            backgroundColor: Colors.white24,
-          ),
-        );
-      });
-    } catch (_) {
-      if (!mounted) return;
-      setState(() => _failed = true);
-      await controller.dispose();
-    }
   }
 
   @override
@@ -82,7 +67,7 @@ class _LessonVideoCardState extends State<LessonVideoCard> {
             padding: const EdgeInsets.all(AppDimens.sm),
             child: Row(
               children: [
-                const Icon(Icons.play_lesson_outlined,
+                const Icon(Icons.smart_display_outlined,
                     size: AppDimens.iconSm,
                     color: UiConstants.primaryButtonColor),
                 const SizedBox(width: AppDimens.sm),
@@ -115,22 +100,28 @@ class _LessonVideoCardState extends State<LessonVideoCard> {
   }
 
   Widget _buildStage() {
-    if (_chewie != null) {
-      return Chewie(controller: _chewie!);
-    }
-    if (_failed) {
-      return const _Poster(
-        icon: Icons.error_outline_rounded,
-        label: "Couldn't load video",
+    if (_started && _controller != null) {
+      // Green-themed YouTube controls to match the app.
+      return Theme(
+        data: Theme.of(context).copyWith(
+          extensions: const [
+            YoutubePlayerTheme(
+              progressBarActiveColor: UiConstants.primaryButtonColor,
+              progressBarBufferedColor: UiConstants.subtitleTextColor,
+              controlsColor: Colors.white,
+            ),
+          ],
+        ),
+        child: YoutubePlayer(
+          controller: _controller!,
+          aspectRatio: 16 / 9,
+        ),
       );
     }
-    if (_started) {
-      return const Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2.5,
-          valueColor:
-              AlwaysStoppedAnimation<Color>(UiConstants.primaryButtonColor),
-        ),
+    if (_videoId == null) {
+      return const _Poster(
+        icon: Icons.error_outline_rounded,
+        label: 'Video unavailable',
       );
     }
     return GestureDetector(

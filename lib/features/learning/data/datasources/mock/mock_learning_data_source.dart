@@ -431,68 +431,109 @@ final _lessons = <String, LessonModel>{
   'binary-search': const LessonModel(
     topicId: 'binary-search',
     body:
-        'Binary search works on any monotonic predicate f(x): find the boundary where f flips from false '
-        'to true (or true to false). The classic sorted-array search is just one instance. '
-        'The core loop: lo, hi = search bounds; mid = (lo+hi)/2; adjust based on f(mid). '
-        'Off-by-one errors are the only real danger — nail your invariants.',
+        'Binary search works on any *monotonic* predicate `f(x)`: it finds the boundary '
+        'where `f` flips from false to true. The classic sorted-array search is just one '
+        'instance of this idea.\n\n'
+        'The core loop keeps two bounds `lo` and `hi`, checks the midpoint '
+        '`mid = (lo + hi) / 2`, and discards half the range based on `f(mid)`. Each step '
+        'halves the search space, so it runs in `O(log n)`.\n\n'
+        'Off-by-one errors are the only real danger here — pin down your loop invariant '
+        'before you write a single line.',
     keyIdeas: [
       'Works on *any* monotonic predicate, not just sorted arrays.',
-      'Template: lo=min, hi=max, while(lo<hi) mid=(lo+hi)/2; if f(mid) hi=mid; else lo=mid+1.',
-      'Use long long for mid when lo+hi can overflow.',
-      '"Binary search on the answer" turns optimisation into repeated feasibility checks.',
-      'Always verify: what is f(lo) and f(hi) before the loop?',
+      'Use `long long` for `mid` when `lo + hi` can overflow.',
+      '“Binary search on the answer” turns optimisation into repeated feasibility checks.',
+      'Always verify what `f(lo)` and `f(hi)` are before the loop starts.',
     ],
+    code: 'int lo = 0, hi = n - 1, ans = -1;\n'
+        'while (lo <= hi) {\n'
+        '    int mid = lo + (hi - lo) / 2;   // avoids overflow\n'
+        '    if (a[mid] <= target) {\n'
+        '        ans = mid;                  // candidate found\n'
+        '        lo = mid + 1;               // search the right half\n'
+        '    } else {\n'
+        '        hi = mid - 1;               // search the left half\n'
+        '    }\n'
+        '}\n'
+        'return ans;',
+    codeLang: 'cpp',
     videos: [
       LessonVideo(
-        title: 'Binary search, visualised',
-        url:
-            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-        durationLabel: '9 min',
+        title: 'Binary Search in 100 seconds',
+        url: 'https://www.youtube.com/watch?v=MFhxShGxHWc',
+        durationLabel: '2 min',
       ),
     ],
   ),
   'graphs-intro': const LessonModel(
     topicId: 'graphs-intro',
     body:
-        'A graph is nodes (vertices) connected by edges. Store it as an adjacency list: '
-        'vector<vector<int>> adj(n). BFS (queue) finds shortest paths in unweighted graphs. '
-        'DFS (stack or recursion) finds connected components, detects cycles, and is the '
-        'workhorse for most tree problems.',
+        'A graph is a set of nodes (vertices) connected by edges. In competitive '
+        'programming you almost always store it as an *adjacency list* — one list of '
+        'neighbours per node.\n\n'
+        '`BFS` (using a queue) explores level by level and finds shortest paths in '
+        'unweighted graphs. `DFS` (recursion or a stack) dives deep first and is the '
+        'workhorse for connected components, cycle detection, and most tree problems.',
     keyIdeas: [
-      'Adjacency list is almost always correct; matrix only when n < 1000.',
-      'BFS = shortest path (unweighted). DFS = reachability, cycles, components.',
-      'Mark visited *before* pushing to the queue, not after popping.',
-      'For trees, DFS naturally gives parent/children — store parent to avoid revisiting.',
+      'An adjacency list is almost always right; use a matrix only when `n < 1000`.',
+      '`BFS` = shortest path (unweighted). `DFS` = reachability, cycles, components.',
+      'Mark a node visited *before* pushing it to the queue, not after popping.',
+      'For trees, `DFS` gives parent/children naturally — store the parent to avoid revisiting.',
     ],
+    code: 'vector<int> adj[N];\n'
+        'bool seen[N];\n\n'
+        'void bfs(int src) {\n'
+        '    queue<int> q;\n'
+        '    q.push(src);\n'
+        '    seen[src] = true;               // mark on push\n'
+        '    while (!q.empty()) {\n'
+        '        int u = q.front(); q.pop();\n'
+        '        for (int v : adj[u])\n'
+        '            if (!seen[v]) {\n'
+        '                seen[v] = true;\n'
+        '                q.push(v);\n'
+        '            }\n'
+        '    }\n'
+        '}',
+    codeLang: 'cpp',
     videos: [
       LessonVideo(
-        title: 'BFS vs DFS walkthrough',
-        url:
-            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-        durationLabel: '11 min',
+        title: 'Graph Traversals — BFS & DFS',
+        url: 'https://www.youtube.com/watch?v=pcKY4hjDrxk',
+        durationLabel: '18 min',
       ),
     ],
   ),
   'dp-intro': const LessonModel(
     topicId: 'dp-intro',
     body:
-        'Dynamic programming solves problems with overlapping subproblems and optimal substructure. '
-        'Step 1: define the state (what does dp[i] mean?). Step 2: write the recurrence. '
-        'Step 3: identify base cases. Step 4: choose top-down (memoisation) or bottom-up (tabulation). '
-        'If you cannot define the state precisely, you cannot write the DP.',
+        'Dynamic programming solves problems that have *overlapping subproblems* and '
+        '*optimal substructure*. The recipe is always the same four steps.\n\n'
+        '1. Define the state — what exactly does `dp[i]` mean?\n'
+        '2. Write the recurrence relating it to smaller states.\n'
+        '3. Identify the base cases.\n'
+        '4. Choose top-down (memoisation) or bottom-up (tabulation).\n\n'
+        'If you cannot state precisely what `dp[i]` means in plain English, you cannot '
+        'write the DP — that definition is most of the work.',
     keyIdeas: [
-      'State definition is 80% of the work. Write it in English first.',
+      'The state definition is 80% of the work — write it in English first.',
       'Memoisation is easier to write; tabulation is faster (no recursion overhead).',
-      'Recurrence must only reference strictly smaller subproblems.',
-      'Always check: are all base cases initialised correctly?',
-      'Print the DP table on small inputs to debug wrong recurrences.',
+      'The recurrence must only reference *strictly smaller* subproblems.',
+      'Print the `dp` table on small inputs to debug a wrong recurrence.',
     ],
+    code: '// Fibonacci, bottom-up tabulation\n'
+        'vector<long long> dp(n + 1);\n'
+        'dp[0] = 0;\n'
+        'dp[1] = 1;                          // base cases\n'
+        'for (int i = 2; i <= n; i++)\n'
+        '    dp[i] = dp[i - 1] + dp[i - 2];  // recurrence\n'
+        'return dp[n];',
+    codeLang: 'cpp',
     videos: [
       LessonVideo(
-        title: 'From recursion to DP',
-        url:
-            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-        durationLabel: '7 min',
+        title: 'Dynamic Programming — full course',
+        url: 'https://www.youtube.com/watch?v=oBt53YbR9Kk',
+        durationLabel: '5 hr',
       ),
     ],
   ),
