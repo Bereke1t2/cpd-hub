@@ -34,13 +34,21 @@ class LessonEntity extends Equatable {
   /// Short videos the learner can watch inline. Empty when the topic has none.
   final List<LessonVideo> videos;
 
+  /// Optional formatted code sample shown in a monospace block.
+  final String? code;
+
+  /// Language label for [code] (e.g. 'cpp'), shown on the code block header.
+  final String? codeLang;
+
   const LessonEntity({
     required this.topicId,
     required this.body,
     required this.keyIdeas,
     this.videos = const [],
+    this.code,
+    this.codeLang,
   });
 
   @override
-  List<Object?> get props => [topicId, body, keyIdeas, videos];
+  List<Object?> get props => [topicId, body, keyIdeas, videos, code, codeLang];
 }
