@@ -128,8 +128,10 @@ class _Hero extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(AppDimens.lg,
           MediaQuery.of(context).padding.top + AppDimens.sm, AppDimens.lg, AppDimens.lg),
       decoration: BoxDecoration(
+        // Muted deep-green → surface so the header matches the card tones
+        // below rather than glowing brighter than the rest of the page.
         gradient: const LinearGradient(
-          colors: [_green, UiConstants.primaryDark],
+          colors: [UiConstants.primaryDark, _surface],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -137,11 +139,11 @@ class _Hero extends StatelessWidget {
           bottomLeft: Radius.circular(AppDimens.rLg),
           bottomRight: Radius.circular(AppDimens.rLg),
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: _green.withValues(alpha: 0.30),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: UiConstants.shadowColor,
+            blurRadius: 16,
+            offset: Offset(0, 6),
           ),
         ],
       ),

@@ -206,17 +206,20 @@ class _HeroHeader extends StatelessWidget {
       margin: const EdgeInsets.all(AppDimens.lg),
       padding: const EdgeInsets.all(AppDimens.lg),
       decoration: BoxDecoration(
+        // Muted deep-green → surface so the box sits in the same tonal range
+        // as the cards below instead of glowing brighter than everything else.
         gradient: const LinearGradient(
-          colors: [_green, UiConstants.primaryDark],
+          colors: [UiConstants.primaryDark, _surface],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: AppDimens.brLg,
-        boxShadow: [
+        border: Border.all(color: _green.withValues(alpha: 0.18)),
+        boxShadow: const [
           BoxShadow(
-            color: _green.withValues(alpha: 0.30),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: UiConstants.shadowColor,
+            blurRadius: 16,
+            offset: Offset(0, 6),
           ),
         ],
       ),
