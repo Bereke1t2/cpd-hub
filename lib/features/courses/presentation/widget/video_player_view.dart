@@ -1,9 +1,9 @@
-// Wraps video_player + chewie. Isolated in RepaintBoundary.
-// Auto-marks lesson complete at ≥90% watched via onComplete().
-import 'package:chewie/chewie.dart';
+// Streams a YouTube video inline. Marks the lesson complete when the
+// video reaches its end via onComplete().
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lab_portal/core/ui_constants.dart';
-import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class VideoPlayerView extends StatefulWidget {
   final String url;
@@ -16,35 +16,32 @@ class VideoPlayerView extends StatefulWidget {
 }
 
 class _VideoPlayerViewState extends State<VideoPlayerView> {
-  VideoPlayerController? _vpc;
-  ChewieController? _cc;
+  YoutubePlayerController? _controller;
+  StreamSubscription<YoutubePlayerValue>? _sub;
+  String? _videoId;
   bool _completeFired = false;
 
   @override
   void initState() {
     super.initState();
-    _init();
+    _videoId = YoutubePlayerController.convertUrlToId(widget.url);
+    final id = _videoId;
+    if (id != null) {
+      _controller = YoutubePlayerController.fromVideoId(
+        videoId: id,
+        autoPlay: false,
+        params: const YoutubePlayerParams(
+          showFullscreenButton: true,
+          strictRelatedVideos: true,
+        ),
+      );
+      _sub = _controller!.listen(_onValue);
+    }
   }
 
-  Future<void> _init() async {
-    final vpc =
-        VideoPlayerController.networkUrl(Uri.parse(widget.url));
-    await vpc.initialize();
-    vpc.addListener(_onTick);
-    final cc = ChewieController(
-      videoPlayerController: vpc,
-      autoPlay: false,
-      looping: false,
-    );
-    if (mounted) setState(() { _vpc = vpc; _cc = cc; });
-  }
-
-  void _onTick() {
+  void _onValue(YoutubePlayerValue value) {
     if (_completeFired) return;
-    final dur = _vpc?.value.duration;
-    final pos = _vpc?.value.position;
-    if (dur == null || pos == null || dur.inMilliseconds == 0) return;
-    if (pos.inMilliseconds / dur.inMilliseconds >= 0.9) {
+    if (value.playerState == PlayerState.ended) {
       _completeFired = true;
       widget.onComplete?.call();
     }
@@ -52,20 +49,40 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
 
   @override
   void dispose() {
-    _vpc?.removeListener(_onTick);
-    _cc?.dispose();
-    _vpc?.dispose();
+    _sub?.cancel();
+    _controller?.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_cc == null) {
+    if (_videoId == null || _controller == null) {
       return const Center(
-        child: CircularProgressIndicator(
-            color: UiConstants.primaryButtonColor),
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'This video is unavailable.',
+            style: TextStyle(color: UiConstants.subtitleTextColor),
+          ),
+        ),
       );
     }
-    return RepaintBoundary(child: Chewie(controller: _cc!));
+    return Theme(
+      data: Theme.of(context).copyWith(
+        extensions: const [
+          YoutubePlayerTheme(
+            progressBarActiveColor: UiConstants.primaryButtonColor,
+            progressBarBufferedColor: UiConstants.subtitleTextColor,
+            controlsColor: Colors.white,
+          ),
+        ],
+      ),
+      child: RepaintBoundary(
+        child: YoutubePlayer(
+          controller: _controller!,
+          aspectRatio: 16 / 9,
+        ),
+      ),
+    );
   }
 }

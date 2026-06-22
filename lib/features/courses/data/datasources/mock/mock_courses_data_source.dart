@@ -1,4 +1,3 @@
-import 'package:lab_portal/features/courses/domain/entity/lesson_entity.dart';
 import '../../models/course_model.dart';
 import '../courses_data_source.dart';
 
@@ -48,7 +47,7 @@ const _graphCourse = {
           'title': 'Breadth-First Search',
           'kind': 'video',
           'contentUrl':
-              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+              'https://www.youtube.com/watch?v=pcKY4hjDrxk',
           'durationSec': 540,
         },
         {
@@ -101,7 +100,7 @@ void dfs(int node, List<List<int>> adj, List<bool> visited) {
           'title': "Dijkstra's Algorithm",
           'kind': 'video',
           'contentUrl':
-              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+              'https://www.youtube.com/watch?v=pcKY4hjDrxk',
           'durationSec': 720,
         },
         {
@@ -213,7 +212,7 @@ int fib(int n) {
           'title': 'Longest Common Subsequence',
           'kind': 'video',
           'contentUrl':
-              'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
+              'https://www.youtube.com/watch?v=oBt53YbR9Kk',
           'durationSec': 480,
         },
       ],
