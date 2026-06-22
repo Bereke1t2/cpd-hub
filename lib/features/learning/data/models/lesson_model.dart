@@ -6,12 +6,16 @@ class LessonModel extends LessonEntity {
     required super.body,
     required super.keyIdeas,
     super.videos,
+    super.code,
+    super.codeLang,
   });
 
   factory LessonModel.fromJson(Map<String, dynamic> j) => LessonModel(
         topicId: (j['topic_id'] ?? '') as String,
         body: (j['body'] ?? '') as String,
         keyIdeas: List<String>.from(j['key_ideas'] ?? []),
+        code: j['code'] as String?,
+        codeLang: j['code_lang'] as String?,
         videos: ((j['videos'] ?? []) as List)
             .map((v) => LessonVideo(
                   title: (v['title'] ?? '') as String,
@@ -25,6 +29,8 @@ class LessonModel extends LessonEntity {
         'topic_id': topicId,
         'body': body,
         'key_ideas': keyIdeas,
+        if (code != null) 'code': code,
+        if (codeLang != null) 'code_lang': codeLang,
         'videos': videos
             .map((v) => {
                   'title': v.title,

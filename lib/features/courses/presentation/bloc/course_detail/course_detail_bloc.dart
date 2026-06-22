@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:lab_portal/features/courses/domain/entity/course_entity.dart';
-import 'package:lab_portal/features/courses/domain/entity/lesson_entity.dart';
 import 'package:lab_portal/features/courses/domain/usecase/get_course_detail.dart';
 import 'package:lab_portal/features/courses/domain/usecase/mark_lesson_complete.dart';
 
