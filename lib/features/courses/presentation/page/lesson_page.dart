@@ -88,7 +88,6 @@ class _LessonPageState extends State<LessonPage> {
       case LessonKind.video:
         return _VideoBody(
           lesson: lesson,
-          kindLabel: _kind.label,
           onComplete: () {
             if (!_completed) _markComplete();
           },
@@ -170,13 +169,19 @@ class _Header extends StatelessWidget {
                                 size: 13,
                                 color: Colors.white.withValues(alpha: 0.85)),
                             const SizedBox(width: AppDimens.xs),
-                            Text(
-                              meta.toString().toUpperCase(),
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.85),
-                                fontSize: AppDimens.fMicro,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.6,
+                            // Flexible + ellipsis so a long kind/duration label
+                            // can never overflow the header row.
+                            Flexible(
+                              child: Text(
+                                meta.toString().toUpperCase(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: AppDimens.fMicro,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.6,
+                                ),
                               ),
                             ),
                           ],
@@ -189,7 +194,7 @@ class _Header extends StatelessWidget {
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: AppDimens.fH1,
-                            fontWeight: FontWeight.w900,
+                            fontWeight: FontWeight.w800,
                             height: 1.2,
                           ),
                         ),
@@ -222,12 +227,10 @@ class _Header extends StatelessWidget {
 // ── Video lesson: framed player + info below ──────────────────────────────────
 class _VideoBody extends StatelessWidget {
   final LessonEntity lesson;
-  final String kindLabel;
   final VoidCallback onComplete;
 
   const _VideoBody({
     required this.lesson,
-    required this.kindLabel,
     required this.onComplete,
   });
 
@@ -240,7 +243,7 @@ class _VideoBody extends StatelessWidget {
           // Framed player.
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppDimens.lg, AppDimens.sm, AppDimens.lg, 0),
+                AppDimens.lg, AppDimens.md, AppDimens.lg, 0),
             child: Container(
               clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
@@ -248,10 +251,10 @@ class _VideoBody extends StatelessWidget {
                 color: Colors.black,
                 border: Border.all(
                     color: UiConstants.primaryButtonColor
-                        .withValues(alpha: 0.25)),
+                        .withValues(alpha: 0.20)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.4),
+                    color: Colors.black.withValues(alpha: 0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 8),
                   ),
@@ -263,36 +266,27 @@ class _VideoBody extends StatelessWidget {
               ),
             ),
           ),
+          // Title and duration already live in the header — keep the body to a
+          // calm overview so nothing is repeated on screen.
           Padding(
             padding: const EdgeInsets.all(AppDimens.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  lesson.title,
-                  style: const TextStyle(
-                    color: UiConstants.mainTextColor,
-                    fontSize: AppDimens.fH1,
-                    fontWeight: FontWeight.w900,
+                  'ABOUT THIS LESSON',
+                  style: TextStyle(
+                    color: UiConstants.primaryButtonColor
+                        .withValues(alpha: 0.9),
+                    fontSize: AppDimens.fMicro,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.0,
                   ),
                 ),
                 const SizedBox(height: AppDimens.sm),
-                Row(
-                  children: [
-                    _MetaPill(
-                        icon: Icons.play_circle_outline_rounded,
-                        label: kindLabel),
-                    if (lesson.duration != null) ...[
-                      const SizedBox(width: AppDimens.sm),
-                      _MetaPill(
-                          icon: Icons.schedule_rounded,
-                          label: '${lesson.duration!.inMinutes} min'),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: AppDimens.md),
                 const Text(
-                  'Watch the lesson, then mark it complete to track your progress through the course.',
+                  'Watch the lesson all the way through, then mark it complete '
+                  'to track your progress through the course.',
                   style: TextStyle(
                     color: UiConstants.subtitleTextColor,
                     fontSize: AppDimens.fBody,
@@ -302,39 +296,6 @@ class _VideoBody extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MetaPill extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _MetaPill({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppDimens.md, vertical: AppDimens.xs),
-      decoration: BoxDecoration(
-        color: UiConstants.primaryButtonColor.withValues(alpha: 0.10),
-        borderRadius: const BorderRadius.all(Radius.circular(AppDimens.rPill)),
-        border: Border.all(
-            color: UiConstants.primaryButtonColor.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: UiConstants.primaryButtonColor),
-          const SizedBox(width: AppDimens.xs),
-          Text(label,
-              style: const TextStyle(
-                color: UiConstants.primaryButtonColor,
-                fontSize: AppDimens.fCaption,
-                fontWeight: FontWeight.w700,
-              )),
         ],
       ),
     );
