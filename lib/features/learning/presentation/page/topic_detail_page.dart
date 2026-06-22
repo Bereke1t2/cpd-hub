@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
-import 'package:lab_portal/core/theme/app_spacing.dart';
+import 'package:lab_portal/core/theme/app_colors.dart';
+import 'package:lab_portal/core/theme/app_dimens.dart';
 import 'package:lab_portal/core/theme/app_text_styles.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/core/widgets/ui_kit.dart';
@@ -12,9 +13,10 @@ import '../../domain/entity/lesson_entity.dart';
 import '../../domain/entity/topic_entity.dart';
 import '../../domain/service/learning_path_engine.dart';
 import '../../domain/usecase/get_lesson.dart';
+import '../widget/lesson_video_card.dart';
 import '../widget/topic_node.dart';
 
-class TopicDetailPage extends StatelessWidget {
+class TopicDetailPage extends StatefulWidget {
   final TopicEntity topic;
   final TopicProgress progress;
   final Map<String, TopicProgress> allProgress;
@@ -27,63 +29,106 @@ class TopicDetailPage extends StatelessWidget {
   });
 
   @override
+  State<TopicDetailPage> createState() => _TopicDetailPageState();
+}
+
+class _TopicDetailPageState extends State<TopicDetailPage> {
+  LessonEntity? _lesson;
+  bool _loadingLesson = true;
+
+  TopicEntity get topic => widget.topic;
+  TopicProgress get progress => widget.progress;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLesson();
+  }
+
+  Future<void> _loadLesson() async {
+    final result = await getIt<GetLesson>().call(topic.id);
+    if (!mounted) return;
+    setState(() {
+      result.fold((l) => _lesson = l, (_) => null);
+      _loadingLesson = false;
+    });
+  }
+
+  // One spacing rhythm for every section so the page reads as a single surface.
+  static const EdgeInsets _sectionPad =
+      EdgeInsets.fromLTRB(AppDimens.lg, AppDimens.md, AppDimens.lg, 0);
+
+  @override
   Widget build(BuildContext context) {
     final style = TopicStatusStyle.of(progress.status);
+    final lesson = _lesson;
+
     return Scaffold(
       backgroundColor: UiConstants.backgroundColor,
       appBar: AppBar(
         backgroundColor: UiConstants.infoBackgroundColor,
         foregroundColor: UiConstants.mainTextColor,
         elevation: 0,
-        title: Text(topic.name, style: AppTextStyles.title),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
-            child: StatusChip(
-              label: style.label,
-              icon: style.icon,
-              color: style.color,
-            ),
-          ),
-        ],
+        title: Text(
+          topic.name,
+          style: AppTextStyles.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       body: CustomScrollView(
         slivers: [
-          // Header card — topic meta + progress ring.
+          // ── Header: progress + meta + status ──────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.md, AppSpacing.md, 0),
+              padding: _sectionPad,
               child: GradientCard(
-                accent: style.color,
                 child: Row(
                   children: [
                     ProgressRing(
                       ratio: progress.ratio,
-                      size: 60,
+                      size: 56,
                       stroke: 6,
-                      color: style.color,
+                      color: UiConstants.primaryButtonColor,
                       center: Text(
                         '${progress.solved}/${progress.total}',
                         style: AppTextStyles.caption.copyWith(
-                          color: style.color,
+                          color: UiConstants.primaryButtonColor,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppDimens.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(topic.category, style: AppTextStyles.caption),
-                          const SizedBox(height: 2),
-                          Text(topic.name, style: AppTextStyles.title),
-                          const SizedBox(height: AppSpacing.xs),
-                          StatPill(
-                            'Level',
-                            '${topic.difficulty} / 5',
-                            color: UiConstants.statTextColor,
+                          const SizedBox(height: AppDimens.xxs),
+                          Text(
+                            topic.name,
+                            style: AppTextStyles.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: AppDimens.sm),
+                          // Wrap keeps the pills on screen no matter the width.
+                          Wrap(
+                            spacing: AppDimens.sm,
+                            runSpacing: AppDimens.xs,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              StatPill(
+                                'Level',
+                                '${topic.difficulty} / 5',
+                                color: UiConstants.primaryButtonColor,
+                              ),
+                              StatusChip(
+                                label: style.label,
+                                icon: style.icon,
+                                color: style.color,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -94,191 +139,165 @@ class TopicDetailPage extends StatelessWidget {
             ),
           ),
 
-          // Summary.
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, AppSpacing.md, AppSpacing.md, 0),
-              child: GradientCard(
+          // ── About ─────────────────────────────────────────────────────────
+          _section(
+            child: GradientCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SectionHeader('About',
+                      icon: Icons.info_outline_rounded),
+                  const SizedBox(height: AppDimens.xs),
+                  Text(topic.summary, style: AppTextStyles.body),
+                ],
+              ),
+            ),
+          ),
+
+          // ── Concept ───────────────────────────────────────────────────────
+          if (!_loadingLesson && lesson != null)
+            _section(child: _ConceptCard(lesson: lesson)),
+
+          // ── Videos (between concept and practice) ─────────────────────────
+          if (!_loadingLesson && lesson != null && lesson.videos.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: _sectionPad,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SectionHeader('About', icon: Icons.info_outline_rounded),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(topic.summary, style: AppTextStyles.body),
+                    const SectionHeader('Watch',
+                        icon: Icons.smart_display_outlined),
+                    for (final v in lesson.videos)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppDimens.sm),
+                        child: LessonVideoCard(video: v),
+                      ),
                   ],
                 ),
               ),
             ),
-          ),
 
-          // Lesson content.
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, AppSpacing.xs, AppSpacing.md, 0),
-              child: _LessonSection(topicId: topic.id),
-            ),
-          ),
-
-          // References.
+          // ── References ────────────────────────────────────────────────────
           if (topic.referenceUrls.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.md, AppSpacing.xs, AppSpacing.md, 0),
-                child: GradientCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SectionHeader('References',
-                          icon: Icons.link_rounded),
-                      const SizedBox(height: AppSpacing.xs),
-                      for (final url in topic.referenceUrls)
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              bottom: AppSpacing.xs),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.open_in_new_rounded,
-                                  size: 14,
-                                  color: UiConstants.problemTextColor),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  url,
-                                  style: AppTextStyles.caption.copyWith(
-                                    color: UiConstants.problemTextColor,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+            _section(
+              child: GradientCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SectionHeader('References',
+                        icon: Icons.link_rounded),
+                    const SizedBox(height: AppDimens.xs),
+                    for (final url in topic.referenceUrls)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: AppDimens.xs),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.open_in_new_rounded,
+                                size: AppDimens.iconSm,
+                                color: UiConstants.primaryButtonColor),
+                            const SizedBox(width: AppDimens.sm),
+                            Expanded(
+                              child: Text(
+                                url,
+                                style: AppTextStyles.caption.copyWith(
+                                  color: UiConstants.primaryButtonColor,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                    ],
-                  ),
+                      ),
+                  ],
                 ),
               ),
             ),
 
-          // Practice problems.
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, AppSpacing.xs, AppSpacing.md, 0),
-              child: _PracticeSection(
-                topic: topic,
-                progress: progress,
-              ),
-            ),
+          // ── Practice ──────────────────────────────────────────────────────
+          _section(
+            child: _PracticeSection(topic: topic, progress: progress),
           ),
 
-          // Prerequisites.
+          // ── Prerequisites ─────────────────────────────────────────────────
           if (topic.prerequisiteIds.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.md, AppSpacing.xs, AppSpacing.md, 0),
-                child: GradientCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SectionHeader('Prerequisites',
-                          icon: Icons.lock_open_rounded),
-                      const SizedBox(height: AppSpacing.xs),
-                      Wrap(
-                        spacing: AppSpacing.xs,
-                        runSpacing: AppSpacing.xs,
-                        children: topic.prerequisiteIds.map((pid) {
-                          final pProg = allProgress[pid];
-                          final pStyle = TopicStatusStyle.of(
-                            pProg?.status ?? TopicStatus.locked,
-                          );
-                          return StatusChip(
-                            label: pid
-                                .replaceAll('-', ' ')
-                                .split(' ')
-                                .map((w) => w.isNotEmpty
-                                    ? '${w[0].toUpperCase()}${w.substring(1)}'
-                                    : '')
-                                .join(' '),
-                            icon: pStyle.icon,
-                            color: pStyle.color,
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
+            _section(
+              child: GradientCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SectionHeader('Prerequisites',
+                        icon: Icons.lock_open_rounded),
+                    const SizedBox(height: AppDimens.xs),
+                    Wrap(
+                      spacing: AppDimens.xs,
+                      runSpacing: AppDimens.xs,
+                      children: topic.prerequisiteIds.map((pid) {
+                        final pProg = widget.allProgress[pid];
+                        final pStyle = TopicStatusStyle.of(
+                          pProg?.status ?? TopicStatus.locked,
+                        );
+                        return StatusChip(
+                          label: pid
+                              .replaceAll('-', ' ')
+                              .split(' ')
+                              .map((w) => w.isNotEmpty
+                                  ? '${w[0].toUpperCase()}${w.substring(1)}'
+                                  : '')
+                              .join(' '),
+                          icon: pStyle.icon,
+                          color: pStyle.color,
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
               ),
             ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppDimens.xl)),
         ],
       ),
     );
   }
+
+  // Wraps any section child in the shared padding rhythm.
+  Widget _section({required Widget child}) => SliverToBoxAdapter(
+        child: Padding(padding: _sectionPad, child: child),
+      );
 }
 
-// Loads and renders the lesson body + key ideas.
-class _LessonSection extends StatefulWidget {
-  final String topicId;
-  const _LessonSection({required this.topicId});
-
-  @override
-  State<_LessonSection> createState() => _LessonSectionState();
-}
-
-class _LessonSectionState extends State<_LessonSection> {
-  LessonEntity? _lesson;
-  bool _loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    final result = await getIt<GetLesson>().call(widget.topicId);
-    if (!mounted) return;
-    setState(() {
-      result.fold((l) => _lesson = l, (_) => null);
-      _loading = false;
-    });
-  }
+// ── Concept (lesson body + key ideas) ─────────────────────────────────────────
+class _ConceptCard extends StatelessWidget {
+  final LessonEntity lesson;
+  const _ConceptCard({required this.lesson});
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const SizedBox.shrink();
-    final lesson = _lesson;
-    if (lesson == null) return const SizedBox.shrink();
-
     return GradientCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionHeader('Concept', icon: Icons.lightbulb_outline_rounded),
-          const SizedBox(height: AppSpacing.xs),
+          const SectionHeader('Concept',
+              icon: Icons.lightbulb_outline_rounded),
+          const SizedBox(height: AppDimens.xs),
           Text(lesson.body, style: AppTextStyles.body),
           if (lesson.keyIdeas.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppDimens.sm),
             const Divider(color: UiConstants.borderColor),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: AppDimens.xs),
             for (final idea in lesson.keyIdeas)
               Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.only(bottom: AppDimens.xs),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('• ',
+                    const Text('•  ',
                         style: TextStyle(
                             color: UiConstants.primaryButtonColor,
                             fontWeight: FontWeight.w900)),
-                    Expanded(
-                        child: Text(idea, style: AppTextStyles.body)),
+                    Expanded(child: Text(idea, style: AppTextStyles.body)),
                   ],
                 ),
               ),
@@ -289,8 +308,7 @@ class _LessonSectionState extends State<_LessonSection> {
   }
 }
 
-// Shows the topic's problem set (easy→hard) with solved ticks.
-// Pulls from ProblemsBloc already in tree; falls back to linking by problemId.
+// ── Practice problems ─────────────────────────────────────────────────────────
 class _PracticeSection extends StatelessWidget {
   final TopicEntity topic;
   final TopicProgress progress;
@@ -304,14 +322,10 @@ class _PracticeSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SectionHeader(
-              'Practice',
-              icon: Icons.code_rounded,
-              trailing: '0 problems',
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            const Text('Problems coming soon.',
-                style: AppTextStyles.body),
+            const SectionHeader('Practice',
+                icon: Icons.code_rounded, trailing: '0 problems'),
+            const SizedBox(height: AppDimens.xs),
+            const Text('Problems coming soon.', style: AppTextStyles.body),
           ],
         ),
       );
@@ -343,29 +357,14 @@ class _PracticeSection extends StatelessWidget {
             icon: Icons.code_rounded,
             trailing: '${progress.solved}/${progress.total}',
           ),
-          const SizedBox(height: AppSpacing.xs),
-          ProgressRing(
-            ratio: progress.ratio,
-            size: 36,
-            stroke: 4,
-            color: UiConstants.primaryButtonColor,
-            center: Text(
-              '${(progress.ratio * 100).round()}%',
-              style: const TextStyle(
-                  fontSize: 9,
-                  color: UiConstants.primaryButtonColor,
-                  fontWeight: FontWeight.w900),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppDimens.xs),
           if (mapped.isEmpty)
             Text(
               topic.problemIds.map((id) => '• $id').join('\n'),
               style: AppTextStyles.caption,
             )
           else
-            for (final p in mapped)
-              _ProblemRow(problem: p),
+            for (final p in mapped) _ProblemRow(problem: p),
         ],
       ),
     );
@@ -388,43 +387,34 @@ class _ProblemRow extends StatelessWidget {
           builder: (_) => ProblemDetailsPage(problem: problem),
         ),
       ),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: AppDimens.brSm,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: AppDimens.sm),
         child: Row(
           children: [
             Icon(
               problem.isSolved
                   ? Icons.check_circle_rounded
                   : Icons.radio_button_unchecked_rounded,
-              size: 18,
+              size: AppDimens.iconMd,
               color: color,
             ),
-            const SizedBox(width: AppSpacing.xs),
+            const SizedBox(width: AppDimens.sm),
             Expanded(
-              child: Text(problem.title, style: AppTextStyles.body),
+              child: Text(problem.title,
+                  style: AppTextStyles.body,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis),
             ),
+            const SizedBox(width: AppDimens.sm),
             Text(problem.difficulty,
                 style: AppTextStyles.caption.copyWith(
-                  color: _diffColor(problem.difficulty),
+                  color: AppColors.difficulty(problem.difficulty),
                   fontWeight: FontWeight.w700,
                 )),
           ],
         ),
       ),
     );
-  }
-
-  Color _diffColor(String d) {
-    switch (d.toLowerCase()) {
-      case 'easy':
-        return const Color(0xFF43A047);
-      case 'medium':
-        return const Color(0xFFFFA726);
-      case 'hard':
-        return const Color(0xFFE53935);
-      default:
-        return UiConstants.subtitleTextColor;
-    }
   }
 }

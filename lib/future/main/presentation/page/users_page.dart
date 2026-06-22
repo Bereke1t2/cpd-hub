@@ -1,12 +1,16 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/core/routing/route_names.dart';
+import 'package:lab_portal/core/theme/app_dimens.dart';
 import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/app_text.dart';
 import 'package:lab_portal/core/widgets/async_view.dart';
+import 'package:lab_portal/core/widgets/avatar.dart';
 import 'package:lab_portal/future/main/domain/entity/user_entity.dart';
 import 'package:lab_portal/future/main/presentation/bloc/users/users_bloc.dart';
+
+import 'base_page.dart';
 
 class UsersPage extends StatefulWidget {
   const UsersPage({super.key});
@@ -19,205 +23,298 @@ class _UsersPageState extends State<UsersPage> {
   // Division filter is purely a UI preference — keep it in local state.
   String _filterDivision = 'All';
 
-  Color _ratingColor(int rating) {
-    if (rating >= 2400) return const Color(0xFFFF0000);
-    if (rating >= 2000) return const Color(0xFFFF8F00);
-    if (rating >= 1900) return const Color(0xFF7E57C2);
-    if (rating >= 1600) return const Color(0xFF1E88E5);
-    if (rating >= 1400) return const Color(0xFF00BCD4);
-    if (rating >= 1200) return const Color(0xFF43A047);
-    return const Color(0xFF9E9E9E);
+  List<UserEntity> _applyDivisionFilter(List<UserEntity> users) {
+    final list = _filterDivision == 'All'
+        ? List<UserEntity>.from(users)
+        : users.where((u) => u.division == _filterDivision).toList();
+    // Leaderboard order: strongest first.
+    list.sort((a, b) => b.rating.compareTo(a.rating));
+    return list;
   }
 
-  List<UserEntity> _applyDivisionFilter(List<UserEntity> users) {
-    if (_filterDivision == 'All') return users;
-    return users.where((u) => u.division == _filterDivision).toList();
+  // Divisions are derived from the data so the filter always matches reality.
+  List<String> _divisions(List<UserEntity> users) {
+    final set = <String>{for (final u in users) u.division}..removeWhere((d) => d.isEmpty);
+    final sorted = set.toList()..sort();
+    return ['All', ...sorted];
+  }
+
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length >= 2 && parts[0].isNotEmpty && parts[1].isNotEmpty) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name.isEmpty ? 'U' : name.substring(0, name.length.clamp(1, 2)).toUpperCase();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<UsersBloc>()..add(UsersStarted()),
-      child: Scaffold(
-        backgroundColor: UiConstants.backgroundColor,
-        appBar: AppBar(
-          backgroundColor: UiConstants.primaryButtonColor,
-          title: const Text('Users',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-          elevation: 0,
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Builder(
-                      builder: (ctx) => TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search users…',
-                          prefixIcon: const Icon(Icons.search),
-                          filled: true,
-                          fillColor: UiConstants.infoBackgroundColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
+      child: BasePage(
+        selectedIndex: 4,
+        title: 'Users',
+        subtitle: 'Community leaderboard',
+        body: Column(
+          children: [
+            // ── Search ─────────────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  AppDimens.lg, AppDimens.md, AppDimens.lg, AppDimens.sm),
+              child: Builder(
+                builder: (ctx) => Container(
+                  height: AppDimens.buttonHeight,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppDimens.md),
+                  decoration: BoxDecoration(
+                    color: UiConstants.infoBackgroundColor,
+                    borderRadius: const BorderRadius.all(
+                        Radius.circular(AppDimens.rPill)),
+                    border: Border.all(
+                        color: UiConstants.primaryButtonColor
+                            .withValues(alpha: 0.25)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search_rounded,
+                          color: UiConstants.primaryButtonColor,
+                          size: AppDimens.iconMd),
+                      const SizedBox(width: AppDimens.sm),
+                      Expanded(
+                        child: TextField(
+                          cursorColor: UiConstants.primaryButtonColor,
+                          style: const TextStyle(
+                              color: UiConstants.mainTextColor,
+                              fontSize: AppDimens.fBody),
+                          decoration: const InputDecoration(
+                            isCollapsed: true,
+                            border: InputBorder.none,
+                            hintText: 'Search by name or username…',
+                            hintStyle: TextStyle(
+                                color: UiConstants.subtitleTextColor,
+                                fontSize: AppDimens.fBody),
                           ),
+                          onChanged: (q) =>
+                              ctx.read<UsersBloc>().add(UsersSearchChanged(q)),
                         ),
-                        onChanged: (q) =>
-                            ctx.read<UsersBloc>().add(UsersSearchChanged(q)),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    decoration: BoxDecoration(
-                      color: UiConstants.infoBackgroundColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _filterDivision,
-                        items: ['All', 'A', 'B', 'C', 'Div1', 'Div2']
-                            .map((d) =>
-                                DropdownMenuItem(value: d, child: Text(d)))
-                            .toList(),
-                        onChanged: (v) =>
-                            setState(() => _filterDivision = v ?? 'All'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: BlocBuilder<UsersBloc, UsersState>(
-                  builder: (context, state) => AsyncView<List<UserEntity>>(
-                    isLoading: state is UsersLoading || state is UsersInitial,
-                    error: state is UsersError ? state.message : null,
-                    data: state is UsersLoaded
-                        ? _applyDivisionFilter(state.users)
-                        : null,
-                    isEmpty: (d) => d.isEmpty,
-                    onRetry: () => context.read<UsersBloc>().add(UsersStarted()),
-                    emptyMessage: 'No users found',
-                    emptySubtitle: 'Try adjusting your search or division filter.',
-                    builder: (users) => LayoutBuilder(
-                      builder: (context, constraints) {
-                        final cross = constraints.maxWidth > 900
-                            ? 3
-                            : (constraints.maxWidth > 600 ? 2 : 1);
-                        return GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: cross,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 3.6,
-                          ),
-                          itemCount: users.length,
-                          itemBuilder: (context, index) =>
-                              _userCard(context, users[index]),
-                        );
-                      },
-                    ),
+                    ],
                   ),
                 ),
               ),
-            ],
+            ),
+
+            // ── Body ───────────────────────────────────────────────────────
+            Expanded(
+              child: BlocBuilder<UsersBloc, UsersState>(
+                builder: (context, state) {
+                  final users = state is UsersLoaded ? state.users : null;
+                  return Column(
+                    children: [
+                      if (users != null && users.isNotEmpty)
+                        _DivisionFilter(
+                          divisions: _divisions(users),
+                          selected: _filterDivision,
+                          onSelected: (d) =>
+                              setState(() => _filterDivision = d),
+                        ),
+                      Expanded(
+                        child: AsyncView<List<UserEntity>>(
+                          isLoading:
+                              state is UsersLoading || state is UsersInitial,
+                          error: state is UsersError ? state.message : null,
+                          data: users == null
+                              ? null
+                              : _applyDivisionFilter(users),
+                          isEmpty: (d) => d.isEmpty,
+                          onRetry: () =>
+                              context.read<UsersBloc>().add(UsersStarted()),
+                          emptyMessage: 'No users found',
+                          emptySubtitle:
+                              'Try adjusting your search or division filter.',
+                          builder: (list) => ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(AppDimens.lg,
+                                AppDimens.sm, AppDimens.lg, AppDimens.xl + 80),
+                            itemCount: list.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: AppDimens.sm),
+                            itemBuilder: (context, index) => RepaintBoundary(
+                              child: _UserTile(
+                                rank: index + 1,
+                                user: list[index],
+                                initials: _initials(list[index].fullName.isEmpty
+                                    ? list[index].username
+                                    : list[index].fullName),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Division filter chips ─────────────────────────────────────────────────────
+class _DivisionFilter extends StatelessWidget {
+  final List<String> divisions;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  const _DivisionFilter({
+    required this.divisions,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // SingleChildScrollView + Row: each chip sizes to its own content, so no
+    // child is ever asked to fill the unbounded width of a horizontal list.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: AppDimens.lg),
+      child: Row(
+        children: [
+          for (final d in divisions) ...[
+            _chip(d),
+            if (d != divisions.last) const SizedBox(width: AppDimens.sm),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _chip(String d) {
+    final isActive = d == selected;
+    return GestureDetector(
+      onTap: () => onSelected(d),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.md, vertical: AppDimens.sm),
+        decoration: BoxDecoration(
+          color: isActive
+              ? UiConstants.primaryButtonColor
+              : UiConstants.infoBackgroundColor,
+          borderRadius:
+              const BorderRadius.all(Radius.circular(AppDimens.rPill)),
+          border: Border.all(
+            color: UiConstants.primaryButtonColor
+                .withValues(alpha: isActive ? 1 : 0.25),
+          ),
+        ),
+        child: Text(
+          d == 'All' ? 'All' : 'Div $d',
+          style: TextStyle(
+            color: isActive ? Colors.white : UiConstants.subtitleTextColor,
+            fontSize: AppDimens.fCaption,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _userCard(BuildContext context, UserEntity u) {
-    final color = _ratingColor(u.rating);
-    final mini = List.generate(7, (i) => Random(u.rating + i).nextInt(6));
-    final spark = List.generate(
-        6, (i) => max(0, u.rating % 100 + Random(i).nextInt(30) - 10));
+// ── Single user row ───────────────────────────────────────────────────────────
+class _UserTile extends StatelessWidget {
+  final int rank;
+  final UserEntity user;
+  final String initials;
 
+  const _UserTile({
+    required this.rank,
+    required this.user,
+    required this.initials,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isTop = rank <= 3;
     return GestureDetector(
       onTap: () => Navigator.pushNamed(
         context,
         RouteNames.userDetails,
-        arguments: u,
+        arguments: user,
       ),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppDimens.md, vertical: AppDimens.md),
         decoration: BoxDecoration(
           color: UiConstants.infoBackgroundColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: AppDimens.brMd,
           border: Border.all(
-              color: UiConstants.primaryButtonColor.withOpacity(0.04)),
+            color: UiConstants.primaryButtonColor
+                .withValues(alpha: isTop ? 0.45 : 0.16),
+          ),
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: color.withOpacity(0.12),
+            // Rank
+            SizedBox(
+              width: 26,
               child: Text(
-                u.username
-                    .substring(0, min(2, u.username.length))
-                    .toUpperCase(),
-                style:
-                    TextStyle(color: color, fontWeight: FontWeight.w900),
+                '$rank',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: isTop
+                      ? UiConstants.primaryButtonColor
+                      : UiConstants.subtitleTextColor,
+                  fontSize: AppDimens.fH2,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimens.sm),
+            Avatar(
+              initials: initials,
+              imageUrl: user.avatarUrl,
+              size: AppDimens.avatarMd,
+            ),
+            const SizedBox(width: AppDimens.md),
+            // Name + meta (single ellipsized line — overflow-proof on small screens)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(children: [
-                    Flexible(
-                      child: Text(u.fullName,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: UiConstants.mainTextColor)),
-                    ),
-                    const SizedBox(width: 8),
-                    Text('@${u.username}',
-                        style: const TextStyle(
-                            color: Colors.grey, fontSize: 12)),
-                  ]),
-                  const SizedBox(height: 6),
-                  Row(children: [
-                    _miniHeat(mini),
-                    const SizedBox(width: 8),
-                    Expanded(
-                        child: SizedBox(
-                            height: 28,
-                            child: _SmallSpark(values: spark))),
-                  ]),
+                  AppText.title(
+                    user.fullName.isEmpty ? user.username : user.fullName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: AppDimens.xxs),
+                  AppText.caption(
+                    '@${user.username} · ${user.solvedProblems} solved',
+                    color: UiConstants.subtitleTextColor,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimens.sm),
+            // Rating
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(u.rating.toString(),
-                    style: TextStyle(
-                        color: color,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16)),
-                const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(8),
+                Text(
+                  '${user.rating}',
+                  style: const TextStyle(
+                    color: UiConstants.primaryButtonColor,
+                    fontSize: AppDimens.fH1,
+                    fontWeight: FontWeight.w900,
                   ),
-                  child: Text(u.division,
-                      style: TextStyle(
-                          color: color, fontWeight: FontWeight.w800)),
                 ),
+                AppText.micro('rating',
+                    color: UiConstants.subtitleTextColor),
               ],
             ),
           ],
@@ -225,69 +322,4 @@ class _UsersPageState extends State<UsersPage> {
       ),
     );
   }
-
-  Widget _miniHeat(List<int> values) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: values.map((v) {
-        final c = v <= 0
-            ? Colors.transparent
-            : (v == 1
-                ? const Color(0xFFD7EAD9)
-                : (v == 2
-                    ? const Color(0xFFAEE0B3)
-                    : (v == 3
-                        ? const Color(0xFF86D28D)
-                        : (v == 4
-                            ? const Color(0xFF4FC068)
-                            : const Color(0xFF2E8B3C)))));
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 1),
-          width: 8,
-          height: 8,
-          decoration:
-              BoxDecoration(color: c, borderRadius: BorderRadius.circular(2)),
-        );
-      }).toList(),
-    );
-  }
-}
-
-class _SmallSpark extends StatelessWidget {
-  const _SmallSpark({required this.values});
-  final List<int> values;
-
-  @override
-  Widget build(BuildContext context) => CustomPaint(
-        size: const Size(double.infinity, double.infinity),
-        painter: _SmallSparkPainter(values),
-      );
-}
-
-class _SmallSparkPainter extends CustomPainter {
-  _SmallSparkPainter(this.values);
-  final List<int> values;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (values.isEmpty) return;
-    final maxV = values.reduce(max).toDouble();
-    final minV = values.reduce(min).toDouble();
-    final range = (maxV - minV) == 0 ? 1.0 : (maxV - minV);
-    final paint = Paint()
-      ..color = UiConstants.primaryButtonColor
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke
-      ..isAntiAlias = true;
-    final path = Path();
-    for (var i = 0; i < values.length; i++) {
-      final x = (i / (values.length - 1)) * size.width;
-      final y = size.height - ((values[i] - minV) / range) * size.height;
-      if (i == 0) { path.moveTo(x, y); } else { path.lineTo(x, y); }
-    }
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

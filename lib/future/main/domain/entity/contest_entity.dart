@@ -24,6 +24,14 @@ class ContestEntity extends Equatable {
     required this.isParticipating,
   });
 
+  /// Parsed start time in local timezone. Use this everywhere instead of
+  /// calling DateTime.tryParse(startTime) at each call site.
+  DateTime get startsAt =>
+      (DateTime.tryParse(startTime) ?? DateTime.now()).toLocal();
+
+  /// True when the contest hasn't started yet.
+  bool get isUpcoming => !isPast && startsAt.isAfter(DateTime.now());
+
   @override
   List<Object?> get props => [
         id,

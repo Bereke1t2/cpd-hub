@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lab_portal/core/theme/app_colors.dart';
+import 'package:lab_portal/core/widgets/app_chip.dart';
 
-import '../../../../core/ui_constants.dart';
-
+/// Thin wrapper kept for backward-compat. Prefer AppChip(difficulty, color: AppColors.difficulty(...)) directly.
 class DifficultyBox extends StatelessWidget {
   final String difficulty;
 
@@ -9,28 +10,10 @@ class DifficultyBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: difficulty.toLowerCase() == 'easy'
-            ? UiConstants.easyProblemColor
-            : difficulty.toLowerCase() == 'medium'
-            ? UiConstants.mediumProblemColor
-            : UiConstants.hardProblemColor,
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      child: Text(
-        difficulty,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: difficulty.toLowerCase() == 'easy'
-              ? Colors.green.shade400
-              : difficulty.toLowerCase() == 'medium'
-              ? Colors.orange.shade400
-              : Colors.red.shade400,
-          fontSize: 12.0,
-        ),
-      ),
+    return AppChip(
+      difficulty,
+      color: AppColors.difficulty(difficulty),
+      backgroundColor: AppColors.difficultyBg(difficulty),
     );
   }
 }

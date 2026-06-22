@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:lab_portal/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/ui_constants.dart';
@@ -23,13 +24,7 @@ class ContestLeaderboardPage extends StatelessWidget {
     return UiConstants.primaryButtonColor;
   }
 
-  Color _ratingColor(int rating) {
-    if (rating >= 1900) return const Color(0xFFFF8F00);
-    if (rating >= 1600) return const Color(0xFF7E57C2);
-    if (rating >= 1400) return const Color(0xFF1E88E5);
-    if (rating >= 1200) return const Color(0xFF43A047);
-    return const Color(0xFF9E9E9E);
-  }
+  Color _ratingColor(int rating) => AppColors.rating(rating);
 
   // Small reusable pill
   Widget _statPill(String label, String value, {Color? valueColor}) {
@@ -66,8 +61,8 @@ class ContestLeaderboardPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.14)),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+        border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.14)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Row(
         children: [
@@ -138,7 +133,7 @@ class ContestLeaderboardPage extends StatelessWidget {
     final accent = _rankColor(e.position);
     final delta = e.newRating - e.oldRating;
     final deltaColor = (delta >= 0) ? const Color(0xFF2E7D32) : const Color(0xFFC62828);
-    final borderColor = isTop3 ? accent.withOpacity(0.55) : UiConstants.primaryButtonColor.withOpacity(0.12);
+    final borderColor = isTop3 ? accent.withValues(alpha: 0.55) : UiConstants.primaryButtonColor.withValues(alpha: 0.12);
 
     // avatar initials
     final initials = (e.username ?? '').isNotEmpty
@@ -151,7 +146,7 @@ class ContestLeaderboardPage extends StatelessWidget {
         color: UiConstants.infoBackgroundColor,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: borderColor),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Row(
         children: [
@@ -176,7 +171,7 @@ class ContestLeaderboardPage extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundColor: _ratingColor(e.newRating).withOpacity(0.12),
+                  backgroundColor: _ratingColor(e.newRating).withValues(alpha: 0.12),
                   child: Text(
                     initials,
                     style: TextStyle(color: _ratingColor(e.newRating), fontWeight: FontWeight.w900),
@@ -247,7 +242,7 @@ class ContestLeaderboardPage extends StatelessWidget {
     return Card(
       color: UiConstants.infoBackgroundColor,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: UiConstants.primaryButtonColor.withOpacity(0.08))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: UiConstants.primaryButtonColor.withValues(alpha: 0.08))),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         child: Column(
@@ -258,9 +253,9 @@ class ContestLeaderboardPage extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: accent.withOpacity(0.12),
+                    color: accent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: accent.withOpacity(0.22)),
+                    border: Border.all(color: accent.withValues(alpha: 0.22)),
                   ),
                   child: Center(
                     child: Text(
@@ -275,7 +270,7 @@ class ContestLeaderboardPage extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 20,
-                        backgroundColor: _ratingColor(e.newRating).withOpacity(0.12),
+                        backgroundColor: _ratingColor(e.newRating).withValues(alpha: 0.12),
                         child: Text(initials, style: TextStyle(color: _ratingColor(e.newRating), fontWeight: FontWeight.w900)),
                       ),
                       const SizedBox(width: 10),
@@ -328,15 +323,15 @@ class ContestLeaderboardPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: UiConstants.infoBackgroundColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.16)),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 12, offset: const Offset(0, 4))],
+                  border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.16)),
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.10), blurRadius: 12, offset: const Offset(0, 4))],
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: UiConstants.primaryButtonColor.withOpacity(0.12),
+                        color: UiConstants.primaryButtonColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(Icons.emoji_events_outlined, color: UiConstants.primaryButtonColor),
@@ -358,9 +353,9 @@ class ContestLeaderboardPage extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: UiConstants.primaryButtonColor.withOpacity(0.10),
+                        color: UiConstants.primaryButtonColor.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: UiConstants.primaryButtonColor.withOpacity(0.22)),
+                        border: Border.all(color: UiConstants.primaryButtonColor.withValues(alpha: 0.22)),
                       ),
                       child: Column(children: [
                         const Text('Problems', style: TextStyle(color: UiConstants.subtitleTextColor, fontSize: 11, fontWeight: FontWeight.w600)),

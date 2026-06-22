@@ -1,4 +1,5 @@
 import '../learning_data_source.dart';
+import '../../../domain/entity/lesson_entity.dart';
 import '../../models/lesson_model.dart';
 import '../../models/topic_model.dart';
 import '../../models/track_model.dart';
@@ -441,6 +442,14 @@ final _lessons = <String, LessonModel>{
       '"Binary search on the answer" turns optimisation into repeated feasibility checks.',
       'Always verify: what is f(lo) and f(hi) before the loop?',
     ],
+    videos: [
+      LessonVideo(
+        title: 'Binary search, visualised',
+        url:
+            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+        durationLabel: '9 min',
+      ),
+    ],
   ),
   'graphs-intro': const LessonModel(
     topicId: 'graphs-intro',
@@ -454,6 +463,14 @@ final _lessons = <String, LessonModel>{
       'BFS = shortest path (unweighted). DFS = reachability, cycles, components.',
       'Mark visited *before* pushing to the queue, not after popping.',
       'For trees, DFS naturally gives parent/children — store parent to avoid revisiting.',
+    ],
+    videos: [
+      LessonVideo(
+        title: 'BFS vs DFS walkthrough',
+        url:
+            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+        durationLabel: '11 min',
+      ),
     ],
   ),
   'dp-intro': const LessonModel(
@@ -469,6 +486,14 @@ final _lessons = <String, LessonModel>{
       'Recurrence must only reference strictly smaller subproblems.',
       'Always check: are all base cases initialised correctly?',
       'Print the DP table on small inputs to debug wrong recurrences.',
+    ],
+    videos: [
+      LessonVideo(
+        title: 'From recursion to DP',
+        url:
+            'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+        durationLabel: '7 min',
+      ),
     ],
   ),
   'greedy': const LessonModel(
