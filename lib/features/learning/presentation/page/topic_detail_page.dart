@@ -63,6 +63,21 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     final style = TopicStatusStyle.of(progress.status);
     final lesson = _lesson;
 
+    // This page is pushed as its own route, so the Learn tab's ProblemsBloc
+    // isn't in scope here. Provide a fresh one so the Practice section can
+    // resolve its problems instead of throwing ProviderNotFoundException
+    // (which paints a full-screen red error box that looks like an overflow).
+    return BlocProvider<ProblemsBloc>(
+      create: (_) => getIt<ProblemsBloc>()..add(ProblemsStarted()),
+      child: _buildScaffold(context, style, lesson),
+    );
+  }
+
+  Widget _buildScaffold(
+    BuildContext context,
+    TopicStatusStyle style,
+    LessonEntity? lesson,
+  ) {
     return Scaffold(
       backgroundColor: UiConstants.backgroundColor,
       // Blended, title-less bar so the hero below carries the topic identity
