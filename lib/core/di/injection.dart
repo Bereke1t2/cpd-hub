@@ -43,6 +43,18 @@ import 'package:lab_portal/future/main/presentation/bloc/users/users_bloc.dart';
 import 'package:lab_portal/future/main/presentation/bloc/contest_leaderboard/contest_leaderboard_bloc.dart';
 // ---- phase 9: learning ----
 import 'package:lab_portal/features/consistency/data/datasources/consistency_data_source.dart';
+import 'package:lab_portal/features/practice/data/datasources/mock/mock_practice_data_source.dart';
+import 'package:lab_portal/features/practice/data/datasources/practice_data_source.dart';
+import 'package:lab_portal/features/practice/data/repository/practice_repository_impl.dart';
+import 'package:lab_portal/features/practice/domain/repository/practice_repository.dart';
+import 'package:lab_portal/features/practice/domain/service/recommender.dart';
+import 'package:lab_portal/features/practice/domain/service/sm2_scheduler.dart';
+import 'package:lab_portal/features/practice/domain/service/strength_analyzer.dart';
+import 'package:lab_portal/features/practice/domain/usecase/add_to_review.dart';
+import 'package:lab_portal/features/practice/domain/usecase/get_review_queue.dart';
+import 'package:lab_portal/features/practice/domain/usecase/get_upsolves.dart';
+import 'package:lab_portal/features/practice/domain/usecase/save_review_result.dart';
+import 'package:lab_portal/features/practice/presentation/bloc/practice/practice_bloc.dart';
 import 'package:lab_portal/features/consistency/data/datasources/mock/mock_consistency_data_source.dart';
 import 'package:lab_portal/features/consistency/data/repository/consistency_repository_impl.dart';
 import 'package:lab_portal/features/consistency/domain/repository/consistency_repository.dart';
@@ -247,6 +259,36 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // ---- phase 11: smart practice ----
+  getIt.registerLazySingleton<PracticeDataSource>(
+    () => MockPracticeDataSource(getIt<SharedPreferences>()),
+  );
+  getIt.registerLazySingleton<PracticeRepository>(
+    () => PracticeRepositoryImpl(getIt<PracticeDataSource>()),
+  );
+  getIt.registerLazySingleton<StrengthAnalyzer>(() => const StrengthAnalyzer());
+  getIt.registerLazySingleton<Recommender>(() => const Recommender());
+  getIt.registerLazySingleton<Sm2Scheduler>(() => const Sm2Scheduler());
+  getIt.registerFactory(() => GetReviewQueue(getIt<PracticeRepository>()));
+  getIt.registerFactory(() => GetUpsolves(getIt<PracticeRepository>()));
+  getIt.registerFactory(
+    () => SaveReviewResult(getIt<PracticeRepository>(),
+        scheduler: getIt<Sm2Scheduler>()),
+  );
+  getIt.registerFactory(
+    () => AddToReview(getIt<PracticeRepository>(),
+        scheduler: getIt<Sm2Scheduler>()),
+  );
+  getIt.registerFactory(
+    () => PracticeBloc(
+      getReviewQueue: getIt<GetReviewQueue>(),
+      getUpsolves: getIt<GetUpsolves>(),
+      saveReviewResult: getIt<SaveReviewResult>(),
+      addToReview: getIt<AddToReview>(),
+      repo: getIt<PracticeRepository>(),
+      analyzer: getIt<StrengthAnalyzer>(),
+      recommender: getIt<Recommender>(),
+      scheduler: getIt<Sm2Scheduler>(),
   // ---- phase 15: courses ----
   getIt.registerLazySingleton<CoursesDataSource>(
     () => MockCoursesDataSource(),

@@ -5,6 +5,12 @@ import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/core/theme/app_dimens.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/features/consistency/presentation/cubit/streak/streak_cubit.dart';
+import 'package:lab_portal/features/learning/domain/entity/topic_entity.dart';
+import 'package:lab_portal/features/learning/domain/service/learning_path_engine.dart';
+import 'package:lab_portal/features/learning/presentation/bloc/topics/topics_bloc.dart';
+import 'package:lab_portal/features/practice/domain/service/strength_analyzer.dart';
+import 'package:lab_portal/features/practice/domain/entity/solve_history.dart';
+import 'package:lab_portal/features/practice/presentation/widget/strength_category_bar.dart';
 import 'package:lab_portal/future/main/presentation/bloc/profile/profile_bloc.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 
