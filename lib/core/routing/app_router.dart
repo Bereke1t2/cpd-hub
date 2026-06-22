@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lab_portal/features/consistency/presentation/page/consistency_page.dart';
 import 'package:lab_portal/features/practice/presentation/page/for_you_page.dart';
+import 'package:lab_portal/features/courses/presentation/page/courses_page.dart';
 import 'package:lab_portal/features/learning/presentation/page/skill_tree_page.dart';
 import 'package:lab_portal/features/learning/presentation/page/tracks_page.dart';
 import 'package:lab_portal/future/main/presentation/page/home_page.dart';
@@ -45,6 +46,9 @@ class AppRouter {
       // ---- phase 9: learning ----
       case RouteNames.learn:
         return _page(const SkillTreePage(), settings);
+      case RouteNames.tracks:
+        return _page(const TracksPage(), settings);
+
       // ---- phase 10: consistency ----
       case RouteNames.consistency:
         return _page(const ConsistencyPage(), settings);
@@ -53,6 +57,10 @@ class AppRouter {
         return _page(const ForYouPage(), settings);
       case RouteNames.tracks:
         return _page(const TracksPage(), settings);
+
+      // ---- phase 15: courses ----
+      case RouteNames.courses:
+        return _page(const CoursesPage(), settings);
 
       default:
         return _page(

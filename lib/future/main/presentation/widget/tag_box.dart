@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:lab_portal/core/theme/app_dimens.dart';
+import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/app_chip.dart';
 
-import '../../../../core/ui_constants.dart';
-
+/// Thin wrapper kept for backward-compat. Prefer AppChip(tag) directly.
 class TagBox extends StatelessWidget {
   final String tag;
   const TagBox({super.key, required this.tag});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(right: 2.0),
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-      decoration: BoxDecoration(
-        color: UiConstants.secondaryButtonColor,
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: Text(
-        tag,
-        style: TextStyle(color: UiConstants.mainTextColor, fontSize: 12.0),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(right: AppDimens.xs),
+      child: AppChip(tag, color: UiConstants.secondaryButtonColor),
     );
   }
 }

@@ -26,4 +26,6 @@ class RouteNames {
 
   // ---- phase 11: smart practice ----
   static const String forYou = '/for-you';
+  // ---- phase 15: courses ----
+  static const String courses = '/courses';
 }

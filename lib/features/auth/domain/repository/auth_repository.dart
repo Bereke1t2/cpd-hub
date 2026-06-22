@@ -11,6 +11,7 @@ abstract class AuthRepository {
     required String fullName,
     required String email,
     required String password,
+    String confirmPassword,
   });
 
   Future<Either<AuthUserEntity, Failure>> getCurrentUser();

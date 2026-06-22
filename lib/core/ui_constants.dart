@@ -1,51 +1,49 @@
 import 'package:flutter/material.dart';
 
 class UiConstants {
-  // Background Colors
-  static const Color backgroundColor = Color(0xFF121212); // Dark background
+  // ── Backgrounds ───────────────────────────────────────────────────────────
+  static const Color backgroundColor = Color(0xFF0D1F17); // deep dark-green tint
+  static const Color infoBackgroundColor = Color(0xFF152B1E); // card surface
   static final Color cardBackgroundColor = Color.lerp(
-        UiConstants.backgroundColor,
-        UiConstants.primaryButtonColor,
-        0.28,
-      )!; // Slightly lighter for cards and sections
-  // Primary Colors
-  static const Color primaryButtonColor = Color(0xFF28C76F); // Bright Green (for buttons like 'Solve It Now')
-  static const Color secondaryButtonColor = Color(0xFF5B6C8E); // Light Blue (for other highlighted sections)
-  static const Color infoBackgroundColor = Color(0xFF1A2A3A); // Darker shade for info sections
+    infoBackgroundColor,
+    primaryButtonColor,
+    0.18,
+  )!;
 
-  // Text Colors
-  static const Color mainTextColor = Color(0xFFFFFFFF); // White text
-  static const Color subtitleTextColor = Color(0xFFB0B0B0); // Light gray for secondary text
-  static const Color problemTextColor = Color(0xFF58B4D8); // Light blue text for problem info
+  // ── Primary palette: green + white ────────────────────────────────────────
+  static const Color primaryButtonColor = Color(0xFF28C76F); // green
+  static const Color primaryDark = Color(0xFF1B7A49); // deeper green (gradients)
 
-  // Rating & Stats
-  static const Color ratingTextColor = Color(0xFFE9A200); // Gold/yellow for rating text
-  static const Color statTextColor = Color(0xFF00C1A1); // Green text for statistics
+  // ── Text ──────────────────────────────────────────────────────────────────
+  static const Color mainTextColor = Color(0xFFFFFFFF); // white
+  static const Color subtitleTextColor = Color(0xFFAABBAA); // muted green-grey
 
-  // Problem Difficulty Colors
-  static const Color easyProblemColor = Color(0x334CAF50); // 20% transparent green (easy problem)
-  static const Color mediumProblemColor = Color(0x33FFC107); // 20% transparent yellow (medium problem)
-  static const Color hardProblemColor = Color(0x33F44336); // 20% transparent red (hard problem)
+  // Keep these aliases pointing at primary so widgets that reference them
+  // stay green without needing a mass find-replace yet.
+  static const Color problemTextColor = Color(0xFFFFFFFF); // white (was blue)
+  static const Color ratingTextColor = Color(0xFF28C76F); // green (was gold)
+  static const Color statTextColor = Color(0xFF28C76F); // green (was teal)
+  static const Color secondaryButtonColor = Color(0xFF28C76F); // green (was blue-grey)
 
-  // Borders and Shadows
-  static const Color borderColor = Color(0xFF333333); // Dark border color for cards and sections
-  static const Color shadowColor = Color(0x80000000); // Semi-transparent black for shadows
+  // ── Difficulty (semantic — keep distinct) ─────────────────────────────────
+  static const Color easyProblemColor = Color(0x2228C76F); // green tint
+  static const Color mediumProblemColor = Color(0x22FFC107); // amber tint
+  static const Color hardProblemColor = Color(0x22F44336); // red tint
 
-  // Shared shadow + border used by cards across the app.
+  // ── Borders & shadows ─────────────────────────────────────────────────────
+  static const Color borderColor = Color(0xFF1E3D2A);
+  static const Color shadowColor = Color(0x80000000);
+
   static const List<BoxShadow> cardShadow = [
-    BoxShadow(color: shadowColor, blurRadius: 12, offset: Offset(0, 4)),
+    BoxShadow(color: shadowColor, blurRadius: 10, offset: Offset(0, 4)),
   ];
   static Border get cardBorder => Border.all(color: borderColor);
 
+  // ── Rating tier colors (kept for competitive context) ────────────────────
   static Color getUserRatingColor(int rating) {
-    if (rating >= 2000) {
-      return const Color(0xFFFF5722); // Red for Expert
-    } else if (rating >= 1500) {
-      return const Color(0xFFFF9800); // Orange for Advanced
-    } else if (rating >= 1000) {
-      return const Color(0xFFFFEB3B); // Yellow for Intermediate
-    } else {
-      return const Color(0xFF4CAF50); // Green for Beginner
-    }
+    if (rating >= 2000) return const Color(0xFFFF5722);
+    if (rating >= 1500) return const Color(0xFFFF9800);
+    if (rating >= 1000) return const Color(0xFFFFEB3B);
+    return primaryButtonColor;
   }
 }

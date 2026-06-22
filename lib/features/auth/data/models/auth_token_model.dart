@@ -4,8 +4,9 @@ class AuthTokenModel {
 
   const AuthTokenModel({required this.access, this.refresh});
 
+  // Go backend: { "token": "...", "user": {...} }
   factory AuthTokenModel.fromJson(Map<String, dynamic> json) => AuthTokenModel(
-        access: (json['access'] ?? json['access_token'] ?? '') as String,
+        access: (json['token'] ?? json['access'] ?? json['access_token'] ?? '') as String,
         refresh: (json['refresh'] ?? json['refresh_token']) as String?,
       );
 }

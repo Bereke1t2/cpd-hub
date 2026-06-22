@@ -15,7 +15,8 @@ class ProblemModel extends ProblemEntity {
   });
 
   factory ProblemModel.fromJson(Map<String, dynamic> json) {
-    final rawTags = json['tags'];
+    // Backend apiProblem() sends topicTags; fallback to tags/topic_tags.
+    final rawTags = json['topicTags'] ?? json['tags'] ?? json['topic_tags'];
     return ProblemModel(
       title: (json['title'] ?? '') as String,
       difficulty: (json['difficulty'] ?? '') as String,
@@ -28,7 +29,8 @@ class ProblemModel extends ProblemEntity {
       problemId: (json['problemId'] ?? json['id'] ?? '') as String,
       isLiked: (json['isLiked'] ?? false) as bool,
       isDisliked: (json['isDisliked'] ?? false) as bool,
-      isSolved: (json['isSolved'] ?? false) as bool,
+      // Backend sends "solved"; also accept "isSolved" for forward-compat.
+      isSolved: (json['isSolved'] ?? json['solved'] ?? false) as bool,
     );
   }
 

@@ -16,20 +16,25 @@ class DailyProblemModel extends DailyProblemEntity {
   });
 
   factory DailyProblemModel.fromJson(Map<String, dynamic> json) {
+    // Backend apiProblem() sends topicTags; fallback to tags/topic_tags.
+    final rawTags =
+        json['topicTags'] ?? json['tags'] ?? json['topic_tags'] ?? const [];
     return DailyProblemModel(
       title: json['title'] as String? ?? '',
       difficulty: json['difficulty'] as String? ?? '',
-      tags: (json['tags'] as List? ?? const [])
-          .map((e) => e.toString())
-          .toList(growable: false),
+      tags: rawTags is List
+          ? rawTags.map((e) => e.toString()).toList(growable: false)
+          : const [],
       problemUrl: json['problemUrl'] as String? ?? '',
-      problemId: json['problemId'] as String? ?? '',
+      problemId: (json['problemId'] ?? json['id'] ?? '') as String,
       isLiked: json['isLiked'] as bool? ?? false,
       isDisliked: json['isDisliked'] as bool? ?? false,
-      isSolved: json['isSolved'] as bool? ?? false,
+      // Backend sends "solved"; also accept "isSolved".
+      isSolved: (json['isSolved'] ?? json['solved'] ?? false) as bool,
       numberOfLikes: (json['numberOfLikes'] as num?)?.toInt() ?? 0,
       numberOfDislikes: (json['numberOfDislikes'] as num?)?.toInt() ?? 0,
-      numberOfSolvedPeople: (json['numberOfSolvedPeople'] as num?)?.toInt() ?? 0,
+      numberOfSolvedPeople:
+          (json['numberOfSolvedPeople'] as num?)?.toInt() ?? 0,
     );
   }
 
