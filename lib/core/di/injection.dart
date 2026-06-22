@@ -289,6 +289,9 @@ Future<void> configureDependencies() async {
       analyzer: getIt<StrengthAnalyzer>(),
       recommender: getIt<Recommender>(),
       scheduler: getIt<Sm2Scheduler>(),
+    ),
+  );
+
   // ---- phase 15: courses ----
   getIt.registerLazySingleton<CoursesDataSource>(
     () => MockCoursesDataSource(),
