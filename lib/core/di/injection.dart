@@ -31,6 +31,7 @@ import 'package:lab_portal/future/main/domain/usecase/get_users.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_contest_leaderboard.dart';
 import 'package:lab_portal/future/main/domain/usecase/get_profile.dart';
 import 'package:lab_portal/future/main/presentation/bloc/bookmarks/bookmarks_cubit.dart';
+import 'package:lab_portal/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:lab_portal/future/main/domain/usecase/like_it.dart';
 import 'package:lab_portal/future/main/domain/usecase/dislike_it.dart';
 import 'package:lab_portal/future/main/domain/usecase/make_it_solved.dart';
@@ -87,6 +88,14 @@ import 'package:lab_portal/features/courses/domain/usecase/get_course_detail.dar
 import 'package:lab_portal/features/courses/domain/usecase/mark_lesson_complete.dart';
 import 'package:lab_portal/features/courses/presentation/bloc/courses/courses_bloc.dart';
 import 'package:lab_portal/features/courses/presentation/bloc/course_detail/course_detail_bloc.dart';
+// ---- articles ----
+import 'package:lab_portal/core/network/external_dio_client.dart';
+import 'package:lab_portal/features/articles/data/datasources/articles_data_source.dart';
+import 'package:lab_portal/features/articles/data/datasources/mock/mock_articles_data_source.dart';
+import 'package:lab_portal/features/articles/data/repository/articles_repository_impl.dart';
+import 'package:lab_portal/features/articles/domain/repository/articles_repository.dart';
+import 'package:lab_portal/features/articles/domain/usecase/get_articles.dart';
+import 'package:lab_portal/features/articles/presentation/bloc/articles_bloc.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -99,6 +108,9 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<BookmarksCubit>(
     () => BookmarksCubit(getIt<SharedPreferences>()),
   );
+  getIt.registerLazySingleton<SettingsCubit>(
+    () => SettingsCubit(getIt<SharedPreferences>()),
+  );
   getIt.registerLazySingleton<FlutterSecureStorage>(
     () => const FlutterSecureStorage(),
   );
@@ -107,6 +119,11 @@ Future<void> configureDependencies() async {
   );
   getIt.registerLazySingleton<Dio>(
     () => buildDio(getIt<FlutterSecureStorage>()),
+  );
+  // Separate Dio for external APIs (Codeforces, etc.) — no auth interceptor.
+  getIt.registerLazySingleton<Dio>(
+    () => createExternalDio(),
+    instanceName: 'externalApi',
   );
 
   // ---- auth feature ----
@@ -312,5 +329,18 @@ Future<void> configureDependencies() async {
       getCourseDetail: getIt<GetCourseDetail>(),
       markLessonComplete: getIt<MarkLessonComplete>(),
     ),
+  );
+
+  // ---- articles ----
+  getIt.registerLazySingleton<ArticlesDataSource>(
+    // Swap for live API: CodeforcesArticlesDataSource(dio: getIt<Dio>(instanceName: 'externalApi'))
+    () => MockArticlesDataSource(),
+  );
+  getIt.registerLazySingleton<ArticlesRepository>(
+    () => ArticlesRepositoryImpl(dataSource: getIt<ArticlesDataSource>()),
+  );
+  getIt.registerFactory(() => GetArticles(getIt<ArticlesRepository>()));
+  getIt.registerFactory(
+    () => ArticlesBloc(getArticles: getIt<GetArticles>()),
   );
 }
