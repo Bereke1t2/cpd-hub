@@ -76,8 +76,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String fullName,
     required String email,
     required String password,
-    // confirmPassword is required by the Go backend — pass it through.
     String confirmPassword = '',
+    String codeforcesHandle = '',
   }) async {
     return _guard(() async {
       final tokens = await _remote.register(
@@ -91,6 +91,15 @@ class AuthRepositoryImpl implements AuthRepository {
         access: tokens.access,
         refresh: tokens.refresh,
       );
+      // Persist the Codeforces handle locally (backend has no field for it yet).
+      if (codeforcesHandle.isNotEmpty) {
+        await _tokens.saveUser(
+          username: username,
+          fullName: fullName,
+          email: email,
+          codeforcesHandle: codeforcesHandle,
+        );
+      }
       return _remote.me();
     });
   }

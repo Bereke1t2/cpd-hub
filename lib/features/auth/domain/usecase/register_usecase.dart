@@ -13,6 +13,7 @@ class Register {
     required String email,
     required String password,
     String confirmPassword = '',
+    String codeforcesHandle = '',
   }) =>
       repo.register(
         username: username,
@@ -20,5 +21,6 @@ class Register {
         email: email,
         password: password,
         confirmPassword: confirmPassword.isEmpty ? password : confirmPassword,
+        codeforcesHandle: codeforcesHandle,
       );
 }

@@ -24,6 +24,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       email: event.email,
       password: event.password,
       confirmPassword: event.confirmPassword,
+      codeforcesHandle: event.codeforcesHandle,
     );
     result.fold(
       (user) => emit(RegisterSuccess(user)),

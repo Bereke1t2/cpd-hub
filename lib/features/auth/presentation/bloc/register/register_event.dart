@@ -12,6 +12,7 @@ class RegisterSubmitted extends RegisterEvent {
   final String email;
   final String password;
   final String confirmPassword;
+  final String codeforcesHandle;
 
   const RegisterSubmitted({
     required this.username,
@@ -19,9 +20,10 @@ class RegisterSubmitted extends RegisterEvent {
     required this.email,
     required this.password,
     required this.confirmPassword,
+    this.codeforcesHandle = '',
   });
 
   @override
   List<Object?> get props =>
-      [username, fullName, email, password, confirmPassword];
+      [username, fullName, email, password, confirmPassword, codeforcesHandle];
 }
