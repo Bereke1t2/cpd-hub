@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/core/routing/route_names.dart';
 import 'package:lab_portal/core/theme/app_spacing.dart';
 import 'package:lab_portal/core/theme/app_text_styles.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/core/widgets/ui_kit.dart';
 import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
+import 'package:lab_portal/features/settings/presentation/cubit/settings_cubit.dart';
 import 'package:lab_portal/future/main/presentation/page/base_page.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -13,7 +15,9 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BasePage(
+    return BlocProvider.value(
+      value: getIt<SettingsCubit>(),
+      child: BasePage(
       title: 'Settings',
       subtitle: 'Account & preferences',
       selectedIndex: 5, // Profile tab
@@ -77,28 +81,31 @@ class SettingsPage extends StatelessWidget {
           const SectionHeader('Notifications',
               icon: Icons.notifications_outlined),
           const SizedBox(height: AppSpacing.xs),
-          GradientCard(
-            child: Column(
-              children: [
-                _ToggleTile(
-                  icon: Icons.alarm_rounded,
-                  title: 'Daily practice reminder',
-                  subtitle: 'Remind me to keep my streak alive',
-                  initialValue: true,
-                  onChanged: (_) {
-                    // Phase 7.B: schedule via flutter_local_notifications
-                  },
+          BlocBuilder<SettingsCubit, SettingsState>(
+            builder: (context, state) {
+              final cubit = context.read<SettingsCubit>();
+              return GradientCard(
+                child: Column(
+                  children: [
+                    _ToggleTile(
+                      icon: Icons.alarm_rounded,
+                      title: 'Daily practice reminder',
+                      subtitle: 'Remind me to keep my streak alive',
+                      value: state.dailyReminder,
+                      onChanged: cubit.setDailyReminder,
+                    ),
+                    const Divider(color: UiConstants.borderColor, height: 1),
+                    _ToggleTile(
+                      icon: Icons.emoji_events_outlined,
+                      title: 'Contest alerts',
+                      subtitle: 'Notify before upcoming contests start',
+                      value: state.contestAlerts,
+                      onChanged: cubit.setContestAlerts,
+                    ),
+                  ],
                 ),
-                const Divider(color: UiConstants.borderColor, height: 1),
-                _ToggleTile(
-                  icon: Icons.emoji_events_outlined,
-                  title: 'Contest alerts',
-                  subtitle: 'Notify before upcoming contests start',
-                  initialValue: true,
-                  onChanged: (_) {},
-                ),
-              ],
-            ),
+              );
+            },
           ),
           const SizedBox(height: AppSpacing.sm),
 
@@ -124,6 +131,14 @@ class SettingsPage extends StatelessWidget {
           GradientCard(
             child: Column(
               children: [
+                _SettingsTile(
+                  icon: Icons.help_outline_rounded,
+                  title: 'Help & Support',
+                  subtitle: 'About the app, my story & getting help',
+                  onTap: () =>
+                      Navigator.pushNamed(context, RouteNames.helpSupport),
+                ),
+                const Divider(color: UiConstants.borderColor, height: 1),
                 _SettingsTile(
                   icon: Icons.code_rounded,
                   title: 'CPD Hub',
@@ -155,6 +170,7 @@ class SettingsPage extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
         ],
+      ),
       ),
     );
   }
@@ -227,49 +243,33 @@ class _SettingsTile extends StatelessWidget {
   }
 }
 
-class _ToggleTile extends StatefulWidget {
+class _ToggleTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final bool initialValue;
+  final bool value;
   final ValueChanged<bool> onChanged;
 
   const _ToggleTile({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.initialValue,
+    required this.value,
     required this.onChanged,
   });
-
-  @override
-  State<_ToggleTile> createState() => _ToggleTileState();
-}
-
-class _ToggleTileState extends State<_ToggleTile> {
-  late bool _value;
-
-  @override
-  void initState() {
-    super.initState();
-    _value = widget.initialValue;
-  }
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm, vertical: 2),
-      leading: Icon(widget.icon, color: UiConstants.primaryButtonColor),
-      title: Text(widget.title, style: AppTextStyles.title),
-      subtitle: Text(widget.subtitle, style: AppTextStyles.caption),
+      leading: Icon(icon, color: UiConstants.primaryButtonColor),
+      title: Text(title, style: AppTextStyles.title),
+      subtitle: Text(subtitle, style: AppTextStyles.caption),
       trailing: Switch(
-        value: _value,
+        value: value,
         activeColor: UiConstants.primaryButtonColor,
-        onChanged: (v) {
-          setState(() => _value = v);
-          widget.onChanged(v);
-        },
+        onChanged: onChanged,
       ),
     );
   }
