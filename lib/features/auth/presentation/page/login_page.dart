@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/branded_loader.dart';
 import 'package:lab_portal/features/auth/presentation/bloc/login/login_bloc.dart';
 import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
 import 'register_page.dart';
@@ -155,9 +156,7 @@ class _LoginViewState extends State<_LoginView> {
                                 ? const SizedBox(
                                     height: 20,
                                     width: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
+                                    child: BrandedLoader.small(
                                     ),
                                   )
                                 : const Text(
@@ -237,7 +236,7 @@ class _LoginViewState extends State<_LoginView> {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(
-            color: UiConstants.primaryButtonColor.withOpacity(0.15),
+            color: UiConstants.primaryButtonColor.withValues(alpha: 0.15),
           ),
         ),
         focusedBorder: OutlineInputBorder(

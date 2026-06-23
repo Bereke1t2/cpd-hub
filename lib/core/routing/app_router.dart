@@ -9,6 +9,8 @@ import 'package:lab_portal/future/main/presentation/page/problems_page.dart';
 import 'package:lab_portal/future/main/presentation/page/contest_page.dart';
 import 'package:lab_portal/future/main/presentation/page/users_page.dart';
 import 'package:lab_portal/future/main/presentation/page/profile_page.dart';
+import 'package:lab_portal/features/settings/presentation/page/settings_page.dart';
+import 'package:lab_portal/features/settings/presentation/page/help_support_page.dart';
 import 'package:lab_portal/future/main/presentation/page/problem_details_page.dart';
 import 'package:lab_portal/future/main/presentation/page/user_details_page.dart';
 import 'package:lab_portal/future/main/presentation/page/contest_leaderboard_page.dart';
@@ -30,6 +32,10 @@ class AppRouter {
         return _page(const UsersPage(), settings);
       case RouteNames.profile:
         return _page(const ProfilePage(), settings);
+      case RouteNames.settings:
+        return _page(const SettingsPage(), settings);
+      case RouteNames.helpSupport:
+        return _page(const HelpSupportPage(), settings);
 
       case RouteNames.problemDetails:
         final problem = settings.arguments as ProblemEntity;
@@ -55,8 +61,6 @@ class AppRouter {
       // ---- phase 11: smart practice ----
       case RouteNames.forYou:
         return _page(const ForYouPage(), settings);
-      case RouteNames.tracks:
-        return _page(const TracksPage(), settings);
 
       // ---- phase 15: courses ----
       case RouteNames.courses:
@@ -70,6 +74,18 @@ class AppRouter {
     }
   }
 
-  static MaterialPageRoute<dynamic> _page(Widget child, RouteSettings settings) =>
-      MaterialPageRoute(builder: (_) => child, settings: settings);
+  static Route<dynamic> _page(Widget child, RouteSettings settings) =>
+      PageRouteBuilder<dynamic>(
+        settings: settings,
+        pageBuilder: (_, __, ___) => child,
+        transitionDuration: const Duration(milliseconds: 180),
+        reverseTransitionDuration: const Duration(milliseconds: 150),
+        transitionsBuilder: (_, animation, __, child) => FadeTransition(
+          opacity: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOut,
+          ),
+          child: child,
+        ),
+      );
 }
