@@ -68,13 +68,19 @@ class ContestPage extends StatelessWidget {
                       context.read<ContestsBloc>().add(ContestsStarted()),
                   emptyMessage: 'No contests available',
                   builder: (contests) {
-                    // Sort upcoming soonest-first; past most-recent-first.
+                    // Live now → soonest to end first.
+                    final live = contests
+                        .where((c) => c.isRunning)
+                        .toList()
+                      ..sort((a, b) => a.endsAt.compareTo(b.endsAt));
+                    // Upcoming → soonest to start first.
                     final upcoming = contests
                         .where((c) => c.isUpcoming)
                         .toList()
                       ..sort((a, b) => a.startsAt.compareTo(b.startsAt));
+                    // Everything else (finished) → most recent first.
                     final past = contests
-                        .where((c) => c.isPast)
+                        .where((c) => !c.isRunning && !c.isUpcoming)
                         .toList()
                       ..sort((a, b) => b.startsAt.compareTo(a.startsAt));
 
@@ -82,6 +88,15 @@ class ContestPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (live.isNotEmpty) ...[
+                            _SectionTitle('Live now'),
+                            ...live.map((c) => RepaintBoundary(
+                                  child: ContestCard(
+                                    contest: c,
+                                    onTap: () => _openLeaderboard(context, c),
+                                  ),
+                                )),
+                          ],
                           if (upcoming.isNotEmpty) ...[
                             _SectionTitle('Upcoming'),
                             ...upcoming.map((c) => RepaintBoundary(

@@ -12,6 +12,10 @@ class RouteNames {
   static const String login = '/login';
   static const String register = '/register';
 
+  // ---- settings ----
+  static const String settings = '/settings';
+  static const String helpSupport = '/help-support';
+
   // ---- detail screens (take arguments) ----
   static const String problemDetails = '/problem';
   static const String userDetails = '/user';

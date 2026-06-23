@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/branded_loader.dart';
 
 /// Renders the four standard BLoC states (loading / error+retry / empty / data)
 /// in one place so every page looks consistent.
@@ -40,11 +41,7 @@ class AsyncView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          color: UiConstants.primaryButtonColor,
-        ),
-      );
+      return const Center(child: BrandedLoader());
     }
 
     if (error != null) {

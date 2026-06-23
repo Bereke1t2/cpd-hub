@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
 import 'package:lab_portal/core/routing/app_router.dart';
 import 'package:lab_portal/core/ui_constants.dart';
+import 'package:lab_portal/core/widgets/branded_loader.dart';
 import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
 import 'package:lab_portal/features/auth/presentation/page/login_page.dart';
 import 'package:lab_portal/future/main/presentation/page/home_page.dart';
@@ -57,11 +58,7 @@ class _AuthGate extends StatelessWidget {
         // SessionUnknown — still resolving the stored token.
         return const Scaffold(
           backgroundColor: UiConstants.backgroundColor,
-          body: Center(
-            child: CircularProgressIndicator(
-              color: UiConstants.primaryButtonColor,
-            ),
-          ),
+          body: Center(child: BrandedLoader()),
         );
       },
     );

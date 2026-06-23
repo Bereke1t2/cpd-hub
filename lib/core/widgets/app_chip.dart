@@ -41,12 +41,21 @@ class AppChip extends StatelessWidget {
             Icon(icon, size: 12, color: c),
             const SizedBox(width: AppDimens.xxs),
           ],
-          Text(
-            label,
-            style: TextStyle(
-              color: c,
-              fontSize: AppDimens.fCaption,
-              fontWeight: FontWeight.w700,
+          // Flexible + ellipsis so a chip never overflows its row when the
+          // surrounding Wrap/Expanded squeezes it (e.g. high text scale on a
+          // narrow card). At normal sizes there's ample room and nothing
+          // truncates.
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: c,
+                fontSize: AppDimens.fCaption,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
