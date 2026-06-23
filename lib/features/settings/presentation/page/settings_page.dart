@@ -198,7 +198,11 @@ class SettingsPage extends StatelessWidget {
             style: FilledButton.styleFrom(
                 backgroundColor: Colors.red.shade700),
             onPressed: () {
+              // Close the dialog first, then clear the whole nav stack so
+              // the WelcomePage in _AuthGate can surface cleanly.
               Navigator.pop(ctx);
+              Navigator.of(context)
+                  .popUntil((route) => route.isFirst);
               context
                   .read<SessionBloc>()
                   .add(const SessionLoggedOut());
@@ -268,7 +272,8 @@ class _ToggleTile extends StatelessWidget {
       subtitle: Text(subtitle, style: AppTextStyles.caption),
       trailing: Switch(
         value: value,
-        activeColor: UiConstants.primaryButtonColor,
+        activeThumbColor: UiConstants.primaryButtonColor,
+        activeTrackColor: UiConstants.primaryButtonColor.withValues(alpha: 0.45),
         onChanged: onChanged,
       ),
     );

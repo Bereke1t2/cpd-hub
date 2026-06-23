@@ -306,14 +306,13 @@ class _FeaturePills extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (int i = 0; i < _items.length; i++) ...[
-          _Pill(icon: _items[i].$1, label: _items[i].$2),
-          if (i < _items.length - 1) const SizedBox(width: 8),
-        ],
-      ],
+    return Wrap(
+      alignment: WrapAlignment.center,
+      spacing: 8,
+      runSpacing: 8,
+      children: _items
+          .map((item) => _Pill(icon: item.$1, label: item.$2))
+          .toList(),
     );
   }
 }
