@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lab_portal/core/di/injection.dart';
+import 'package:lab_portal/core/routing/route_names.dart';
 import 'package:lab_portal/core/theme/app_dimens.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/features/consistency/presentation/cubit/streak/streak_cubit.dart';
@@ -804,7 +805,7 @@ class _AccountCard extends StatelessWidget {
             icon: Icons.settings_outlined,
             title: 'Settings',
             subtitle: 'Notifications, appearance, privacy',
-            onTap: () {},
+            onTap: () => Navigator.pushNamed(context, RouteNames.settings),
           ),
           const SizedBox(height: AppDimens.sm),
           _SettingsTile(

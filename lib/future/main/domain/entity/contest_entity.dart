@@ -29,8 +29,33 @@ class ContestEntity extends Equatable {
   DateTime get startsAt =>
       (DateTime.tryParse(startTime) ?? DateTime.now()).toLocal();
 
-  /// True when the contest hasn't started yet.
-  bool get isUpcoming => !isPast && startsAt.isAfter(DateTime.now());
+  /// [duration] arrives as "HH:MM:SS"; parse it into a real Duration.
+  Duration get parsedDuration {
+    final parts = duration.split(':');
+    if (parts.length == 3) {
+      return Duration(
+        hours: int.tryParse(parts[0]) ?? 0,
+        minutes: int.tryParse(parts[1]) ?? 0,
+        seconds: int.tryParse(parts[2]) ?? 0,
+      );
+    }
+    return Duration.zero;
+  }
+
+  /// When the contest is scheduled to finish.
+  DateTime get endsAt => startsAt.add(parsedDuration);
+
+  /// True when the contest hasn't started yet (time-based).
+  bool get isUpcoming => DateTime.now().isBefore(startsAt);
+
+  /// True when the contest has started but not yet ended — i.e. live now.
+  bool get isRunning {
+    final now = DateTime.now();
+    return !now.isBefore(startsAt) && now.isBefore(endsAt);
+  }
+
+  /// True once the scheduled end time has passed.
+  bool get hasEnded => DateTime.now().isAfter(endsAt);
 
   @override
   List<Object?> get props => [
