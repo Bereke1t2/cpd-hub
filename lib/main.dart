@@ -5,7 +5,7 @@ import 'package:lab_portal/core/routing/app_router.dart';
 import 'package:lab_portal/core/ui_constants.dart';
 import 'package:lab_portal/core/widgets/branded_loader.dart';
 import 'package:lab_portal/features/auth/presentation/bloc/session/session_bloc.dart';
-import 'package:lab_portal/features/auth/presentation/page/login_page.dart';
+import 'package:lab_portal/features/auth/presentation/page/welcome_page.dart';
 import 'package:lab_portal/future/main/presentation/page/home_page.dart';
 
 Future<void> main() async {
@@ -46,6 +46,11 @@ class MyApp extends StatelessWidget {
 }
 
 /// Decides which root screen to show based on [SessionBloc] state.
+///
+/// Flow:
+///   SessionUnknown (resolving token) → branded splash loader
+///   SessionUnauthenticated            → WelcomePage (sign in / create account)
+///   SessionAuthenticated              → HomePage
 class _AuthGate extends StatelessWidget {
   const _AuthGate();
 
@@ -53,12 +58,29 @@ class _AuthGate extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
-        if (state is SessionAuthenticated) return const HomePage();
-        if (state is SessionUnauthenticated) return const LoginPage();
-        // SessionUnknown — still resolving the stored token.
-        return const Scaffold(
-          backgroundColor: UiConstants.backgroundColor,
-          body: Center(child: BrandedLoader()),
+        final Widget child;
+        if (state is SessionAuthenticated) {
+          child = const HomePage();
+        } else if (state is SessionUnauthenticated) {
+          child = const WelcomePage();
+        } else {
+          // SessionUnknown — still resolving the stored token.
+          child = const Scaffold(
+            key: ValueKey('splash'),
+            backgroundColor: UiConstants.backgroundColor,
+            body: Center(child: BrandedLoader()),
+          );
+        }
+
+        // Fade between splash → welcome → home so there's never a hard cut.
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 400),
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          child: KeyedSubtree(
+            key: ValueKey(state.runtimeType),
+            child: child,
+          ),
         );
       },
     );
