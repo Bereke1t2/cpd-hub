@@ -117,3 +117,31 @@ lib/
     ├── practice/        # Review queue & Spaced Repetition logic
     └── settings/        # User preferences & Help/Support
 ```
+
+---
+
+## ⚡ Backend Microservices & Infrastructure
+
+| Layer / Dependency | Technology & Function |
+|--------------------|-----------------------|
+| **Language / Engine** | **Go 1.22+** delivering high-concurrency, low-latency execution with garbage collection optimized for microservices. |
+| **HTTP Web Framework** | **Gin Framework** with custom panic recovery, structured JSON logger, security headers, rate limiting, and CORS middleware. |
+| **Database & Pooling** | **PostgreSQL 16 (Neon Serverless)** accessed via `pgxpool` connection pool for efficient query execution. |
+| **Security & Auth** | **JWT (HMAC-SHA256)** authentication with access tokens (24h) and refresh tokens (30d) plus Bcrypt password hashing. |
+| **External API Ingestion**| Concurrent client fetching from **Kontests API** and **Codeforces Standings API** with in-memory TTL caching. |
+
+### Backend Folder Layout (`cpd-hub-backend`)
+```text
+cmd/
+└── server/             # Entrypoint main.go & environment loader
+internal/
+├── delivery/
+│   └── httpdelivery/   # REST HTTP handlers, routes, middleware, and validation
+├── domain/             # Entities, app error definitions, and interface contracts
+├── usecase/            # Business logic (Auth, Activity, Contests, Practice)
+└── infrastructure/
+    ├── config/         # App configuration & env loader
+    ├── external/       # Codeforces & Kontests clients + TTL Cache
+    ├── postgres/       # SQL queries, migrations, and db connection pool
+    └── security/       # JWT token generation, parsing, and bcrypt utilities
+```
