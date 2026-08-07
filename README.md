@@ -276,3 +276,26 @@ flutter analyze
 cd cpd-hub-backend
 go test -v ./...
 ```
+
+---
+
+## 🔮 Future Roadmap & Product Vision
+
+### 🚩 Milestone v1.5 — Real-time Notifications & Webhooks
+- [ ] Push Notifications via Firebase Cloud Messaging (FCM) for contest reminders (15-min warning before start).
+- [ ] Codeforces Submission Webhooks for automated background profile sync.
+- [ ] Dynamic Dark / Light Mode theme customization.
+
+### 🚀 Milestone v2.0 — Embedded Code Editor & Online Compiler
+- [ ] In-App Monaco-based Code Editor supporting C++, Python, Java, and Go.
+- [ ] Sandboxed Code Execution Engine (Judge0 / Custom Isolated Runner).
+- [ ] Custom Test Case Creator & Custom Output Validator.
+
+### 🤖 Milestone v2.5 — AI Algorithmic Tutor & Hint Assistant
+- [ ] LLM-Powered Hint Generator: Provides progressive, non-spoiling hints without revealing full solutions.
+- [ ] Code Time Complexity Analyzer & Memory Bottleneck Detector.
+- [ ] Personalized Problem Recommendation Engine based on weak topic areas.
+
+### 🏆 Milestone v3.0 — Division Gamification & Team Battle Modes
+- [ ] Team vs Team Virtual Battles & Division Leaderboards.
+- [ ] Custom Achievement Badges (e.g., "Dynamic Programming Master", "100-Day Streak Legend").
