@@ -256,3 +256,23 @@ go run ./cmd/server
 | **Practice** | `GET` | `/api/practice/review-queue` | Get spaced repetition review queue items *(Protected)* |
 
 *Full OpenAPI 3.0 specification available at `/openapi.yaml` or interactive Swagger docs at `http://localhost:8000/docs`.*
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+### Flutter Unit & BLoC Verification
+```bash
+# Run unit, repository, and BLoC state test suites
+flutter test
+
+# Perform static code analysis and linter checks
+flutter analyze
+```
+
+### Go Backend Integration & Unit Tests
+```bash
+# Run all backend package unit & usecase tests
+cd cpd-hub-backend
+go test -v ./...
+```
