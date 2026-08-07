@@ -160,3 +160,44 @@ Before setting up the environment, verify that your machine satisfies the softwa
 | **PostgreSQL** | `16.0+` (or Docker) | `psql --version` or `docker compose version` |
 | **Android SDK / ADB** | API Level 34 | `adb version` |
 | **Git** | `2.40+` | `git --version` |
+
+---
+
+## 🚀 Mobile App Setup & Execution Guide
+
+### 1. Clone & Fetch Dependencies
+```bash
+git clone https://github.com/Bereke1t2/cpd-hub.git
+cd cpd-hub
+flutter pub get
+```
+
+### 2. Execution Environments & Network Routing
+
+Depending on your target development device, run the app using the appropriate `--dart-define` parameters:
+
+#### Option A: Android Emulator
+```bash
+flutter run
+```
+*Defaults automatically to `http://10.0.2.2:8000/api`.*
+
+#### Option B: Physical Device over USB (via ADB Reverse)
+```bash
+# 1. Reverse port 8000 from device to host machine
+adb reverse tcp:8000 tcp:8000
+
+# 2. Run app with USE_LOCALHOST flag
+flutter run --dart-define=USE_LOCALHOST=true
+```
+
+#### Option C: Physical Device over Wi-Fi
+```bash
+# Replace 192.168.x.x with your computer's local LAN IP address
+flutter run --dart-define=API_BASE_URL=http://192.168.0.201:8000/api
+```
+
+#### Option D: Offline Mock Mode (No Backend Required)
+```bash
+flutter run --dart-define=USE_MOCK=true
+```
