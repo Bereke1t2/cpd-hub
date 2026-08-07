@@ -85,3 +85,35 @@ flowchart TB
 2. **UseCase / Application Layer**: Encapsulates feature-specific business workflows (e.g., user signup, contest ranking recalculation, spaced repetition scheduling).
 3. **Data / Infrastructure Layer**: Implements repository contracts, handles SQL database persistence via `pgxpool`, external HTTP client integrations, and secure local token storage.
 4. **Presentation / Delivery Layer**: Manages state transitions using BLoC on the client and Gin HTTP route handlers / middleware on the server.
+
+---
+
+## 📱 Mobile Application Tech Stack & Patterns
+
+| Technology / Library | Purpose & Rationale |
+|----------------------|---------------------|
+| **Flutter 3.x / Dart 3.x** | Cross-platform UI engine targeting Android, iOS, Web, and Desktop with native performance. |
+| **`flutter_bloc` (v9.x)** | Predictable, event-driven state management separating UI rendering from business logic. |
+| **`get_it`** | High-performance Service Locator for compile-time dependency injection. |
+| **`dio` (v5.x)** | Network client configured with Auth interceptors, error mapping, dynamic base URL resolution, and optional HTTP logging. |
+| **`flutter_secure_storage`** | Keychain (iOS) and Keystore (Android) encrypted token persistence. |
+| **`dartz`** | Functional programming primitives (`Either<Left, Right>`) for explicit, type-safe error handling. |
+| **`equatable`** | Value-equality comparisons for immutable BLoC states and domain entities. |
+
+### Mobile Project Structure
+```text
+lib/
+├── core/
+│   ├── config/          # Environment configuration (AppConfig, dart-define)
+│   ├── error/           # Typed AppException definitions
+│   ├── network/         # Dio client, Interceptors, NetworkInfo
+│   ├── storage/         # TokenStore & secure local storage
+│   └── url_constants.dart # Centralized API route mappings
+└── features/
+    ├── auth/            # Login, Signup, Token Refresh BLoCs & DataSources
+    ├── articles/        # Editorial feeds & Codeforces blog integration
+    ├── courses/         # Video lessons & progress tracking
+    ├── learning/        # Algorithmic topics & DAG prerequisite viewer
+    ├── practice/        # Review queue & Spaced Repetition logic
+    └── settings/        # User preferences & Help/Support
+```
