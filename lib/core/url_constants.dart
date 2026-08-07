@@ -6,25 +6,25 @@ import 'config/app_config.dart';
 class UrlConstants {
   UrlConstants._();
 
-  static const String _base = AppConfig.apiBaseUrl;
+  static String get _base => AppConfig.apiBaseUrl;
 
   // ── Auth ─────────────────────────────────────────────────────────────────
   // POST  /api/auth/login   body: { email, password }
   //                         → { token, user: { username, fullName } }
-  static const String loginUrl = '$_base/auth/login';
+  static String get loginUrl => '$_base/auth/login';
 
   // POST  /api/auth/signup  body: { username, fullName, email, password }
   //                         → { token, user: { username, fullName } }
-  static const String signupUrl = '$_base/auth/signup';
+  static String get signupUrl => '$_base/auth/signup';
 
   // ── Problems ─────────────────────────────────────────────────────────────
   // GET   /api/problems     → [{id, problemId, title, difficulty, topicTags,
   //                            numberOfLikes, numberOfDislikes, problemUrl,
   //                            isLiked, isDisliked, solved, numberOfSolvedPeople}]
-  static const String getProblemsUrl = '$_base/problems';
+  static String get getProblemsUrl => '$_base/problems';
 
   // GET   /api/problems/daily → same shape as above
-  static const String getDailyProblemUrl = '$_base/problems/daily';
+  static String get getDailyProblemUrl => '$_base/problems/daily';
 
   // POST  /api/problems/:id/like
   // POST  /api/problems/:id/dislike
@@ -36,7 +36,7 @@ class UrlConstants {
 
   // ── Contests ─────────────────────────────────────────────────────────────
   // GET   /api/contests     → [Contest]
-  static const String getContestsUrl = '$_base/contests';
+  static String get getContestsUrl => '$_base/contests';
 
   // GET   /api/contests/:id/leaderboard → [LeaderboardEntry]
   // :id = contest.id from the list response (e.g. "codeforces-1932")
@@ -45,7 +45,7 @@ class UrlConstants {
 
   // ── Users & Profiles ─────────────────────────────────────────────────────
   // GET   /api/users        → [UserProfile]
-  static const String getUsersUrl = '$_base/users';
+  static String get getUsersUrl => '$_base/users';
 
   // GET   /api/users/profile/:username → UserProfile
   static String userProfileUrl(String username) =>
@@ -69,8 +69,8 @@ class UrlConstants {
 
   // ── Activity & Info ───────────────────────────────────────────────────────
   // GET   /api/activity     → [Activity]
-  static const String getActivityUrl = '$_base/activity';
+  static String get getActivityUrl => '$_base/activity';
 
   // GET   /api/info         → [Info]
-  static const String getInfoUrl = '$_base/info';
+  static String get getInfoUrl => '$_base/info';
 }
