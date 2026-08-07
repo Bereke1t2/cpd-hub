@@ -13,7 +13,7 @@ import '../error/exceptions.dart';
 ///   3. Log interceptor   — enabled only when AppConfig.enableHttpLogs is true.
 ///
 /// Register in get_it:
-///   getIt.registerLazySingleton<Dio>(() => buildDio(getIt<FlutterSecureStorage>()));
+///   `getIt.registerLazySingleton<Dio>(() => buildDio(getIt<FlutterSecureStorage>()));`
 Dio buildDio(FlutterSecureStorage storage) {
   final dio = Dio(
     BaseOptions(
@@ -61,7 +61,11 @@ DioException _mapError(DioException e) {
       e.type == DioExceptionType.connectionTimeout ||
       e.type == DioExceptionType.receiveTimeout ||
       e.type == DioExceptionType.sendTimeout) {
-    return e.copyWith(error: const NetworkException());
+    final detail = e.error?.toString() ?? e.message;
+    final msg = (detail != null && detail.isNotEmpty)
+        ? 'Connection failed ($detail)'
+        : 'No internet connection.';
+    return e.copyWith(error: NetworkException(msg));
   }
 
   final status = e.response?.statusCode;
@@ -69,9 +73,9 @@ DioException _mapError(DioException e) {
 
   switch (status) {
     case 401:
-      mapped = const UnauthorizedException();
+      mapped = UnauthorizedException(_extractMessage(e) ?? 'Unauthorized');
     case 404:
-      mapped = const NotFoundException();
+      mapped = NotFoundException(_extractMessage(e) ?? 'Not found');
     case 400:
     case 422:
       mapped = ValidationException(

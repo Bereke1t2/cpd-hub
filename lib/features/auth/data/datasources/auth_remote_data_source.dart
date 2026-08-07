@@ -55,14 +55,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required String confirmPassword,
   }) async {
+    final data = <String, dynamic>{
+      'fullName': fullName,
+      'email': email,
+      'password': password,
+      'confirmPassword': confirmPassword,
+    };
+    if (username.isNotEmpty) {
+      data['username'] = username;
+    }
+
     final res = await _dio.post(
       UrlConstants.signupUrl,
-      data: {
-        'fullName': fullName,
-        'email': email,
-        'password': password,
-        'confirmPassword': confirmPassword, // required by backend validation
-      },
+      data: data,
     );
     final json = res.data as Map<String, dynamic>;
     final token = AuthTokenModel.fromJson(json);
