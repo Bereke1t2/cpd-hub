@@ -201,3 +201,38 @@ flutter run --dart-define=API_BASE_URL=http://192.168.0.201:8000/api
 ```bash
 flutter run --dart-define=USE_MOCK=true
 ```
+
+---
+
+## ⚙️ Backend Setup & Database Migration Guide
+
+### 1. Configure Environment Variables (`.env`)
+Navigate to `cpd-hub-backend` and configure your local environment settings:
+
+```env
+# Server bind address
+SERVER_ADDR=:8000
+
+# JWT signing key
+JWT_SECRET=super_secret_jwt_key_change_in_prod
+
+# PostgreSQL DSN (Neon DB or Local Docker)
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/cpdhub?sslmode=disable
+
+# Logging level & options
+LOG_LEVEL=debug
+CORS_ORIGINS=*
+AUTO_MIGRATE=false
+```
+
+### 2. Launch Local Postgres (via Docker Compose)
+```bash
+docker compose up -d
+```
+
+### 3. Run Server & Seed Database
+```bash
+cd cpd-hub-backend
+go run ./cmd/server
+```
+*The server will initialize connection pooling, verify table schemas, and begin listening on `:8000`.*
