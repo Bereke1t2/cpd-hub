@@ -299,3 +299,26 @@ go test -v ./...
 ### 🏆 Milestone v3.0 — Division Gamification & Team Battle Modes
 - [ ] Team vs Team Virtual Battles & Division Leaderboards.
 - [ ] Custom Achievement Badges (e.g., "Dynamic Programming Master", "100-Day Streak Legend").
+
+---
+
+## 🤝 Contributing Guidelines
+
+We welcome contributions from division members and open-source developers!
+
+1. **Fork the Repository**: Create your personal fork on GitHub.
+2. **Create a Feature Branch**: `git checkout -b feature/amazing-feature`
+3. **Format & Test**: Run `flutter analyze`, `flutter test`, and `go test ./...`
+4. **Commit Changes**: Use semantic commit messages (e.g., `feat(auth): add OAuth2 provider`).
+5. **Open a Pull Request**: Provide a detailed description of the changes made.
+
+---
+
+## 📄 License & Acknowledgments
+
+Distributed under the **MIT License**. See `LICENSE` for details.
+
+### Acknowledgments & Credits
+- **CSEC Competitive Programming Division (CPD)** for feedback and platform testing.
+- [Codeforces API](https://codeforces.com/apihelp) & [Kontests API](https://kontests.net) for live contest data.
+- [USACO Guide](https://usaco.guide) & [CP-Algorithms](https://cp-algorithms.com) for educational resources.
