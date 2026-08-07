@@ -236,3 +236,23 @@ cd cpd-hub-backend
 go run ./cmd/server
 ```
 *The server will initialize connection pooling, verify table schemas, and begin listening on `:8000`.*
+
+---
+
+## 📡 REST API Reference & Endpoints
+
+| Category | HTTP Method | Endpoint Path | Description & Auth Requirement |
+|----------|-------------|---------------|--------------------------------|
+| **Auth** | `POST` | `/api/auth/signup` | Create new member account (Returns JWT token) |
+| **Auth** | `POST` | `/api/auth/login` | Authenticate member (Returns JWT access & refresh token) |
+| **Auth** | `POST` | `/api/auth/refresh` | Mint new access token using valid refresh token |
+| **Auth** | `GET` | `/api/auth/me` | Fetch authenticated member profile *(Bearer Token Required)* |
+| **Problems** | `GET` | `/api/problems` | List problems with user-specific solved/liked metadata *(Protected)* |
+| **Problems** | `GET` | `/api/problems/daily` | Get today's featured daily problem *(Protected)* |
+| **Problems** | `POST` | `/api/problems/:id/solve` | Mark problem as solved & record activity *(Protected)* |
+| **Contests** | `GET` | `/api/contests` | List upcoming and past contests *(Protected)* |
+| **Contests** | `GET` | `/api/contests/:id/leaderboard` | Live contest standings & rank list *(Protected)* |
+| **Analytics** | `GET` | `/api/users/profile/:username/analytics/heatmap` | 365-day submission activity heatmap *(Protected)* |
+| **Practice** | `GET` | `/api/practice/review-queue` | Get spaced repetition review queue items *(Protected)* |
+
+*Full OpenAPI 3.0 specification available at `/openapi.yaml` or interactive Swagger docs at `http://localhost:8000/docs`.*
