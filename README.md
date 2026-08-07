@@ -37,3 +37,51 @@
 ### 5. 📰 Articles Feed & Division Announcements
 - **Editorial & Tutorial Feed**: Curated articles covering contest solutions, algorithm deep-dives, and division announcements.
 - **Codeforces Blog Integration**: Live ingestion of top competitive programming blogs and editorial breakdowns.
+
+---
+
+## 🏗️ System Architecture & Design Patterns
+
+The project is architected following **Clean Architecture (Hexagonal Architecture)** principles on both the frontend and backend to guarantee strict separation of concerns, high testability, and decoupled transport/persistence mechanisms.
+
+```mermaid
+flowchart TB
+    subgraph Frontend["📱 Mobile Frontend (Flutter + BLoC)"]
+        UI["UI Components & Pages"]
+        BLoC["BLoC / State Management"]
+        DomainFE["FE Domain (Entities & UseCases)"]
+        DataFE["FE Data Layer (Repositories & Dio Client)"]
+        UI --> BLoC --> DomainFE --> DataFE
+    end
+
+    subgraph Backend["⚡ Backend Ecosystem (Go / Gin Framework)"]
+        Gateway["REST API Router & Middleware\n(Rate Limiter, CORS, JWT Auth)"]
+        Delivery["Delivery Layer (HTTP Handlers)"]
+        UseCase["UseCase Layer (Business Rules & Domain Services)"]
+        DomainBE["Core Entities & Interfaces"]
+        Infra["Infrastructure Layer (PG Drivers & External Clients)"]
+        
+        Gateway --> Delivery --> UseCase
+        UseCase --> DomainBE
+        UseCase --> Infra
+    end
+
+    subgraph External["🌐 External Integrations & Storage"]
+        PG[("PostgreSQL 16\n(Neon DB Serverless)")]
+        CF["Codeforces API"]
+        Kontests["Kontests API"]
+        Cache[("In-Memory TTL Cache")]
+    end
+
+    DataFE <== "HTTPS / REST (JSON)" ==> Gateway
+    Infra --> PG
+    Infra --> CF
+    Infra --> Kontests
+    Infra --> Cache
+```
+
+### Clean Architecture Layers
+1. **Domain Layer**: Contains pure business entities, value objects, domain logic, and abstract repository contracts. Has zero external dependencies.
+2. **UseCase / Application Layer**: Encapsulates feature-specific business workflows (e.g., user signup, contest ranking recalculation, spaced repetition scheduling).
+3. **Data / Infrastructure Layer**: Implements repository contracts, handles SQL database persistence via `pgxpool`, external HTTP client integrations, and secure local token storage.
+4. **Presentation / Delivery Layer**: Manages state transitions using BLoC on the client and Gin HTTP route handlers / middleware on the server.
