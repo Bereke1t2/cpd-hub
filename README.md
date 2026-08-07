@@ -145,3 +145,18 @@ internal/
     ├── postgres/       # SQL queries, migrations, and db connection pool
     └── security/       # JWT token generation, parsing, and bcrypt utilities
 ```
+
+---
+
+## 🛠️ Prerequisites & System Requirements
+
+Before setting up the environment, verify that your machine satisfies the software dependencies below:
+
+| Requirement | Minimum Version | Installation / Verification Command |
+|-------------|-----------------|--------------------------------------|
+| **Flutter SDK** | `3.19.0+` | `flutter --version` |
+| **Dart SDK** | `3.3.0+` | `dart --version` |
+| **Go Compiler** | `1.22.0+` | `go version` |
+| **PostgreSQL** | `16.0+` (or Docker) | `psql --version` or `docker compose version` |
+| **Android SDK / ADB** | API Level 34 | `adb version` |
+| **Git** | `2.40+` | `git --version` |
