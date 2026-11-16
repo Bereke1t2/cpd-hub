@@ -27,9 +27,9 @@ Dio buildDio(FlutterSecureStorage storage) {
     ),
   );
 
-  // 1. Attach bearer token to every outgoing request.
+  // 1. Attach bearer token to every outgoing request and auto-refresh on 401.
   dio.interceptors.add(
-    InterceptorsWrapper(
+    QueuedInterceptorsWrapper(
       onRequest: (options, handler) async {
         const key = 'access_token';
         final token = await storage.read(key: key);
@@ -38,8 +38,61 @@ Dio buildDio(FlutterSecureStorage storage) {
         }
         handler.next(options);
       },
-      // 2. Map DioException → typed AppException before it reaches the repo.
-      onError: (e, handler) {
+      onError: (e, handler) async {
+        final path = e.requestOptions.path;
+        final isAuthRequest = path.contains('/auth/login') ||
+            path.contains('/auth/signup') ||
+            path.contains('/auth/refresh');
+
+        if (e.response?.statusCode == 401 && !isAuthRequest) {
+          final refreshToken = await storage.read(key: 'refresh_token');
+          if (refreshToken != null && refreshToken.isNotEmpty) {
+            try {
+              final tokenDio = Dio(BaseOptions(
+                baseUrl: AppConfig.apiBaseUrl,
+                connectTimeout:
+                    const Duration(milliseconds: AppConfig.connectTimeoutMs),
+                receiveTimeout:
+                    const Duration(milliseconds: AppConfig.receiveTimeoutMs),
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json',
+                },
+              ));
+
+              final refreshResponse = await tokenDio.post(
+                '/auth/refresh',
+                data: {'refreshToken': refreshToken},
+              );
+
+              if (refreshResponse.statusCode == 200 &&
+                  refreshResponse.data is Map<String, dynamic>) {
+                final data = refreshResponse.data as Map<String, dynamic>;
+                final newAccessToken = data['token'] as String?;
+                final newRefreshToken = data['refreshToken'] as String?;
+
+                if (newAccessToken != null && newAccessToken.isNotEmpty) {
+                  await storage.write(
+                      key: 'access_token', value: newAccessToken);
+                  if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+                    await storage.write(
+                        key: 'refresh_token', value: newRefreshToken);
+                  }
+
+                  // Retry the original failed request with the new access token
+                  final retryOptions = e.requestOptions;
+                  retryOptions.headers['Authorization'] =
+                      'Bearer $newAccessToken';
+                  final cloneReq = await dio.fetch(retryOptions);
+                  return handler.resolve(cloneReq);
+                }
+              }
+            } catch (_) {
+              // Refresh failed; proceed to normal 401 error mapping
+            }
+          }
+        }
+
         handler.reject(_mapError(e));
       },
     ),

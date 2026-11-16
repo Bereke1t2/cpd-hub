@@ -38,16 +38,34 @@ class AppRouter {
         return _page(const HelpSupportPage(), settings);
 
       case RouteNames.problemDetails:
-        final problem = settings.arguments as ProblemEntity;
-        return _page(ProblemDetailsPage(problem: problem), settings);
+        final arg = settings.arguments;
+        if (arg is! ProblemEntity) {
+          return _page(
+            const Scaffold(body: Center(child: Text('Problem not found'))),
+            settings,
+          );
+        }
+        return _page(ProblemDetailsPage(problem: arg), settings);
 
       case RouteNames.userDetails:
-        final user = settings.arguments as UserEntity;
-        return _page(UserDetailsPage(user: user), settings);
+        final arg = settings.arguments;
+        if (arg is! UserEntity) {
+          return _page(
+            const Scaffold(body: Center(child: Text('User not found'))),
+            settings,
+          );
+        }
+        return _page(UserDetailsPage(user: arg), settings);
 
       case RouteNames.contestLeaderboard:
-        final contest = settings.arguments as ContestEntity;
-        return _page(ContestLeaderboardPage(contest: contest), settings);
+        final arg = settings.arguments;
+        if (arg is! ContestEntity) {
+          return _page(
+            const Scaffold(body: Center(child: Text('Contest not found'))),
+            settings,
+          );
+        }
+        return _page(ContestLeaderboardPage(contest: arg), settings);
 
       // ---- phase 9: learning ----
       case RouteNames.learn:
